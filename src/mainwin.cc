@@ -67,6 +67,12 @@
 #include <QMessageBox>
 #include <QDesktopServices>
 #include <QSettings>
+
+
+#include "interpreter.h"
+#include "streamredirector.h"
+#include <boost/bind.hpp>
+
 #ifdef _QCODE_EDIT_
 #include "qdocument.h"
 #include "qformatscheme.h"
@@ -95,6 +101,7 @@ using OpenSCAD::OGL::Nef3_Converter;
 //
 #define class struct
 #include <CGAL/Nef_3/OGL_helper.h>
+#include "parser.y"
 #undef class
 using CGAL::OGL::Polyhedron;
 using CGAL::OGL::SNC_BOUNDARY;
@@ -523,10 +530,17 @@ void MainWindow::load()
 AbstractNode *MainWindow::find_root_tag(AbstractNode *n)
 {
 	foreach(AbstractNode *v, n->children) {
-		if (v->modinst->tag_root) return v;
+		if (v->tag_root) return v;
 		if (AbstractNode *vroot = find_root_tag(v)) return vroot;
 	}
 	return NULL;
+}
+
+void displayError( QTextEdit *te, const QString &message) {
+  QColor textColor(te->textColor());
+  te->setTextColor(Qt::red);
+  te->append(message);
+  te->setTextColor(textColor);
 }
 
 /*!
@@ -602,9 +616,10 @@ void MainWindow::compile(bool procevents)
 	root_ctx.set_variable("$vpr", vpr);
 
 	// Parse
-	last_compiled_doc = editor->toPlainText();
+//	last_compiled_doc = editor->toPlainText();
 	root_module = parse((last_compiled_doc + "\n" + commandline_commands).toAscii().data(), this->fileName.isEmpty() ? "" : QFileInfo(this->fileName).absolutePath().toLocal8Bit(), false);
-
+	Interpreter myInterpreter;
+	myInterpreter.setCallback( static_cast<Interpreter::ErrorCallback>(boost::bind( &displayError, console, _1 )) );
 	// Error highlighting
 	if (highlighter) {
 		delete highlighter;
@@ -613,7 +628,6 @@ void MainWindow::compile(bool procevents)
 	if (parser_error_pos >= 0) {
 		highlighter = new Highlighter(editor->document());
 	}
-
 	if (!root_module) {
 		if (!animate_panel->isVisible()) {
 #ifdef _QCODE_EDIT_
@@ -636,7 +650,7 @@ void MainWindow::compile(bool procevents)
 	AbstractNode::resetIndexCounter();
 	root_inst = ModuleInstantiation();
 	absolute_root_node = root_module->evaluate(&root_ctx, &root_inst);
-
+ 
 	if (!absolute_root_node)
 		goto fail;
 
@@ -644,6 +658,16 @@ void MainWindow::compile(bool procevents)
 	if (!(this->root_node = find_root_tag(absolute_root_node))) {
 		this->root_node = absolute_root_node;
 	}
+	
+	myInterpreter.interpret(editor->toPlainText());
+	
+	root_node->append( myInterpreter.getRoot() );
+	
+/*	
+root_node->children.append(builtinCube(10,10,10,false,true));
+root_node->children.append(builtinSphere(10,19,19,19,true));
+root_node->children.append(builtinCylinder(3,3,40,19,19,19,true));
+*/
 	root_node->dump("");
 
 	if (1) {

@@ -33,6 +33,8 @@
 #include "builtin.h"
 #include "printutils.h"
 #include <assert.h>
+#include <boost/concept_check.hpp>
+#include <boost/foreach.hpp>
 
 enum primitive_type_e {
 	CUBE,
@@ -61,15 +63,18 @@ public:
 	double fn, fs, fa;
 	primitive_type_e type;
 	int convexity;
-	Value points, paths, triangles;
-	PrimitiveNode(const ModuleInstantiation *mi, primitive_type_e type) : AbstractPolyNode(mi), type(type) { }
+	Vec2D points2d;
+	Vec3D points3d;
+	VecPaths paths;
+	VecTriangles triangles;
+	PrimitiveNode(bool root, bool highlight, bool background, primitive_type_e type) : AbstractPolyNode(root, highlight, background), type(type) {}
 	virtual PolySet *render_polyset(render_mode_e mode) const;
 	virtual QString dump(QString indent) const;
 };
 
 AbstractNode *PrimitiveModule::evaluate(const Context *ctx, const ModuleInstantiation *inst) const
 {
-	PrimitiveNode *node = new PrimitiveNode(inst, type);
+	PrimitiveNode *node = new PrimitiveNode(inst->tag_root, inst->tag_highlight, inst->tag_background, type);
 
 	node->center = false;
 	node->x = node->y = node->z = node->h = node->r1 = node->r2 = 1;
@@ -162,8 +167,8 @@ AbstractNode *PrimitiveModule::evaluate(const Context *ctx, const ModuleInstanti
 	}
 
 	if (type == POLYHEDRON) {
-		node->points = c.lookup_variable("points");
-		node->triangles = c.lookup_variable("triangles");
+//		node->points = c.lookup_variable("points");
+//		node->triangles = c.lookup_variable("triangles");
 	}
 
 	if (type == SQUARE) {
@@ -185,8 +190,8 @@ AbstractNode *PrimitiveModule::evaluate(const Context *ctx, const ModuleInstanti
 	}
 
 	if (type == POLYGON) {
-		node->points = c.lookup_variable("points");
-		node->paths = c.lookup_variable("paths");
+//		node->points = c.lookup_variable("points");
+//		node->paths = c.lookup_variable("paths");
 	}
 
 	node->convexity = c.lookup_variable("convexity", true).num;
@@ -195,6 +200,69 @@ AbstractNode *PrimitiveModule::evaluate(const Context *ctx, const ModuleInstanti
 
 	return node;
 }
+
+AbstractNode *builtinCube(double x, double y, double z, bool center, bool highlight, bool background, bool root) {
+	PrimitiveNode *node = new PrimitiveNode(root, highlight, background, CUBE);
+	node->center = center;
+	node->x = x; node->y = y; node->z = z;
+	node->convexity = 1;
+	return node;
+}
+AbstractNode *builtinSphere(double r, double fn, double fs, double fa, bool center, bool highlight, bool background, bool root) {
+	PrimitiveNode *node = new PrimitiveNode(root, highlight, background, SPHERE);
+	node->center = center;
+	node->r1 = r;
+	node->fn = fn;
+	node->fs = std::max(fs, PrimitiveNode::F_MINIMUM);
+	node->fa = std::max(fa, PrimitiveNode::F_MINIMUM);
+	node->convexity = 1;
+	return node;
+}
+AbstractNode *builtinCylinder(double r1, double r2, double h, double fn, double fs, double fa, bool center, bool highlight, bool background, bool root) {
+	PrimitiveNode *node = new PrimitiveNode(root, highlight, background, CYLINDER);
+	node->center = center;
+	node->r1 = r1;
+	node->r2 = r2;
+	node->h = h;
+	node->fn = fn;
+	node->fs = std::max(fs, PrimitiveNode::F_MINIMUM);
+	node->fa = std::max(fa, PrimitiveNode::F_MINIMUM);
+	node->convexity = 1;
+	return node;
+}
+AbstractNode *builtinPolyhedron(const Vec3D &points, const VecTriangles &triangles, int convexity, bool highlight, bool background, bool root) {
+	PrimitiveNode *node = new PrimitiveNode(root, highlight, background, POLYHEDRON);
+	node->points3d = points;
+	node->triangles = triangles;
+	node->convexity = convexity;
+	return node;
+}
+AbstractNode *builtinSquare(double x, double y, bool center, bool highlight, bool background, bool root) {
+	PrimitiveNode *node = new PrimitiveNode(root, highlight, background, SQUARE);
+	node->center = center;
+	node->y = x;
+	node->y = y;
+	node->convexity = 1;
+	return node;
+}
+AbstractNode *builtinCircle(double r, double fn, double fs, double fa, bool center, bool highlight, bool background, bool root) {
+	PrimitiveNode *node = new PrimitiveNode(root, highlight, background, CIRCLE);
+	node->center = center;
+	node->r1 = r;
+	node->fn = fn;
+	node->fs = std::max(fs, PrimitiveNode::F_MINIMUM);
+	node->fa = std::max(fa, PrimitiveNode::F_MINIMUM);
+	node->convexity = 1;
+	return node;
+}
+AbstractNode *builtinPolygon(const Vec2D &points, const VecPaths &paths, int convexity, bool highlight, bool background, bool root) {
+	PrimitiveNode *node = new PrimitiveNode(root, highlight, background, POLYGON);
+	node->points2d = points;
+	node->paths = paths;
+	node->convexity = convexity;
+	return node;
+}
+
 
 void register_builtin_primitives()
 {
@@ -219,18 +287,19 @@ int get_fragments_from_r(double r, double fn, double fs, double fa)
 	return (int)ceil(fmax(fmin(360.0 / fa, r*M_PI / fs), 5));
 }
 
-struct point2d {
-	double x, y;
-};
-
-static void generate_circle(point2d *circle, double r, int fragments)
+static void generate_circle(Vec2D &circle, double r)
 {
-	for (int i=0; i<fragments; i++) {
-		double phi = (M_PI*2* (i + 0.5)) / fragments;
+	for (unsigned int i=0; i<circle.size(); i++) {
+		double phi = (M_PI*2* (i + 0.5)) / circle.size();
 		circle[i].x = r*cos(phi);
 		circle[i].y = r*sin(phi);
 	}
 }
+
+struct ring_s {
+	Vec2D points;
+	double z;
+};
 
 PolySet *PrimitiveNode::render_polyset(render_mode_e) const
 {
@@ -292,17 +361,14 @@ PolySet *PrimitiveNode::render_polyset(render_mode_e) const
 
 	if (type == SPHERE && r1 > 0)
 	{
-		struct ring_s {
-			point2d *points;
-			double z;
-		};
+
 
 		int fragments = get_fragments_from_r(r1, fn, fs, fa);
 		int rings = fragments/2;
 // Uncomment the following three lines to enable experimental sphere tesselation
 //		if (rings % 2 == 0) rings++; // To ensure that the middle ring is at phi == 0 degrees
-
-		ring_s *ring = new ring_s[rings];
+		typedef std::vector< ring_s > RingVector;
+		RingVector ring(rings);
 
 //		double offset = 0.5 * ((fragments / 2) % 2);
 		for (int i = 0; i < rings; i++) {
@@ -310,8 +376,8 @@ PolySet *PrimitiveNode::render_polyset(render_mode_e) const
 			double phi = (M_PI * (i + 0.5)) / rings;
 			double r = r1 * sin(phi);
 			ring[i].z = r1 * cos(phi);
-			ring[i].points = new point2d[fragments];
-			generate_circle(ring[i].points, r, fragments);
+			ring[i].points.resize(fragments);
+			generate_circle(ring[i].points, r);
 		}
 
 		p->append_poly();
@@ -319,8 +385,8 @@ PolySet *PrimitiveNode::render_polyset(render_mode_e) const
 			p->append_vertex(ring[0].points[i].x, ring[0].points[i].y, ring[0].z);
 
 		for (int i = 0; i < rings-1; i++) {
-			ring_s *r1 = &ring[i];
-			ring_s *r2 = &ring[i+1];
+			ring_s &r1(ring[i]);
+			ring_s &r2(ring[i+1]);
 			int r1i = 0, r2i = 0;
 			while (r1i < fragments || r2i < fragments)
 			{
@@ -334,27 +400,24 @@ PolySet *PrimitiveNode::render_polyset(render_mode_e) const
 sphere_next_r1:
 					p->append_poly();
 					int r1j = (r1i+1) % fragments;
-					p->insert_vertex(r1->points[r1i].x, r1->points[r1i].y, r1->z);
-					p->insert_vertex(r1->points[r1j].x, r1->points[r1j].y, r1->z);
-					p->insert_vertex(r2->points[r2i % fragments].x, r2->points[r2i % fragments].y, r2->z);
+					p->insert_vertex(r1.points[r1i].x, r1.points[r1i].y, r1.z);
+					p->insert_vertex(r1.points[r1j].x, r1.points[r1j].y, r1.z);
+					p->insert_vertex(r2.points[r2i % fragments].x, r2.points[r2i % fragments].y, r2.z);
 					r1i++;
 				} else {
 sphere_next_r2:
 					p->append_poly();
 					int r2j = (r2i+1) % fragments;
-					p->append_vertex(r2->points[r2i].x, r2->points[r2i].y, r2->z);
-					p->append_vertex(r2->points[r2j].x, r2->points[r2j].y, r2->z);
-					p->append_vertex(r1->points[r1i % fragments].x, r1->points[r1i % fragments].y, r1->z);
+					p->append_vertex(r2.points[r2i].x, r2.points[r2i].y, r2.z);
+					p->append_vertex(r2.points[r2j].x, r2.points[r2j].y, r2.z);
+					p->append_vertex(r1.points[r1i % fragments].x, r1.points[r1i % fragments].y, r1.z);
 					r2i++;
 				}
 			}
 		}
-
 		p->append_poly();
 		for (int i = 0; i < fragments; i++)
 			p->insert_vertex(ring[rings-1].points[i].x, ring[rings-1].points[i].y, ring[rings-1].z);
-
-		delete[] ring;
 	}
 
 	if (type == CYLINDER && h > 0 && r1 >=0 && r2 >= 0 && (r1 > 0 || r2 > 0))
@@ -370,11 +433,11 @@ sphere_next_r2:
 			z2 = h;
 		}
 
-		point2d *circle1 = new point2d[fragments];
-		point2d *circle2 = new point2d[fragments];
+		Vec2D circle1(fragments);
+		Vec2D circle2(fragments);
 
-		generate_circle(circle1, r1, fragments);
-		generate_circle(circle2, r2, fragments);
+		generate_circle(circle1, r1);
+		generate_circle(circle2, r2);
 		
 		for (int i=0; i<fragments; i++) {
 			int j = (i+1) % fragments;
@@ -411,26 +474,20 @@ sphere_next_r2:
 			for (int i=0; i<fragments; i++)
 				p->append_vertex(circle2[i].x, circle2[i].y, z2);
 		}
-
-		delete[] circle1;
-		delete[] circle2;
 	}
 
 	if (type == POLYHEDRON)
 	{
-		p->convexity = convexity;
-		for (int i=0; i<triangles.vec.size(); i++)
-		{
-			p->append_poly();
-			for (int j=0; j<triangles.vec[i]->vec.size(); j++) {
-				int pt = triangles.vec[i]->vec[j]->num;
-				if (pt < points.vec.size()) {
-					double px, py, pz;
-					if (points.vec[pt]->getv3(px, py, pz))
-						p->insert_vertex(px, py, pz);
-				}
-			}
-		}
+	  p->convexity = convexity;
+	  BOOST_FOREACH( const Triangle &ti, triangles ) {
+	    p->append_poly();
+	    BOOST_FOREACH( unsigned int pt, ti ) {
+	      if (pt < points3d.size()) {
+		const Point3D &p3d(points3d[pt]);
+		p->insert_vertex(p3d.x, p3d.y, p3d.z);
+	      }
+	    }
+	  }
 	}
 
 	if (type == SQUARE)
@@ -468,58 +525,47 @@ sphere_next_r2:
 		}
 	}
 
-	if (type == POLYGON)
-	{
-		DxfData dd;
+	if (type == POLYGON) {
+	  DxfData dd;
+	  BOOST_FOREACH( const Point2D &p2d, points2d ) {
+	    dd.points.append(DxfData::Point(p2d.x, p2d.y));
+	  }
 
-		for (int i=0; i<points.vec.size(); i++) {
-			double x,y;
-			if (!points.vec[i]->getv2(x, y)) {
-				PRINTF("ERROR: Unable to convert point at index %d to a vec2 of numbers", i);
-				// FIXME: Return NULL and make sure this is checked by all callers?
-				return p;
-			}
-			dd.points.append(DxfData::Point(x, y));
+	  if (paths.size() == 0)
+	  {
+		  dd.paths.append(DxfData::Path());
+		  for (unsigned int i=0; i<points2d.size(); i++) {
+			  assert(i < static_cast<unsigned int>(dd.points.size())); // FIXME: Not needed, but this used to be an 'if'
+			  DxfData::Point *p = &dd.points[i];
+			  dd.paths.last().points.append(p);
+		  }
+		  if (dd.paths.last().points.size() > 0) {
+			  dd.paths.last().points.append(dd.paths.last().points.first());
+			  dd.paths.last().is_closed = true;
+		  }
+	  }
+	  else
+	  {
+	    BOOST_FOREACH( const VecPoints &pi, paths ) {
+	      dd.paths.append(DxfData::Path());
+	      BOOST_FOREACH( unsigned int idx, pi ) {
+		if (idx < static_cast<unsigned int>(dd.points.size())) {
+		  DxfData::Point *p = &dd.points[idx];
+		  dd.paths.last().points.append(p);
 		}
-
-		if (paths.vec.size() == 0)
-		{
-			dd.paths.append(DxfData::Path());
-			for (int i=0; i<points.vec.size(); i++) {
-				assert(i < dd.points.size()); // FIXME: Not needed, but this used to be an 'if'
-				DxfData::Point *p = &dd.points[i];
-				dd.paths.last().points.append(p);
-			}
-			if (dd.paths.last().points.size() > 0) {
-				dd.paths.last().points.append(dd.paths.last().points.first());
-				dd.paths.last().is_closed = true;
-			}
-		}
-		else
-		{
-			for (int i=0; i<paths.vec.size(); i++)
-			{
-				dd.paths.append(DxfData::Path());
-				for (int j=0; j<paths.vec[i]->vec.size(); j++) {
-					int idx = paths.vec[i]->vec[j]->num;
-					if (idx < dd.points.size()) {
-						DxfData::Point *p = &dd.points[idx];
-						dd.paths.last().points.append(p);
-					}
-				}
-				if (dd.paths.last().points.isEmpty()) {
-					dd.paths.removeLast();
-				} else {
-					dd.paths.last().points.append(dd.paths.last().points.first());
-					dd.paths.last().is_closed = true;
-				}
-			}
-		}
-
-		p->is2d = true;
-		p->convexity = convexity;
-		dxf_tesselate(p, &dd, 0, true, false, 0);
-		dxf_border_to_ps(p, &dd);
+	      }
+	      if (dd.paths.last().points.isEmpty()) {
+		dd.paths.removeLast();
+	      } else {
+		dd.paths.last().points.append(dd.paths.last().points.first());
+		dd.paths.last().is_closed = true;
+	      }
+	    }
+	  }
+	  p->is2d = true;
+	  p->convexity = convexity;
+	  dxf_tesselate(p, &dd, 0, true, false, 0);
+	  dxf_border_to_ps(p, &dd);
 	}
 
 	return p;
@@ -536,13 +582,13 @@ QString PrimitiveNode::dump(QString indent) const
 		if (type == CYLINDER)
 			text.sprintf("cylinder($fn = %g, $fa = %g, $fs = %g, h = %g, r1 = %g, r2 = %g, center = %s);\n", fn, fa, fs, h, r1, r2, center ? "true" : "false");
 		if (type == POLYHEDRON)
-			text.sprintf("polyhedron(points = %s, triangles = %s, convexity = %d);\n", points.dump().toAscii().data(), triangles.dump().toAscii().data(), convexity);
+			text.sprintf("polyhedron(%d points, %d triangles, convexity = %d);\n", int(points3d.size()), int(triangles.size()), convexity);
 		if (type == SQUARE)
 			text.sprintf("square(size = [%g, %g], center = %s);\n", x, y, center ? "true" : "false");
 		if (type == CIRCLE)
 			text.sprintf("circle($fn = %g, $fa = %g, $fs = %g, r = %g);\n", fn, fa, fs, r1);
 		if (type == POLYGON)
-			text.sprintf("polygon(points = %s, paths = %s, convexity = %d);\n", points.dump().toAscii().data(), paths.dump().toAscii().data(), convexity);
+			text.sprintf("polygon(%d points, %d paths, convexity = %d);\n", int(points2d.size()), int(paths.size()), convexity);
 		((AbstractNode*)this)->dump_cache = indent + QString("n%1: ").arg(idx) + text;
 	}
 	return dump_cache;

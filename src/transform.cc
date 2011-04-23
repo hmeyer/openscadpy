@@ -55,7 +55,7 @@ class TransformNode : public AbstractNode
 {
 public:
 	double m[20];
-	TransformNode(const ModuleInstantiation *mi) : AbstractNode(mi) { }
+	TransformNode(bool root, bool highlight, bool background) : AbstractNode(root, highlight, background) { }
 #ifdef ENABLE_CGAL
 	virtual CGAL_Nef_polyhedron render_cgal_nef_polyhedron() const;
 #endif
@@ -65,7 +65,7 @@ public:
 
 AbstractNode *TransformModule::evaluate(const Context *ctx, const ModuleInstantiation *inst) const
 {
-	TransformNode *node = new TransformNode(inst);
+	TransformNode *node = new TransformNode(inst->tag_root, inst->tag_highlight, inst->tag_background);
 
 	for (int i = 0; i < 16; i++)
 		node->m[i] = i % 5 == 0 ? 1.0 : 0.0;
@@ -256,7 +256,7 @@ CGAL_Nef_polyhedron TransformNode::render_cgal_nef_polyhedron() const
 	CGAL_Nef_polyhedron N;
 
 	foreach (AbstractNode *v, children) {
-		if (v->modinst->tag_background)
+		if (v->tag_background)
 			continue;
 		if (first) {
 			N = v->render_cgal_nef_polyhedron();
@@ -338,9 +338,9 @@ CSGTerm *TransformNode::render_csg_term(double c[20], QVector<CSGTerm*> *highlig
 			t1 = new CSGTerm(CSGTerm::TYPE_UNION, t1, t2);
 		}
 	}
-	if (t1 && modinst->tag_highlight && highlights)
+	if (t1 && tag_highlight && highlights)
 		highlights->append(t1->link());
-	if (t1 && modinst->tag_background && background) {
+	if (t1 && tag_background && background) {
 		background->append(t1);
 		return NULL;
 	}

@@ -61,14 +61,14 @@ public:
 	int convexity;
 	double fn, fs, fa;
 	double origin_x, origin_y, scale;
-	ImportNode(const ModuleInstantiation *mi, import_type_e type) : AbstractPolyNode(mi), type(type) { }
+	ImportNode(bool root, bool highlight, bool background, import_type_e type) : AbstractPolyNode(root, highlight, background), type(type) { }
 	virtual PolySet *render_polyset(render_mode_e mode) const;
 	virtual QString dump(QString indent) const;
 };
 
 AbstractNode *ImportModule::evaluate(const Context *ctx, const ModuleInstantiation *inst) const
 {
-	ImportNode *node = new ImportNode(inst, type);
+	ImportNode *node = new ImportNode(inst->tag_root, inst->tag_highlight, inst->tag_background, type);
 
 	QVector<QString> argnames;
 	if (type == TYPE_DXF) {

@@ -112,9 +112,9 @@ AbstractNode *ControlModule::evaluate(const Context*, const ModuleInstantiation 
 	AbstractNode *node;
 
 	if (type == INT_FOR)
-		node = new AbstractIntersectionNode(inst);
+		node = new AbstractIntersectionNode(inst->tag_root, inst->tag_highlight, inst->tag_background);
 	else
-		node = new AbstractNode(inst);
+		node = new AbstractNode(inst->tag_root, inst->tag_highlight, inst->tag_background);
 
 	if (type == ECHO)
 	{

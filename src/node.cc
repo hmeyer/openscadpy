@@ -34,9 +34,8 @@
 
 int AbstractNode::idx_counter;
 
-AbstractNode::AbstractNode(const ModuleInstantiation *mi)
+AbstractNode::AbstractNode(bool root, bool highlight, bool background):tag_root(root),tag_highlight(highlight),tag_background(background)
 {
-	modinst = mi;
 	idx = idx_counter++;
 }
 
@@ -77,7 +76,7 @@ static CGAL_Nef_polyhedron render_cgal_nef_polyhedron_backend(const AbstractNode
 	bool first = true;
 	CGAL_Nef_polyhedron N;
 	foreach (AbstractNode *v, that->children) {
-		if (v->modinst->tag_background)
+		if (v->tag_background)
 			continue;
 		if (first) {
 			N = v->render_cgal_nef_polyhedron();
@@ -130,9 +129,9 @@ static CSGTerm *render_csg_term_backend(const AbstractNode *that, bool intersect
 				t1 = new CSGTerm(CSGTerm::TYPE_UNION, t1, t2);
 		}
 	}
-	if (t1 && that->modinst->tag_highlight && highlights)
+	if (t1 && that->tag_highlight && highlights)
 		highlights->append(t1->link());
-	if (t1 && that->modinst->tag_background && background) {
+	if (t1 && that->tag_background && background) {
 		background->append(t1);
 		return NULL;
 	}
@@ -217,15 +216,15 @@ CGAL_Nef_polyhedron AbstractPolyNode::render_cgal_nef_polyhedron() const
 CSGTerm *AbstractPolyNode::render_csg_term(double m[20], QVector<CSGTerm*> *highlights, QVector<CSGTerm*> *background) const
 {
 	PolySet *ps = render_polyset(RENDER_OPENCSG);
-	return render_csg_term_from_ps(m, highlights, background, ps, modinst, idx);
+	return render_csg_term_from_ps(m, highlights, background, ps, tag_highlight, tag_background, idx);
 }
 
-CSGTerm *AbstractPolyNode::render_csg_term_from_ps(double m[20], QVector<CSGTerm*> *highlights, QVector<CSGTerm*> *background, PolySet *ps, const ModuleInstantiation *modinst, int idx)
+CSGTerm *AbstractPolyNode::render_csg_term_from_ps(double m[20], QVector<CSGTerm*> *highlights, QVector<CSGTerm*> *background, PolySet *ps, bool tag_highlight, bool tag_background, int idx)
 {
 	CSGTerm *t = new CSGTerm(ps, m, QString("n%1").arg(idx));
-	if (modinst->tag_highlight && highlights)
+	if (tag_highlight && highlights)
 		highlights->append(t->link());
-	if (modinst->tag_background && background) {
+	if (tag_background && background) {
 		background->append(t);
 		return NULL;
 	}

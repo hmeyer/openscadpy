@@ -38,7 +38,7 @@ AbstractModule::~AbstractModule()
 
 AbstractNode *AbstractModule::evaluate(const Context*, const ModuleInstantiation *inst) const
 {
-	AbstractNode *node = new AbstractNode(inst);
+	AbstractNode *node = new AbstractNode(inst->tag_root, inst->tag_highlight, inst->tag_background);
 
 	foreach (ModuleInstantiation *v, inst->children) {
 		AbstractNode *n = v->evaluate(inst->ctx);
@@ -147,7 +147,7 @@ AbstractNode *Module::evaluate(const Context *ctx, const ModuleInstantiation *in
 		c.set_variable(assignments_var[i], assignments_expr[i]->evaluate(&c));
 	}
 
-	AbstractNode *node = new AbstractNode(inst);
+	AbstractNode *node = new AbstractNode(inst->tag_root, inst->tag_highlight, inst->tag_background);
 	for (int i = 0; i < children.size(); i++) {
 		AbstractNode *n = children[i]->evaluate(&c);
 		if (n != NULL)

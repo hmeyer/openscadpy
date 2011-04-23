@@ -22,7 +22,9 @@ public:
 	static void resetIndexCounter() { idx_counter = 1; }
 
 	QVector<AbstractNode*> children;
-	const class ModuleInstantiation *modinst;
+	const bool tag_root;
+	const bool tag_highlight;
+	const bool tag_background;
 
 	int progress_mark;
 	void progress_prepare();
@@ -31,7 +33,8 @@ public:
 	int idx;
 	QString dump_cache;
 
-	AbstractNode(const ModuleInstantiation *mi);
+
+	AbstractNode(bool root, bool highlight, bool background);
 	virtual ~AbstractNode();
 	virtual QString mk_cache_id() const;
 #ifdef ENABLE_CGAL
@@ -46,12 +49,13 @@ public:
 #endif
 	virtual class CSGTerm *render_csg_term(double m[20], QVector<CSGTerm*> *highlights, QVector<CSGTerm*> *background) const;
 	virtual QString dump(QString indent) const;
+	void append(AbstractNode *child) { children.append(child); }
 };
 
 class AbstractIntersectionNode : public AbstractNode
 {
 public:
-	AbstractIntersectionNode(const ModuleInstantiation *mi) : AbstractNode(mi) { };
+	AbstractIntersectionNode(bool root, bool highlight, bool background) : AbstractNode(root, highlight, background) { };
 #ifdef ENABLE_CGAL
 	virtual CGAL_Nef_polyhedron render_cgal_nef_polyhedron() const;
 #endif
@@ -66,13 +70,13 @@ public:
 		RENDER_CGAL,
 		RENDER_OPENCSG
 	};
-	AbstractPolyNode(const ModuleInstantiation *mi) : AbstractNode(mi) { };
+	AbstractPolyNode(bool root, bool highlight, bool background) : AbstractNode(root, highlight, background) { };
 	virtual class PolySet *render_polyset(render_mode_e mode) const = 0;
 #ifdef ENABLE_CGAL
 	virtual CGAL_Nef_polyhedron render_cgal_nef_polyhedron() const;
 #endif
 	virtual CSGTerm *render_csg_term(double m[20], QVector<CSGTerm*> *highlights, QVector<CSGTerm*> *background) const;
-	static CSGTerm *render_csg_term_from_ps(double m[20], QVector<CSGTerm*> *highlights, QVector<CSGTerm*> *background, PolySet *ps, const ModuleInstantiation *modinst, int idx);
+	static CSGTerm *render_csg_term_from_ps(double m[20], QVector<CSGTerm*> *highlights, QVector<CSGTerm*> *background, PolySet *ps, bool tag_highlight, bool tag_background, int idx);
 };
 
 #endif

@@ -84,6 +84,7 @@ CONFIG += cgal
 CONFIG += opencsg
 CONFIG += progresswidget
 CONFIG += boost
+CONFIG += lua
 
 #Uncomment the following line to enable QCodeEdit
 #CONFIG += qcodeedit
@@ -104,6 +105,7 @@ include(cgal.pri)
 include(opencsg.pri)
 include(eigen2.pri)
 include(boost.pri)
+include(lua.pri)
 
 # Standard include path for misc external libs
 #macx {
@@ -142,7 +144,9 @@ HEADERS += src/CGAL_renderer.h \
            src/value.h \
            src/progress.h \
            src/editor.h \
-           src/mathc99.h
+           src/mathc99.h \
+           src/streamredirector.h \
+           src/interpreter.h
 
 SOURCES += src/openscad.cc \
            src/mainwin.cc \
@@ -181,7 +185,9 @@ SOURCES += src/openscad.cc \
            src/Preferences.cc \
            src/progress.cc \
            src/editor.cc \
-	   src/mathc99.cc
+	   src/mathc99.cc \
+           src/streamredirector.cc \
+           src/interpreter.cc
 
 macx {
   HEADERS += src/AppleEvents.h \

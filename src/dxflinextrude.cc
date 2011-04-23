@@ -56,7 +56,7 @@ public:
 	double origin_x, origin_y, scale;
 	bool center, has_twist;
 	QString filename, layername;
-	DxfLinearExtrudeNode(const ModuleInstantiation *mi) : AbstractPolyNode(mi) {
+	DxfLinearExtrudeNode(bool root, bool highlight, bool background) : AbstractPolyNode(root, highlight, background) {
 		convexity = slices = 0;
 		fn = fs = fa = height = twist = 0;
 		origin_x = origin_y = scale = 0;
@@ -68,7 +68,7 @@ public:
 
 AbstractNode *DxfLinearExtrudeModule::evaluate(const Context *ctx, const ModuleInstantiation *inst) const
 {
-	DxfLinearExtrudeNode *node = new DxfLinearExtrudeNode(inst);
+	DxfLinearExtrudeNode *node = new DxfLinearExtrudeNode(inst->tag_root, inst->tag_highlight, inst->tag_background);
 
 	QVector<QString> argnames = QVector<QString>() << "file" << "layer" << "height" << "origin" << "scale" << "center" << "twist" << "slices";
 	QVector<Expression*> argexpr;
@@ -233,7 +233,7 @@ PolySet *DxfLinearExtrudeNode::render_polyset(render_mode_e) const
 		CGAL_Nef_polyhedron N;
 		N.dim = 2;
 		foreach(AbstractNode * v, children) {
-			if (v->modinst->tag_background)
+			if (v->tag_background)
 				continue;
 			N.p2 += v->render_cgal_nef_polyhedron().p2;
 		}

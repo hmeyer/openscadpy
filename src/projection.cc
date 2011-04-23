@@ -58,7 +58,7 @@ class ProjectionNode : public AbstractPolyNode
 public:
 	int convexity;
 	bool cut_mode;
-	ProjectionNode(const ModuleInstantiation *mi) : AbstractPolyNode(mi) {
+	ProjectionNode(bool root, bool highlight, bool background) : AbstractPolyNode(root, highlight, background) {
 		cut_mode = false;
 	}
 	virtual PolySet *render_polyset(render_mode_e mode) const;
@@ -67,7 +67,7 @@ public:
 
 AbstractNode *ProjectionModule::evaluate(const Context *ctx, const ModuleInstantiation *inst) const
 {
-	ProjectionNode *node = new ProjectionNode(inst);
+	ProjectionNode *node = new ProjectionNode(inst->tag_root, inst->tag_highlight, inst->tag_background);
 
 	QVector<QString> argnames = QVector<QString>() << "cut";
 	QVector<Expression*> argexpr;
@@ -118,7 +118,7 @@ PolySet *ProjectionNode::render_polyset(render_mode_e) const
 	CGAL::Failure_behaviour old_behaviour = CGAL::set_error_behaviour(CGAL::THROW_EXCEPTION);
   try {
 	foreach(AbstractNode *v, this->children) {
-		if (v->modinst->tag_background)
+		if (v->tag_background)
 			continue;
 		N.p3 += v->render_cgal_nef_polyhedron().p3;
 	}

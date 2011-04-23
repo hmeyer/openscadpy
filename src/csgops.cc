@@ -53,7 +53,7 @@ class CsgNode : public AbstractNode
 {
 public:
 	csg_type_e type;
-	CsgNode(const ModuleInstantiation *mi, csg_type_e type) : AbstractNode(mi), type(type) { }
+	CsgNode(bool root, bool highlight, bool background, csg_type_e type) : AbstractNode(root, highlight, background), type(type) { }
 #ifdef ENABLE_CGAL
 	virtual CGAL_Nef_polyhedron render_cgal_nef_polyhedron() const;
 #endif
@@ -63,7 +63,7 @@ public:
 
 AbstractNode *CsgModule::evaluate(const Context*, const ModuleInstantiation *inst) const
 {
-	CsgNode *node = new CsgNode(inst, type);
+	CsgNode *node = new CsgNode(inst->tag_root, inst->tag_highlight, inst->tag_background, type);
 	foreach (ModuleInstantiation *v, inst->children) {
 		AbstractNode *n = v->evaluate(inst->ctx);
 		if (n != NULL)
@@ -90,7 +90,7 @@ CGAL_Nef_polyhedron CsgNode::render_cgal_nef_polyhedron() const
 	CGAL_Nef_polyhedron N;
 	try {
 	foreach (AbstractNode *v, children) {
-		if (v->modinst->tag_background)
+		if (v->tag_background)
 			continue;
 		if (first) {
 			N = v->render_cgal_nef_polyhedron();
@@ -147,9 +147,9 @@ CSGTerm *CsgNode::render_csg_term(double m[20], QVector<CSGTerm*> *highlights, Q
 			}
 		}
 	}
-	if (t1 && modinst->tag_highlight && highlights)
+	if (t1 && tag_highlight && highlights)
 		highlights->append(t1->link());
-	if (t1 && modinst->tag_background && background) {
+	if (t1 && tag_background && background) {
 		background->append(t1);
 		return NULL;
 	}

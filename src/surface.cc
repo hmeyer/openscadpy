@@ -48,14 +48,14 @@ public:
 	QString filename;
 	bool center;
 	int convexity;
-	SurfaceNode(const ModuleInstantiation *mi) : AbstractPolyNode(mi) { }
+	SurfaceNode(bool root, bool highlight, bool background) : AbstractPolyNode(root, highlight, background) { }
 	virtual PolySet *render_polyset(render_mode_e mode) const;
 	virtual QString dump(QString indent) const;
 };
 
 AbstractNode *SurfaceModule::evaluate(const Context *ctx, const ModuleInstantiation *inst) const
 {
-	SurfaceNode *node = new SurfaceNode(inst);
+	SurfaceNode *node = new SurfaceNode(inst->tag_root, inst->tag_highlight, inst->tag_background);
 	node->center = false;
 	node->convexity = 1;
 

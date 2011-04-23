@@ -70,6 +70,12 @@ development. Other versions may or may not work as well..
 * Flex (2.5.35):
   http://flex.sourceforge.net/
 
+* liblua
+  http://www.lua.org/
+
+* Luabind
+  http://www.rasterbar.com/products/luabind.html
+
 
 BUILDING OPENSCAD
 ================

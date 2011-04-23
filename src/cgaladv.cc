@@ -59,7 +59,7 @@ public:
 	QString subdiv_type;
 	int convexity, level;
 	cgaladv_type_e type;
-	CgaladvNode(const ModuleInstantiation *mi, cgaladv_type_e type) : AbstractNode(mi), type(type) {
+	CgaladvNode(bool root, bool highlight, bool background, cgaladv_type_e type) : AbstractNode(root, highlight, background), type(type) {
 		convexity = 1;
 	}
 #ifdef ENABLE_CGAL
@@ -71,7 +71,7 @@ public:
 
 AbstractNode *CgaladvModule::evaluate(const Context *ctx, const ModuleInstantiation *inst) const
 {
-	CgaladvNode *node = new CgaladvNode(inst, type);
+	CgaladvNode *node = new CgaladvNode(inst->tag_root, inst->tag_highlight, inst->tag_background, type);
 
 	QVector<QString> argnames;
 	QVector<Expression*> argexpr;
@@ -148,7 +148,7 @@ CGAL_Nef_polyhedron CgaladvNode::render_cgal_nef_polyhedron() const
 	{
 		bool first = true;
 		foreach(AbstractNode * v, children) {
-			if (v->modinst->tag_background)
+			if (v->tag_background)
 				continue;
 			if (first) {
 				N = v->render_cgal_nef_polyhedron();
@@ -182,7 +182,7 @@ CGAL_Nef_polyhedron CgaladvNode::render_cgal_nef_polyhedron() const
 		std::list<CGAL_Nef_polyhedron2> polys;
 		bool all2d = true;
 		foreach(AbstractNode * v, children) {
-			if (v->modinst->tag_background)
+			if (v->tag_background)
 		    continue;
 			N = v->render_cgal_nef_polyhedron();
 			if (N.dim == 3) {

@@ -53,7 +53,7 @@ class RenderNode : public AbstractNode
 {
 public:
 	int convexity;
-	RenderNode(const ModuleInstantiation *mi) : AbstractNode(mi), convexity(1) { }
+	RenderNode(bool root, bool highlight, bool background) : AbstractNode(root, highlight, background), convexity(1) { }
 #ifdef ENABLE_CGAL
 	virtual CGAL_Nef_polyhedron render_cgal_nef_polyhedron() const;
 #endif
@@ -63,7 +63,7 @@ public:
 
 AbstractNode *RenderModule::evaluate(const Context *ctx, const ModuleInstantiation *inst) const
 {
-	RenderNode *node = new RenderNode(inst);
+	RenderNode *node = new RenderNode(inst->tag_root, inst->tag_highlight, inst->tag_background);
 
 	QVector<QString> argnames = QVector<QString>() << "convexity";
 	QVector<Expression*> argexpr;
@@ -106,7 +106,7 @@ CGAL_Nef_polyhedron RenderNode::render_cgal_nef_polyhedron() const
 	CGAL_Nef_polyhedron N;
 	foreach(AbstractNode * v, children)
 	{
-		if (v->modinst->tag_background)
+		if (v->tag_background)
 			continue;
 		if (first) {
 			N = v->render_cgal_nef_polyhedron();
@@ -133,7 +133,7 @@ CSGTerm *AbstractNode::render_csg_term_from_nef(double m[20], QVector<CSGTerm*> 
 	if (PolySet::ps_cache.contains(key)) {
 		PRINT(PolySet::ps_cache[key]->msg);
 		return AbstractPolyNode::render_csg_term_from_ps(m, highlights, background,
-				PolySet::ps_cache[key]->ps->link(), modinst, idx);
+				PolySet::ps_cache[key]->ps->link(), tag_highlight, tag_background, idx);
 	}
 
 	print_messages_push();
@@ -208,9 +208,9 @@ CSGTerm *AbstractNode::render_csg_term_from_nef(double m[20], QVector<CSGTerm*> 
 		PolySet::ps_cache.insert(key, new PolySet::ps_cache_entry(ps->link()));
 
 		CSGTerm *term = new CSGTerm(ps, m, QString("n%1").arg(idx));
-		if (modinst->tag_highlight && highlights)
+		if (tag_highlight && highlights)
 			highlights->append(term->link());
-		if (modinst->tag_background && background) {
+		if (tag_background && background) {
 			background->append(term);
 			return NULL;
 		}

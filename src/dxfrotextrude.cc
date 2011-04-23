@@ -54,7 +54,7 @@ public:
 	double fn, fs, fa;
 	double origin_x, origin_y, scale;
 	QString filename, layername;
-	DxfRotateExtrudeNode(const ModuleInstantiation *mi) : AbstractPolyNode(mi) {
+	DxfRotateExtrudeNode(bool root, bool highlight, bool background) : AbstractPolyNode(root, highlight, background) {
 		convexity = 0;
 		fn = fs = fa = 0;
 		origin_x = origin_y = scale = 0;
@@ -65,7 +65,7 @@ public:
 
 AbstractNode *DxfRotateExtrudeModule::evaluate(const Context *ctx, const ModuleInstantiation *inst) const
 {
-	DxfRotateExtrudeNode *node = new DxfRotateExtrudeNode(inst);
+	DxfRotateExtrudeNode *node = new DxfRotateExtrudeNode(inst->tag_root, inst->tag_highlight, inst->tag_background);
 
 	QVector<QString> argnames = QVector<QString>() << "file" << "layer" << "origin" << "scale";
 	QVector<Expression*> argexpr;
@@ -133,7 +133,7 @@ PolySet *DxfRotateExtrudeNode::render_polyset(render_mode_e) const
 		CGAL_Nef_polyhedron N;
 		N.dim = 2;
 		foreach(AbstractNode * v, children) {
-			if (v->modinst->tag_background)
+			if (v->tag_background)
 				continue;
 			N.p2 += v->render_cgal_nef_polyhedron().p2;
 		}
