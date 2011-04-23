@@ -48,5 +48,8 @@ AbstractNode *builtinPolyhedron(const Vec3D &points, const VecTriangles &triangl
 AbstractNode *builtinSquare(double x, double y, bool center = false, bool highlight = false, bool background = false, bool root = false);
 AbstractNode *builtinCircle(double r, double fn, double fs, double fa, bool center = false, bool highlight = false, bool background = false, bool root = false);
 AbstractNode *builtinPolygon(const Vec2D &points, const VecPaths &paths, int convexity, bool highlight = false, bool background = false, bool root = false);
+AbstractNode *builtinUnion(AbstractNode *a, AbstractNode *b, bool highlight = false, bool background = false, bool root = false);
+AbstractNode *builtinDifference(AbstractNode *a, AbstractNode *b, bool highlight = false, bool background = false, bool root = false);
+AbstractNode *builtinIntersection(AbstractNode *a, AbstractNode *b, bool highlight = false, bool background = false, bool root = false);
 
 #endif

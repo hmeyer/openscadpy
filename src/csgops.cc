@@ -72,6 +72,24 @@ AbstractNode *CsgModule::evaluate(const Context*, const ModuleInstantiation *ins
 	return node;
 }
 
+AbstractNode *builtinCSG(csg_type_e type, AbstractNode *a, AbstractNode *b, bool highlight = false, bool background = false, bool root = false) {
+  CsgNode *node = new CsgNode(root, highlight, background, type);
+  node->children.append(a);
+  node->children.append(b);
+  return node;  
+}
+
+AbstractNode *builtinUnion(AbstractNode *a, AbstractNode *b, bool highlight, bool background, bool root) {
+  return builtinCSG(CSG_TYPE_UNION, a, b, highlight, background, root);
+}
+AbstractNode *builtinDifference(AbstractNode *a, AbstractNode *b, bool highlight, bool background, bool root) {
+  return builtinCSG(CSG_TYPE_DIFFERENCE, a, b, highlight, background, root);
+}
+AbstractNode *builtinIntersection(AbstractNode *a, AbstractNode *b, bool highlight, bool background, bool root) {
+  return builtinCSG(CSG_TYPE_INTERSECTION, a, b, highlight, background, root);
+}
+
+
 #ifdef ENABLE_CGAL
 
 CGAL_Nef_polyhedron CsgNode::render_cgal_nef_polyhedron() const

@@ -38,6 +38,9 @@ Interpreter::Interpreter():impl(new Interpreter_impl()) {
       def("square", &builtinSquare),
       def("circle", &builtinCircle),
       def("polygon", &lua_builtinPolygon),
+      def("union", &builtinUnion),
+      def("difference", &builtinDifference),
+      def("intersection", &builtinIntersection),
       
       class_<AbstractNode>("AbstractNode")
 	  .def("append", &AbstractNode::append)
