@@ -239,6 +239,137 @@ AbstractNode *TransformModule::evaluate(const Context *ctx, const ModuleInstanti
 	return node;
 }
 
+TransformNode *initTransformNode(AbstractNode *child, bool highlight, bool background, bool root) {
+	TransformNode *node = new TransformNode(root, highlight, background);
+	node->children.append(child);
+	for (int i = 0; i < 16; i++)
+		node->m[i] = i % 5 == 0 ? 1.0 : 0.0;
+	for (int i = 16; i < 20; i++)
+		node->m[i] = -1;
+	return node;
+}
+
+
+AbstractNode *builtinScale(AbstractNode *child, double x, double y, double z, bool highlight, bool background, bool root) {
+  TransformNode *node = initTransformNode(child,highlight,background,root);
+  node->m[0] = x;
+  node->m[5] = y;
+  node->m[10] = z;
+  if (node->m[10] <= 0)
+	  node->m[10] = 1;
+  return node;
+}
+
+AbstractNode *builtinRotateXYZ(AbstractNode *child, double x, double y, double z, bool highlight, bool background, bool root) {
+  TransformNode *node = initTransformNode(child,highlight,background,root);
+  double a[3] = {x,y,z};
+  for (int i = 0; i < 3; i++) {
+	  double c = cos(a[i]*M_PI/180.0);
+	  double s = sin(a[i]*M_PI/180.0);
+	  double x = i == 0, y = i == 1, z = i == 2;
+	  double mr[16] = {
+		  x*x*(1-c)+c,
+		  y*x*(1-c)+z*s,
+		  z*x*(1-c)-y*s,
+		  0,
+		  x*y*(1-c)-z*s,
+		  y*y*(1-c)+c,
+		  z*y*(1-c)+x*s,
+		  0,
+		  x*z*(1-c)+y*s,
+		  y*z*(1-c)-x*s,
+		  z*z*(1-c)+c,
+		  0,
+		  0, 0, 0, 1
+	  };
+	  double m[16];
+	  for (int x = 0; x < 4; x++)
+	  for (int y = 0; y < 4; y++)
+	  {
+		  m[x+y*4] = 0;
+		  for (int i = 0; i < 4; i++)
+			  m[x+y*4] += node->m[i+y*4] * mr[x+i*4];
+	  }
+	  for (int i = 0; i < 16; i++)
+		  node->m[i] = m[i];
+  }
+  return node;
+}
+
+AbstractNode *builtinRotateAxis(AbstractNode *child, double x, double y, double z, double a, bool highlight, bool background, bool root) {
+  TransformNode *node = initTransformNode(child,highlight,background,root);
+
+  if (x != 0.0 || y != 0.0 || z != 0.0) {
+	  double sn = 1.0 / sqrt(x*x + y*y + z*z);
+	  x *= sn, y *= sn, z *= sn;
+
+	  double c = cos(a*M_PI/180.0);
+	  double s = sin(a*M_PI/180.0);
+
+	  node->m[ 0] = x*x*(1-c)+c;
+	  node->m[ 1] = y*x*(1-c)+z*s;
+	  node->m[ 2] = z*x*(1-c)-y*s;
+
+	  node->m[ 4] = x*y*(1-c)-z*s;
+	  node->m[ 5] = y*y*(1-c)+c;
+	  node->m[ 6] = z*y*(1-c)+x*s;
+
+	  node->m[ 8] = x*z*(1-c)+y*s;
+	  node->m[ 9] = y*z*(1-c)-x*s;
+	  node->m[10] = z*z*(1-c)+c;
+  }
+  return node;
+}
+
+AbstractNode *builtinMirror(AbstractNode *child, double x, double y, double z, bool highlight, bool background, bool root) {
+  TransformNode *node = initTransformNode(child,highlight,background,root);
+  if (x != 0.0 || y != 0.0 || z != 0.0) {
+	  double sn = 1.0 / sqrt(x*x + y*y + z*z);
+	  x *= sn, y *= sn, z *= sn;
+  }
+  if (x != 0.0 || y != 0.0 || z != 0.0)
+  {
+	  node->m[ 0] = 1-2*x*x;
+	  node->m[ 1] = -2*y*x;
+	  node->m[ 2] = -2*z*x;
+
+	  node->m[ 4] = -2*x*y;
+	  node->m[ 5] = 1-2*y*y;
+	  node->m[ 6] = -2*z*y;
+
+	  node->m[ 8] = -2*x*z;
+	  node->m[ 9] = -2*y*z;
+	  node->m[10] = 1-2*z*z;
+  }
+  return node;
+}
+
+AbstractNode *builtinTranslate(AbstractNode *child, double x, double y, double z, bool highlight, bool background, bool root) {
+  TransformNode *node = initTransformNode(child,highlight,background,root);
+  node->m[12] = x;
+  node->m[13] = y;
+  node->m[14] = z;
+  return node;
+}
+
+AbstractNode *builtinMultMatrix(AbstractNode *child, const MatDouble4x4 &m, bool highlight, bool background, bool root) {
+  TransformNode *node = initTransformNode(child,highlight,background,root);
+  for (int i = 0; i < 16; i++) {
+    int x = i / 4, y = i % 4;
+    node->m[i] = m[y][x];
+  }
+  return node;
+}
+
+AbstractNode *builtinColor(AbstractNode *child, double r, double g, double b, double a, bool highlight, bool background, bool root) {
+  TransformNode *node = initTransformNode(child,highlight,background,root);
+  node->m[16] = r;
+  node->m[17] = g;
+  node->m[18] = b;
+  node->m[19] = a;
+  return node;
+}
+
 #ifdef ENABLE_CGAL
 
 CGAL_Nef_polyhedron TransformNode::render_cgal_nef_polyhedron() const

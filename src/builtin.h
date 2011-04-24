@@ -32,6 +32,8 @@ struct Point2D {
 struct Point3D {
 	double x, y, z;
 };
+typedef boost::array< double, 4> VecDouble4;
+typedef boost::array< VecDouble4, 4> MatDouble4x4;
 typedef boost::array< unsigned int, 3> Triangle;
 typedef std::vector<unsigned int> VecPoints;
 typedef std::vector<VecPoints> VecPaths;
@@ -48,8 +50,15 @@ AbstractNode *builtinPolyhedron(const Vec3D &points, const VecTriangles &triangl
 AbstractNode *builtinSquare(double x, double y, bool center = false, bool highlight = false, bool background = false, bool root = false);
 AbstractNode *builtinCircle(double r, double fn, double fs, double fa, bool center = false, bool highlight = false, bool background = false, bool root = false);
 AbstractNode *builtinPolygon(const Vec2D &points, const VecPaths &paths, int convexity, bool highlight = false, bool background = false, bool root = false);
-AbstractNode *builtinUnion(AbstractNode *a, AbstractNode *b, bool highlight = false, bool background = false, bool root = false);
-AbstractNode *builtinDifference(AbstractNode *a, AbstractNode *b, bool highlight = false, bool background = false, bool root = false);
-AbstractNode *builtinIntersection(AbstractNode *a, AbstractNode *b, bool highlight = false, bool background = false, bool root = false);
+AbstractNode *builtinUnion(AbstractNode *child, AbstractNode *b, bool highlight = false, bool background = false, bool root = false);
+AbstractNode *builtinDifference(AbstractNode *child, AbstractNode *b, bool highlight = false, bool background = false, bool root = false);
+AbstractNode *builtinIntersection(AbstractNode *child, AbstractNode *b, bool highlight = false, bool background = false, bool root = false);
+AbstractNode *builtinScale(AbstractNode *child, double x, double y, double z, bool highlight = false, bool background = false, bool root = false);
+AbstractNode *builtinRotateXYZ(AbstractNode *child, double x, double y, double z, bool highlight = false, bool background = false, bool root = false);
+AbstractNode *builtinRotateAxis(AbstractNode *child, double x, double y, double z, double a, bool highlight = false, bool background = false, bool root = false);
+AbstractNode *builtinMirror(AbstractNode *child, double x, double y, double z, bool highlight = false, bool background = false, bool root = false);
+AbstractNode *builtinTranslate(AbstractNode *child, double x, double y, double z, bool highlight = false, bool background = false, bool root = false) ;
+AbstractNode *builtinMultMatrix(AbstractNode *child, const MatDouble4x4 &m, bool highlight = false, bool background = false, bool root = false);
+AbstractNode *builtinColor(AbstractNode *child, double r, double g, double b, double a, bool highlight = false, bool background = false, bool root = false);
 
 #endif

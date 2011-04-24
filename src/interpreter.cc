@@ -13,7 +13,7 @@ using namespace luabind;
 
 AbstractNode *lua_builtinPolygon(object const &lua_points, object const &lua_paths, int convexity, bool highlight = false, bool background = false, bool root = false);
 AbstractNode *lua_builtinPolyhedron(object const &lua_points, object const &lua_triangles, int convexity, bool highlight = false, bool background = false, bool root = false);
-
+AbstractNode *lua_builtinMultMatrix(AbstractNode *child, object const &lua_Matrix, bool highlight = false, bool background = false, bool root = false);
 
 struct Interpreter_impl {
   lua_State *L; 
@@ -28,10 +28,10 @@ Interpreter::Interpreter():impl(new Interpreter_impl()) {
   impl->L = lua_open();
   luaL_openlibs(impl->L);
   open(impl->L);
-  module(impl->L)
+  module(impl->L)//, "openscad")
   [
       def("setroot", &internalSetRoot),
-      def("cube", &builtinCube),
+      def("_cube", &builtinCube),
       def("sphere", &builtinSphere),
       def("cylinder", &builtinCylinder),
       def("polyhedron", &builtinPolyhedron),
@@ -41,10 +41,20 @@ Interpreter::Interpreter():impl(new Interpreter_impl()) {
       def("union", &builtinUnion),
       def("difference", &builtinDifference),
       def("intersection", &builtinIntersection),
+      def("scale", &builtinScale),
+      def("rotateXYZ", &builtinRotateXYZ),
+      def("rotateAxis", &builtinRotateAxis),
+      def("mirror", &builtinMirror),
+      def("translate", &builtinTranslate),
+      def("multmatrix", &lua_builtinMultMatrix),
+      def("color", &builtinColor),
       
       class_<AbstractNode>("AbstractNode")
 	  .def("append", &AbstractNode::append)
   ];
+  interpret(
+    "function cube(dim, center=false, highlight=false, background=false, root=false) return _cube(dim[0], dim[1], dim[2], center==true, highlight, background, root)  end"
+  );
   root = new AbstractNode(true, false, false);
 }
 
@@ -130,4 +140,21 @@ AbstractNode *lua_builtinPolyhedron(object const &lua_points, object const &lua_
     }    
   }
   return builtinPolyhedron(points, triangles, convexity, highlight, background, root);  
+}
+
+AbstractNode *lua_builtinMultMatrix(AbstractNode *child, object const &lua_Matrix, bool highlight, bool background, bool root) {
+  MatDouble4x4 m;
+  if (type(lua_Matrix) == LUA_TTABLE) {
+    int rowNum = 0;
+    for (iterator lua_row(lua_Matrix), end; lua_row != end; ++lua_row) {
+      if (type(*lua_row) == LUA_TTABLE) {
+	int indexNum = 0;
+	for (iterator lua_index(*lua_row), end; lua_index != end; ++lua_index) {
+	  if (rowNum <= 4 && indexNum <= 4)
+	    m[rowNum][indexNum] = object_cast<double>(*lua_index);
+	}
+      }
+    }    
+  }  
+  return builtinMultMatrix(child,m,highlight,background,root);
 }
