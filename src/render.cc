@@ -84,6 +84,13 @@ AbstractNode *RenderModule::evaluate(const Context *ctx, const ModuleInstantiati
 	return node;
 }
 
+AbstractNode *builtinRender(AbstractNode *n, int convexity,  bool highlight, bool background, bool root) {
+  RenderNode *node = new RenderNode(root, highlight, background);
+  node->convexity = convexity;
+  node->children.append(n);
+  return node;
+}
+
 void register_builtin_render()
 {
 	builtin_modules["render"] = new RenderModule();

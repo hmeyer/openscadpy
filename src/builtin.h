@@ -60,5 +60,11 @@ AbstractNode *builtinMirror(AbstractNode *child, double x, double y, double z, b
 AbstractNode *builtinTranslate(AbstractNode *child, double x, double y, double z, bool highlight = false, bool background = false, bool root = false) ;
 AbstractNode *builtinMultMatrix(AbstractNode *child, const MatDouble4x4 &m, bool highlight = false, bool background = false, bool root = false);
 AbstractNode *builtinColor(AbstractNode *child, double r, double g, double b, double a, bool highlight = false, bool background = false, bool root = false);
+AbstractNode *builtinSurface(const QString &file, int convexity, bool center = false, bool highlight = false, bool background = false, bool root = false);
+AbstractNode *builtinRender(AbstractNode *n, int convexity,  bool highlight = false, bool background = false, bool root = false);
+AbstractNode *builtinImportSTL(const QString &file, int convexity,  bool highlight = false, bool background = false, bool root = false);
+AbstractNode *builtinImportDXF(const QString &file, const QString &layer, double origin_x, double origin_y, double scale, int convexity,  double fn, double fs, double fa, bool highlight = false, bool background = false, bool root = false);
+AbstractNode *builtinProjection(AbstractNode *child, bool cut, int convexity, bool highlight = false, bool background = false, bool root = false);
+AbstractNode *builtinMinkowski(AbstractNode *a, AbstractNode *b, int convexity, bool highlight = false, bool background = false, bool root = false) ;
 
 #endif

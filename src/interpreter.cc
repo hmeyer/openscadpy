@@ -48,13 +48,22 @@ Interpreter::Interpreter():impl(new Interpreter_impl()) {
       def("translate", &builtinTranslate),
       def("multmatrix", &lua_builtinMultMatrix),
       def("color", &builtinColor),
+      def("surface", &builtinSurface),
+      def("render", &builtinRender),
+      def("importSTL", &builtinImportSTL),
+//      def("importDXF", &builtinImportDXF),
+      def("projection", &builtinProjection),
+      def("minkowski", &builtinMinkowski),
+      
       
       class_<AbstractNode>("AbstractNode")
 	  .def("append", &AbstractNode::append)
   ];
+/*
   interpret(
     "function cube(dim, center=false, highlight=false, background=false, root=false) return _cube(dim[0], dim[1], dim[2], center==true, highlight, background, root)  end"
   );
+*/  
   root = new AbstractNode(true, false, false);
 }
 

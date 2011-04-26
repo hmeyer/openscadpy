@@ -122,6 +122,15 @@ AbstractNode *CgaladvModule::evaluate(const Context *ctx, const ModuleInstantiat
 	return node;
 }
 
+AbstractNode *builtinMinkowski(AbstractNode *a, AbstractNode *b, int convexity, bool highlight, bool background, bool root)  {
+	CgaladvNode *node = new CgaladvNode(root, highlight, background, MINKOWSKI);
+	node->convexity = convexity;
+	node->children.append(a);
+	node->children.append(b);
+	return node;  
+}
+
+
 void register_builtin_cgaladv()
 {
 	builtin_modules["minkowski"] = new CgaladvModule(MINKOWSKI);

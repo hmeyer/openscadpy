@@ -113,6 +113,43 @@ AbstractNode *ImportModule::evaluate(const Context *ctx, const ModuleInstantiati
 	return node;
 }
 
+AbstractNode *builtinImportSTL(const QString &file, int convexity,  bool highlight, bool background, bool root) {
+	ImportNode *node = new ImportNode(root, highlight, background, TYPE_STL);
+
+	node->filename = file;
+	node->convexity = convexity;
+
+	if (node->convexity <= 0)
+		node->convexity = 1;
+
+	return node;
+}
+
+AbstractNode *builtinImportDXF(const QString &file, const QString &layer, double origin_x, double origin_y, double scale, int convexity,  double fn, double fs, double fa, bool highlight, bool background, bool root) {
+	ImportNode *node = new ImportNode(root, highlight, background, TYPE_DXF);
+
+	node->fn = fn;
+	node->fs = fs;
+	node->fa = fa;
+
+	node->filename = file;
+	node->layername = layer;
+	node->convexity = convexity;
+
+	if (node->convexity <= 0)
+		node->convexity = 1;
+
+	node->origin_x = origin_x;
+	node->origin_y = origin_y;
+
+	node->scale = scale;
+
+	if (node->scale <= 0)
+		node->scale = 1;
+
+	return node;
+}
+
 void register_builtin_import()
 {
 	builtin_modules["import_stl"] = new ImportModule(TYPE_STL);

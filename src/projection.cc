@@ -92,6 +92,17 @@ AbstractNode *ProjectionModule::evaluate(const Context *ctx, const ModuleInstant
 	return node;
 }
 
+AbstractNode *builtinProjection(AbstractNode *child, bool cut, int convexity, bool highlight, bool background, bool root) {
+  ProjectionNode *node = new ProjectionNode(root, highlight, background);
+  node->convexity = convexity;
+  node->cut_mode = cut;
+
+  node->children.append(child);
+
+  return node;
+}
+
+
 void register_builtin_projection()
 {
 	builtin_modules["projection"] = new ProjectionModule();

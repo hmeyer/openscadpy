@@ -80,6 +80,14 @@ AbstractNode *SurfaceModule::evaluate(const Context *ctx, const ModuleInstantiat
 	return node;
 }
 
+AbstractNode *builtinSurface(const QString &file, int convexity, bool center, bool highlight, bool background, bool root) {
+  SurfaceNode *node = new SurfaceNode(root, highlight, background);
+  node->center = center;
+  node->filename = file; // QFileInfo(QDir(this->document_path), filename).absoluteFilePath()
+  node->convexity = convexity;
+  return node;
+}
+
 void register_builtin_surface()
 {
 	builtin_modules["surface"] = new SurfaceModule();
