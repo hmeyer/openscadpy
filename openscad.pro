@@ -145,7 +145,6 @@ HEADERS += src/CGAL_renderer.h \
            src/progress.h \
            src/editor.h \
            src/mathc99.h \
-           src/streamredirector.h \
            src/interpreter.h
 
 SOURCES += src/openscad.cc \
@@ -186,7 +185,6 @@ SOURCES += src/openscad.cc \
            src/progress.cc \
            src/editor.cc \
 	   src/mathc99.cc \
-           src/streamredirector.cc \
            src/interpreter.cc
 
 macx {
