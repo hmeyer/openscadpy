@@ -151,7 +151,7 @@ CGAL_Nef_polyhedron CgaladvNode::render_cgal_nef_polyhedron() const
 	{
 		bool first = true;
 		foreach(AbstractNode::Pointer v, children) {
-			if (v->modinst->tag_background)
+			if (v->props.background)
 				continue;
 			if (first) {
 				N = v->render_cgal_nef_polyhedron();
@@ -185,7 +185,7 @@ CGAL_Nef_polyhedron CgaladvNode::render_cgal_nef_polyhedron() const
 		std::list<CGAL_Nef_polyhedron2> polys;
 		bool all2d = true;
 		foreach(AbstractNode::Pointer v, children) {
-			if (v->modinst->tag_background)
+			if (v->props.background)
 		    continue;
 			N = v->render_cgal_nef_polyhedron();
 			if (N.dim == 3) {

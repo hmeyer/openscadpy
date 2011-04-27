@@ -519,7 +519,7 @@ void MainWindow::load()
 AbstractNode::Pointer MainWindow::find_root_tag(AbstractNode::Pointer n)
 {
 	foreach(AbstractNode::Pointer v, n->children) {
-		if (v->modinst->tag_root) return v;
+		if (v->props.root) return v;
 		if (AbstractNode::Pointer vroot = find_root_tag(v)) return vroot;
 	}
 	return AbstractNode::Pointer();

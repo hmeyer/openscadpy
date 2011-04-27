@@ -234,7 +234,7 @@ PolySet *DxfLinearExtrudeNode::render_polyset(render_mode_e) const
 		CGAL_Nef_polyhedron N;
 		N.dim = 2;
 		foreach(AbstractNode::Pointer v, children) {
-			if (v->modinst->tag_background)
+			if (v->props.background)
 				continue;
 			N.p2 += v->render_cgal_nef_polyhedron().p2;
 		}

@@ -107,7 +107,7 @@ CGAL_Nef_polyhedron RenderNode::render_cgal_nef_polyhedron() const
 	CGAL_Nef_polyhedron N;
 	foreach(AbstractNode::Pointer v, children)
 	{
-		if (v->modinst->tag_background)
+		if (v->props.background)
 			continue;
 		if (first) {
 			N = v->render_cgal_nef_polyhedron();
@@ -134,7 +134,7 @@ CSGTerm *AbstractNode::render_csg_term_from_nef(double m[20], QVector<CSGTerm*> 
 	if (PolySet::ps_cache.contains(key)) {
 		PRINT(PolySet::ps_cache[key]->msg);
 		return AbstractPolyNode::render_csg_term_from_ps(m, highlights, background,
-				PolySet::ps_cache[key]->ps->link(), modinst, idx);
+				PolySet::ps_cache[key]->ps->link(), props, idx);
 	}
 
 	print_messages_push();
@@ -209,9 +209,9 @@ CSGTerm *AbstractNode::render_csg_term_from_nef(double m[20], QVector<CSGTerm*> 
 		PolySet::ps_cache.insert(key, new PolySet::ps_cache_entry(ps->link()));
 
 		CSGTerm *term = new CSGTerm(ps, m, QString("n%1").arg(idx));
-		if (modinst->tag_highlight && highlights)
+		if (props.highlight && highlights)
 			highlights->append(term->link());
-		if (modinst->tag_background && background) {
+		if (props.background && background) {
 			background->append(term);
 			return NULL;
 		}

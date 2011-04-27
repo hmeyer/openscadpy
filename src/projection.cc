@@ -119,7 +119,7 @@ PolySet *ProjectionNode::render_polyset(render_mode_e) const
 	CGAL::Failure_behaviour old_behaviour = CGAL::set_error_behaviour(CGAL::THROW_EXCEPTION);
   try {
 	foreach(AbstractNode::Pointer v, this->children) {
-		if (v->modinst->tag_background)
+		if (v->props.background)
 			continue;
 		N.p3 += v->render_cgal_nef_polyhedron().p3;
 	}

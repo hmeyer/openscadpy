@@ -93,7 +93,7 @@ CGAL_Nef_polyhedron CsgNode::render_cgal_nef_polyhedron() const
 	CGAL_Nef_polyhedron N;
 	try {
 	foreach (AbstractNode::Pointer v, children) {
-		if (v->modinst->tag_background)
+		if (v->props.background)
 			continue;
 		if (first) {
 			N = v->render_cgal_nef_polyhedron();
@@ -150,9 +150,9 @@ CSGTerm *CsgNode::render_csg_term(double m[20], QVector<CSGTerm*> *highlights, Q
 			}
 		}
 	}
-	if (t1 && modinst->tag_highlight && highlights)
+	if (t1 && props.highlight && highlights)
 		highlights->append(t1->link());
-	if (t1 && modinst->tag_background && background) {
+	if (t1 && props.background && background) {
 		background->append(t1);
 		return NULL;
 	}
