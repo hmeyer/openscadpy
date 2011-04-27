@@ -111,7 +111,7 @@ CGAL_Poly2 nef2p2(CGAL_Nef_polyhedron2 p)
 }
 static CGAL_Nef_polyhedron2 p2nef2(CGAL_Poly2 p2) {
   std::list<CGAL_Nef_polyhedron2::Point> points;
-  for (size_t j = 0; j < p2.size(); j++) {
+  for (int j = 0; j < p2.size(); j++) {
     double x = to_double(p2[j].x());
     double y = to_double(p2[j].y());
     CGAL_Nef_polyhedron2::Point p = CGAL_Nef_polyhedron2::Point(x, y);

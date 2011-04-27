@@ -39,7 +39,7 @@ CGAL_Nef_polyhedron2 convexhull2(std::list<CGAL_Nef_polyhedron2> a)
 	std::list<CGAL_Nef_polyhedron2>::iterator i;
 	for (i=a.begin(); i!=a.end(); i++) {
 		CGAL_Poly2 ap=nef2p2(*i);
-		for (size_t j=0;j<ap.size();j++) {
+		for (int j=0;j<ap.size();j++) {
 	    double x=to_double(ap[j].x()),y=to_double(ap[j].y());
 	    CGAL_Nef_polyhedron2::Point p=CGAL_Nef_polyhedron2::Point(x,y);
 	    points.push_back(p);
