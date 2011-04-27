@@ -8,20 +8,25 @@
 #include "cgal.h"
 #endif
 
+#include <boost/shared_ptr.hpp>
+
+using boost::shared_ptr;
+
 extern int progress_report_count;
-extern void (*progress_report_f)(const class AbstractNode*, void*, int);
+extern void (*progress_report_f)(const class AbstractNode&, void*, int);
 extern void *progress_report_vp;
 
-void progress_report_prep(AbstractNode *root, void (*f)(const class AbstractNode *node, void *vp, int mark), void *vp);
+void progress_report_prep(AbstractNode &root, void (*f)(const class AbstractNode &node, void *vp, int mark), void *vp);
 void progress_report_fin();
 
 class AbstractNode
 {
 	static int idx_counter;   // Node instantiation index
 public:
+	typedef shared_ptr<AbstractNode> Pointer;
 	static void resetIndexCounter() { idx_counter = 1; }
 
-	QVector<AbstractNode*> children;
+	QVector<Pointer> children;
 	const class ModuleInstantiation *modinst;
 
 	int progress_mark;

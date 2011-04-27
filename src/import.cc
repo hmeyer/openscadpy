@@ -37,6 +37,7 @@
 #include <QFile>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <boost/make_shared.hpp>
 
 enum import_type_e {
 	TYPE_STL,
@@ -49,12 +50,13 @@ class ImportModule : public AbstractModule
 public:
 	import_type_e type;
 	ImportModule(import_type_e type) : type(type) { }
-	virtual AbstractNode *evaluate(const Context *ctx, const ModuleInstantiation *inst) const;
+	virtual AbstractNode::Pointer evaluate(const Context *ctx, const ModuleInstantiation *inst) const;
 };
 
 class ImportNode : public AbstractPolyNode
 {
 public:
+	typedef shared_ptr< ImportNode > Pointer;
 	import_type_e type;
 	QString filename;
 	QString layername;
@@ -66,9 +68,9 @@ public:
 	virtual QString dump(QString indent) const;
 };
 
-AbstractNode *ImportModule::evaluate(const Context *ctx, const ModuleInstantiation *inst) const
+AbstractNode::Pointer ImportModule::evaluate(const Context *ctx, const ModuleInstantiation *inst) const
 {
-	ImportNode *node = new ImportNode(inst, type);
+	ImportNode::Pointer node(boost::make_shared<ImportNode>(inst, type));
 
 	QVector<QString> argnames;
 	if (type == TYPE_DXF) {

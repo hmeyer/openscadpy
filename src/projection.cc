@@ -45,17 +45,19 @@
 #include <QApplication>
 #include <QTime>
 #include <QProgressDialog>
+#include <boost/make_shared.hpp>
 
 class ProjectionModule : public AbstractModule
 {
 public:
 	ProjectionModule() { }
-	virtual AbstractNode *evaluate(const Context *ctx, const ModuleInstantiation *inst) const;
+	virtual AbstractNode::Pointer evaluate(const Context *ctx, const ModuleInstantiation *inst) const;
 };
 
 class ProjectionNode : public AbstractPolyNode
 {
 public:
+	typedef shared_ptr<ProjectionNode> Pointer;
 	int convexity;
 	bool cut_mode;
 	ProjectionNode(const ModuleInstantiation *mi) : AbstractPolyNode(mi) {
@@ -65,9 +67,9 @@ public:
 	virtual QString dump(QString indent) const;
 };
 
-AbstractNode *ProjectionModule::evaluate(const Context *ctx, const ModuleInstantiation *inst) const
+AbstractNode::Pointer ProjectionModule::evaluate(const Context *ctx, const ModuleInstantiation *inst) const
 {
-	ProjectionNode *node = new ProjectionNode(inst);
+	ProjectionNode::Pointer node(boost::make_shared<ProjectionNode>(inst));
 
 	QVector<QString> argnames = QVector<QString>() << "cut";
 	QVector<Expression*> argexpr;
@@ -84,9 +86,8 @@ AbstractNode *ProjectionModule::evaluate(const Context *ctx, const ModuleInstant
 		node->cut_mode = cut.b;
 
 	foreach (ModuleInstantiation *v, inst->children) {
-		AbstractNode *n = v->evaluate(inst->ctx);
-		if (n)
-			node->children.append(n);
+		AbstractNode::Pointer n = v->evaluate(inst->ctx);
+		if (n) node->children.append(n);
 	}
 
 	return node;
@@ -117,7 +118,7 @@ PolySet *ProjectionNode::render_polyset(render_mode_e) const
 	N.dim = 3;
 	CGAL::Failure_behaviour old_behaviour = CGAL::set_error_behaviour(CGAL::THROW_EXCEPTION);
   try {
-	foreach(AbstractNode *v, this->children) {
+	foreach(AbstractNode::Pointer v, this->children) {
 		if (v->modinst->tag_background)
 			continue;
 		N.p3 += v->render_cgal_nef_polyhedron().p3;
@@ -288,7 +289,7 @@ QString ProjectionNode::dump(QString indent) const
 		QString text;
 		text.sprintf("projection(cut = %s, convexity = %d) {\n",
 				this->cut_mode ? "true" : "false", this->convexity);
-		foreach (AbstractNode *v, this->children)
+		foreach (AbstractNode::Pointer v, this->children)
 			text += v->dump(indent + QString("\t"));
 		text += indent + "}\n";
 		((AbstractNode*)this)->dump_cache = indent + QString("n%1: ").arg(idx) + text;

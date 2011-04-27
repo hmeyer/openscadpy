@@ -274,7 +274,7 @@ int main(int argc, char **argv)
 
 		AbstractModule *root_module;
 		ModuleInstantiation root_inst;
-		AbstractNode *root_node;
+		AbstractNode::Pointer root_node;
 
 		QFileInfo fileInfo(filename);
 		handle_dep(filename);
@@ -327,7 +327,6 @@ int main(int argc, char **argv)
 		if (dxf_output_file)
 			export_dxf(root_N, dxf_output_file, NULL);
 
-		delete root_node;
 		delete root_N;
 #else
 		fprintf(stderr, "OpenSCAD has been compiled without CGAL support!\n");

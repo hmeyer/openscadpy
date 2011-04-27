@@ -39,17 +39,19 @@
 #include <QProgressDialog>
 #include <QDateTime>
 #include <QFileInfo>
+#include <boost/make_shared.hpp>
 
 class DxfRotateExtrudeModule : public AbstractModule
 {
 public:
 	DxfRotateExtrudeModule() { }
-	virtual AbstractNode *evaluate(const Context *ctx, const ModuleInstantiation *inst) const;
+	virtual AbstractNode::Pointer evaluate(const Context *ctx, const ModuleInstantiation *inst) const;
 };
 
 class DxfRotateExtrudeNode : public AbstractPolyNode
 {
 public:
+	typedef shared_ptr<DxfRotateExtrudeNode> Pointer;
 	int convexity;
 	double fn, fs, fa;
 	double origin_x, origin_y, scale;
@@ -63,9 +65,9 @@ public:
 	virtual QString dump(QString indent) const;
 };
 
-AbstractNode *DxfRotateExtrudeModule::evaluate(const Context *ctx, const ModuleInstantiation *inst) const
+AbstractNode::Pointer DxfRotateExtrudeModule::evaluate(const Context *ctx, const ModuleInstantiation *inst) const
 {
-	DxfRotateExtrudeNode *node = new DxfRotateExtrudeNode(inst);
+	DxfRotateExtrudeNode::Pointer node(boost::make_shared<DxfRotateExtrudeNode>(inst));
 
 	QVector<QString> argnames = QVector<QString>() << "file" << "layer" << "origin" << "scale";
 	QVector<Expression*> argexpr;
@@ -101,9 +103,8 @@ AbstractNode *DxfRotateExtrudeModule::evaluate(const Context *ctx, const ModuleI
 
 	if (node->filename.isEmpty()) {
 		foreach (ModuleInstantiation *v, inst->children) {
-			AbstractNode *n = v->evaluate(inst->ctx);
-			if (n)
-				node->children.append(n);
+			AbstractNode::Pointer n = v->evaluate(inst->ctx);
+			if (n) node->children.append(n);
 		}
 	}
 
@@ -132,7 +133,7 @@ PolySet *DxfRotateExtrudeNode::render_polyset(render_mode_e) const
 #ifdef ENABLE_CGAL
 		CGAL_Nef_polyhedron N;
 		N.dim = 2;
-		foreach(AbstractNode * v, children) {
+		foreach(AbstractNode::Pointer v, children) {
 			if (v->modinst->tag_background)
 				continue;
 			N.p2 += v->render_cgal_nef_polyhedron().p2;
@@ -236,7 +237,7 @@ QString DxfRotateExtrudeNode::dump(QString indent) const
 				filename.toAscii().data(), (int)fileInfo.lastModified().toTime_t(),
 				(int)fileInfo.size(),layername.toAscii().data(), origin_x, origin_y, 
 				scale, convexity, fn, fa, fs);
-		foreach (AbstractNode *v, children)
+		foreach (AbstractNode::Pointer v, children)
 			text += v->dump(indent + QString("\t"));
 		text += indent + "}\n";
 		((AbstractNode*)this)->dump_cache = indent + QString("n%1: ").arg(idx) + text;

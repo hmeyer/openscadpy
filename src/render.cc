@@ -41,17 +41,19 @@
 #include <QProgressDialog>
 #include <QApplication>
 #include <QTime>
+#include <boost/make_shared.hpp>
 
 class RenderModule : public AbstractModule
 {
 public:
 	RenderModule() { }
-	virtual AbstractNode *evaluate(const Context *ctx, const ModuleInstantiation *inst) const;
+	virtual AbstractNode::Pointer evaluate(const Context *ctx, const ModuleInstantiation *inst) const;
 };
 
 class RenderNode : public AbstractNode
 {
 public:
+	typedef shared_ptr< RenderNode > Pointer;
 	int convexity;
 	RenderNode(const ModuleInstantiation *mi) : AbstractNode(mi), convexity(1) { }
 #ifdef ENABLE_CGAL
@@ -61,9 +63,9 @@ public:
 	virtual QString dump(QString indent) const;
 };
 
-AbstractNode *RenderModule::evaluate(const Context *ctx, const ModuleInstantiation *inst) const
+AbstractNode::Pointer RenderModule::evaluate(const Context *ctx, const ModuleInstantiation *inst) const
 {
-	RenderNode *node = new RenderNode(inst);
+	RenderNode::Pointer node(boost::make_shared<RenderNode>(inst));
 
 	QVector<QString> argnames = QVector<QString>() << "convexity";
 	QVector<Expression*> argexpr;
@@ -76,9 +78,8 @@ AbstractNode *RenderModule::evaluate(const Context *ctx, const ModuleInstantiati
 		node->convexity = (int)v.num;
 
 	foreach (ModuleInstantiation *v, inst->children) {
-		AbstractNode *n = v->evaluate(inst->ctx);
-		if (n != NULL)
-			node->children.append(n);
+		AbstractNode::Pointer n(v->evaluate(inst->ctx));
+		if (n) node->children.append(n);
 	}
 
 	return node;
@@ -104,7 +105,7 @@ CGAL_Nef_polyhedron RenderNode::render_cgal_nef_polyhedron() const
 
 	bool first = true;
 	CGAL_Nef_polyhedron N;
-	foreach(AbstractNode * v, children)
+	foreach(AbstractNode::Pointer v, children)
 	{
 		if (v->modinst->tag_background)
 			continue;
@@ -255,7 +256,7 @@ QString RenderNode::dump(QString indent) const
 {
 	if (dump_cache.isEmpty()) {
 		QString text = indent + QString("n%1: ").arg(idx) + QString("render(convexity = %1) {\n").arg(QString::number(convexity));
-		foreach (AbstractNode *v, children)
+		foreach (AbstractNode::Pointer v, children)
 			text += v->dump(indent + QString("\t"));
 		((AbstractNode*)this)->dump_cache = text + indent + "}\n";
 	}

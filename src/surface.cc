@@ -32,6 +32,8 @@
 #include "dxftess.h"
 #include "printutils.h"
 #include "openscad.h" // handle_dep()
+#include <boost/make_shared.hpp>
+using boost::make_shared;
 
 #include <QFile>
 
@@ -39,12 +41,13 @@ class SurfaceModule : public AbstractModule
 {
 public:
 	SurfaceModule() { }
-	virtual AbstractNode *evaluate(const Context *ctx, const ModuleInstantiation *inst) const;
+	virtual AbstractNode::Pointer evaluate(const Context *ctx, const ModuleInstantiation *inst) const;
 };
 
 class SurfaceNode : public AbstractPolyNode
 {
 public:
+	typedef shared_ptr< SurfaceNode > Pointer;
 	QString filename;
 	bool center;
 	int convexity;
@@ -53,9 +56,9 @@ public:
 	virtual QString dump(QString indent) const;
 };
 
-AbstractNode *SurfaceModule::evaluate(const Context *ctx, const ModuleInstantiation *inst) const
+AbstractNode::Pointer SurfaceModule::evaluate(const Context *ctx, const ModuleInstantiation *inst) const
 {
-	SurfaceNode *node = new SurfaceNode(inst);
+	SurfaceNode::Pointer node(make_shared<SurfaceNode>(inst));
 	node->center = false;
 	node->convexity = 1;
 

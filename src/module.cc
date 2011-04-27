@@ -31,17 +31,20 @@
 #include "function.h"
 #include "builtin.h"
 #include "printutils.h"
+#include <boost/make_shared.hpp>
+
+using boost::make_shared;
 
 AbstractModule::~AbstractModule()
 {
 }
 
-AbstractNode *AbstractModule::evaluate(const Context*, const ModuleInstantiation *inst) const
+AbstractNode::Pointer AbstractModule::evaluate(const Context*, const ModuleInstantiation *inst) const
 {
-	AbstractNode *node = new AbstractNode(inst);
+	AbstractNode::Pointer node(make_shared<AbstractNode>(inst));
 
 	foreach (ModuleInstantiation *v, inst->children) {
-		AbstractNode *n = v->evaluate(inst->ctx);
+		AbstractNode::Pointer n = v->evaluate(inst->ctx);
 		if (n)
 			node->children.append(n);
 	}
@@ -96,9 +99,9 @@ QString ModuleInstantiation::dump(QString indent) const
 	return text;
 }
 
-AbstractNode *ModuleInstantiation::evaluate(const Context *ctx) const
+AbstractNode::Pointer ModuleInstantiation::evaluate(const Context *ctx) const
 {
-	AbstractNode *node = NULL;
+	AbstractNode::Pointer node;
 	if (this->ctx) {
 		PRINTA("WARNING: Ignoring recursive module instanciation of '%1'.", modname);
 	} else {
@@ -127,7 +130,7 @@ Module::~Module()
 		delete v;
 }
 
-AbstractNode *Module::evaluate(const Context *ctx, const ModuleInstantiation *inst) const
+AbstractNode::Pointer Module::evaluate(const Context *ctx, const ModuleInstantiation *inst) const
 {
 	Context c(ctx);
 	c.args(argnames, argexpr, inst->argnames, inst->argvalues);
@@ -147,13 +150,11 @@ AbstractNode *Module::evaluate(const Context *ctx, const ModuleInstantiation *in
 		c.set_variable(assignments_var[i], assignments_expr[i]->evaluate(&c));
 	}
 
-	AbstractNode *node = new AbstractNode(inst);
-	for (int i = 0; i < children.size(); i++) {
-		AbstractNode *n = children[i]->evaluate(&c);
-		if (n != NULL)
-			node->children.append(n);
+	AbstractNode::Pointer node(make_shared<AbstractNode>(inst));
+	foreach(ModuleInstantiation *v, children) {
+	  AbstractNode::Pointer n = v->evaluate(&c);
+	  if (n) node->children.append(n);
 	}
-
 	return node;
 }
 

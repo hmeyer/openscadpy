@@ -30,6 +30,9 @@
 #include "builtin.h"
 #include "printutils.h"
 #include "cgal.h"
+#include <boost/make_shared.hpp>
+
+using boost::make_shared;
 
 #ifdef ENABLE_CGAL
 extern CGAL_Nef_polyhedron3 minkowski3(CGAL_Nef_polyhedron3 a, CGAL_Nef_polyhedron3 b);
@@ -49,12 +52,13 @@ class CgaladvModule : public AbstractModule
 public:
 	cgaladv_type_e type;
 	CgaladvModule(cgaladv_type_e type) : type(type) { }
-	virtual AbstractNode *evaluate(const Context *ctx, const ModuleInstantiation *inst) const;
+	virtual AbstractNode::Pointer evaluate(const Context *ctx, const ModuleInstantiation *inst) const;
 };
 
 class CgaladvNode : public AbstractNode
 {
 public:
+	typedef shared_ptr<CgaladvNode> Pointer;
 	Value path;
 	QString subdiv_type;
 	int convexity, level;
@@ -69,9 +73,9 @@ public:
 	virtual QString dump(QString indent) const;
 };
 
-AbstractNode *CgaladvModule::evaluate(const Context *ctx, const ModuleInstantiation *inst) const
+AbstractNode::Pointer CgaladvModule::evaluate(const Context *ctx, const ModuleInstantiation *inst) const
 {
-	CgaladvNode *node = new CgaladvNode(inst, type);
+	CgaladvNode::Pointer node(make_shared<CgaladvNode>(inst, type));
 
 	QVector<QString> argnames;
 	QVector<Expression*> argexpr;
@@ -114,9 +118,8 @@ AbstractNode *CgaladvModule::evaluate(const Context *ctx, const ModuleInstantiat
 		node->level = 1;
 
 	foreach (ModuleInstantiation *v, inst->children) {
-		AbstractNode *n = v->evaluate(inst->ctx);
-		if (n)
-			node->children.append(n);
+		AbstractNode::Pointer n = v->evaluate(inst->ctx);
+		if (n) node->children.append(n);
 	}
 
 	return node;
@@ -147,7 +150,7 @@ CGAL_Nef_polyhedron CgaladvNode::render_cgal_nef_polyhedron() const
 	if (type == MINKOWSKI)
 	{
 		bool first = true;
-		foreach(AbstractNode * v, children) {
+		foreach(AbstractNode::Pointer v, children) {
 			if (v->modinst->tag_background)
 				continue;
 			if (first) {
@@ -181,7 +184,7 @@ CGAL_Nef_polyhedron CgaladvNode::render_cgal_nef_polyhedron() const
 	{
 		std::list<CGAL_Nef_polyhedron2> polys;
 		bool all2d = true;
-		foreach(AbstractNode * v, children) {
+		foreach(AbstractNode::Pointer v, children) {
 			if (v->modinst->tag_background)
 		    continue;
 			N = v->render_cgal_nef_polyhedron();
@@ -248,7 +251,7 @@ QString CgaladvNode::dump(QString indent) const
 			text.sprintf("subdiv(level = %d, convexity = %d) {\n", this->level, this->convexity);
 		if (type == HULL)
 			text.sprintf("hull() {\n");
-		foreach (AbstractNode *v, this->children)
+		foreach (AbstractNode::Pointer v, this->children)
 			text += v->dump(indent + QString("\t"));
 		text += indent + "}\n";
 		((AbstractNode*)this)->dump_cache = indent + QString("n%1: ").arg(idx) + text;

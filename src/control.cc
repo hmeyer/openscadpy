@@ -29,6 +29,8 @@
 #include "context.h"
 #include "builtin.h"
 #include "printutils.h"
+#include <boost/make_shared.hpp>
+using boost::make_shared;
 
 enum control_type_e {
 	CHILD,
@@ -44,10 +46,10 @@ class ControlModule : public AbstractModule
 public:
 	control_type_e type;
 	ControlModule(control_type_e type) : type(type) { }
-	virtual AbstractNode *evaluate(const Context *ctx, const ModuleInstantiation *inst) const;
+	virtual AbstractNode::Pointer evaluate(const Context *ctx, const ModuleInstantiation *inst) const;
 };
 
-void for_eval(AbstractNode *node, int l, const QVector<QString> &call_argnames, const QVector<Value> &call_argvalues, const QVector<ModuleInstantiation*> arg_children, const Context *arg_context)
+void for_eval(AbstractNode::Pointer node, int l, const QVector<QString> &call_argnames, const QVector<Value> &call_argvalues, const QVector<ModuleInstantiation*> arg_children, const Context *arg_context)
 {
 	if (call_argnames.size() > l) {
 		QString it_name = call_argnames[l];
@@ -80,14 +82,13 @@ void for_eval(AbstractNode *node, int l, const QVector<QString> &call_argnames, 
 		}
 	} else {
 		foreach (ModuleInstantiation *v, arg_children) {
-			AbstractNode *n = v->evaluate(arg_context);
-			if (n != NULL)
-				node->children.append(n);
+			AbstractNode::Pointer n = v->evaluate(arg_context);
+			if (n) node->children.append(n);
 		}
 	}
 }
 
-AbstractNode *ControlModule::evaluate(const Context*, const ModuleInstantiation *inst) const
+AbstractNode::Pointer ControlModule::evaluate(const Context*, const ModuleInstantiation *inst) const
 {
 	if (type == CHILD)
 	{
@@ -102,19 +103,19 @@ AbstractNode *ControlModule::evaluate(const Context*, const ModuleInstantiation 
 			if (c->inst_p) {
 				if (n < c->inst_p->children.size())
 					return c->inst_p->children[n]->evaluate(c->inst_p->ctx);
-				return NULL;
+				return AbstractNode::Pointer();
 			}
 			c = c->parent;
 		}
-		return NULL;
+		return AbstractNode::Pointer();
 	}
 
-	AbstractNode *node;
+	AbstractNode::Pointer node;
 
 	if (type == INT_FOR)
-		node = new AbstractIntersectionNode(inst);
+		node.reset(new AbstractIntersectionNode(inst));
 	else
-		node = new AbstractNode(inst);
+		node.reset(new AbstractNode(inst));
 
 	if (type == ECHO)
 	{
@@ -137,9 +138,8 @@ AbstractNode *ControlModule::evaluate(const Context*, const ModuleInstantiation 
 				c.set_variable(inst->argnames[i], inst->argvalues[i]);
 		}
 		foreach (ModuleInstantiation *v, inst->children) {
-			AbstractNode *n = v->evaluate(&c);
-			if (n != NULL)
-				node->children.append(n);
+			AbstractNode::Pointer n = v->evaluate(&c);
+			if (n) node->children.append(n);
 		}
 	}
 
@@ -153,16 +153,14 @@ AbstractNode *ControlModule::evaluate(const Context*, const ModuleInstantiation 
 		const IfElseModuleInstantiation *ifelse = dynamic_cast<const IfElseModuleInstantiation*>(inst);
 		if (ifelse->argvalues.size() > 0 && ifelse->argvalues[0].type == Value::BOOL && ifelse->argvalues[0].b) {
 			foreach (ModuleInstantiation *v, ifelse->children) {
-				AbstractNode *n = v->evaluate(ifelse->ctx);
-				if (n != NULL)
-					node->children.append(n);
+				AbstractNode::Pointer n = v->evaluate(ifelse->ctx);
+				if (n) node->children.append(n);
 			}
 		}
 		else {
 			foreach (ModuleInstantiation *v, ifelse->else_children) {
-				AbstractNode *n = v->evaluate(ifelse->ctx);
-				if (n != NULL)
-					node->children.append(n);
+				AbstractNode::Pointer n = v->evaluate(ifelse->ctx);
+				if (n) node->children.append(n);
 			}
 		}
 	}

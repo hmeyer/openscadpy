@@ -33,6 +33,8 @@
 #include "builtin.h"
 #include "printutils.h"
 #include <assert.h>
+#include <boost/make_shared.hpp>
+using boost::make_shared;
 
 enum primitive_type_e {
 	CUBE,
@@ -49,12 +51,13 @@ class PrimitiveModule : public AbstractModule
 public:
 	primitive_type_e type;
 	PrimitiveModule(primitive_type_e type) : type(type) { }
-	virtual AbstractNode *evaluate(const Context *ctx, const ModuleInstantiation *inst) const;
+	virtual AbstractNode::Pointer evaluate(const Context *ctx, const ModuleInstantiation *inst) const;
 };
 
 class PrimitiveNode : public AbstractPolyNode
 {
 public:
+	typedef shared_ptr<PrimitiveNode> Pointer;
 	bool center;
 	double x, y, z, h, r1, r2;
 	static const double F_MINIMUM = 0.01;
@@ -67,9 +70,9 @@ public:
 	virtual QString dump(QString indent) const;
 };
 
-AbstractNode *PrimitiveModule::evaluate(const Context *ctx, const ModuleInstantiation *inst) const
+AbstractNode::Pointer PrimitiveModule::evaluate(const Context *ctx, const ModuleInstantiation *inst) const
 {
-	PrimitiveNode *node = new PrimitiveNode(inst, type);
+	PrimitiveNode::Pointer node(make_shared<PrimitiveNode>(inst, type));
 
 	node->center = false;
 	node->x = node->y = node->z = node->h = node->r1 = node->r2 = 1;

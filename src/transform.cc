@@ -33,6 +33,8 @@
 #include "dxftess.h"
 #include "builtin.h"
 #include "printutils.h"
+#include <boost/make_shared.hpp>
+using boost::make_shared;
 
 enum transform_type_e {
 	SCALE,
@@ -48,12 +50,13 @@ class TransformModule : public AbstractModule
 public:
 	transform_type_e type;
 	TransformModule(transform_type_e type) : type(type) { }
-	virtual AbstractNode *evaluate(const Context *ctx, const ModuleInstantiation *inst) const;
+	virtual AbstractNode::Pointer evaluate(const Context *ctx, const ModuleInstantiation *inst) const;
 };
 
 class TransformNode : public AbstractNode
 {
 public:
+	typedef shared_ptr< TransformNode > Pointer;
 	double m[20];
 	TransformNode(const ModuleInstantiation *mi) : AbstractNode(mi) { }
 #ifdef ENABLE_CGAL
@@ -63,9 +66,9 @@ public:
 	virtual QString dump(QString indent) const;
 };
 
-AbstractNode *TransformModule::evaluate(const Context *ctx, const ModuleInstantiation *inst) const
+AbstractNode::Pointer TransformModule::evaluate(const Context *ctx, const ModuleInstantiation *inst) const
 {
-	TransformNode *node = new TransformNode(inst);
+	TransformNode::Pointer node(make_shared<TransformNode>(inst) );
 
 	for (int i = 0; i < 16; i++)
 		node->m[i] = i % 5 == 0 ? 1.0 : 0.0;
@@ -231,11 +234,9 @@ AbstractNode *TransformModule::evaluate(const Context *ctx, const ModuleInstanti
 	}
 
 	foreach (ModuleInstantiation *v, inst->children) {
-		AbstractNode *n = v->evaluate(inst->ctx);
-		if (n != NULL)
-			node->children.append(n);
+		AbstractNode::Pointer n(v->evaluate(inst->ctx));
+		if (n) node->children.append(n);
 	}
-
 	return node;
 }
 
@@ -255,7 +256,7 @@ CGAL_Nef_polyhedron TransformNode::render_cgal_nef_polyhedron() const
 	bool first = true;
 	CGAL_Nef_polyhedron N;
 
-	foreach (AbstractNode *v, children) {
+	foreach (AbstractNode::Pointer v, children) {
 		if (v->modinst->tag_background)
 			continue;
 		if (first) {
@@ -329,7 +330,7 @@ CSGTerm *TransformNode::render_csg_term(double c[20], QVector<CSGTerm*> *highlig
 		x[i] = m[i] < 0 ? c[i] : m[i];
 
 	CSGTerm *t1 = NULL;
-	foreach(AbstractNode *v, children)
+	foreach(AbstractNode::Pointer v, children)
 	{
 		CSGTerm *t2 = v->render_csg_term(x, highlights, background);
 		if (t2 && !t1) {
@@ -362,7 +363,7 @@ QString TransformNode::dump(QString indent) const
 					m[2], m[6], m[10], m[14],
 					m[3], m[7], m[11], m[15]);
 		text = indent + text + " {\n";
-		foreach (AbstractNode *v, children)
+		foreach (AbstractNode::Pointer v, children)
 			text += v->dump(indent + QString("\t"));
 		((AbstractNode*)this)->dump_cache = text + indent + "}\n";
 	}

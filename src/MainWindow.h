@@ -8,6 +8,10 @@
 #include "module.h"
 #include "polyset.h"
 #include <QPointer>
+#include <boost/shared_ptr.hpp>
+using boost::shared_ptr;
+class AbstractNode;
+typedef shared_ptr<AbstractNode> AbstractNodePtr;
 
 class MainWindow : public QMainWindow, public Ui::MainWindow
 {
@@ -30,8 +34,8 @@ public:
 	Context root_ctx;
 	AbstractModule *root_module;      // Result of parsing
 	ModuleInstantiation root_inst;    // Top level instance
-	AbstractNode *absolute_root_node; // Result of tree evaluation
-	AbstractNode *root_node;          // Root if the root modifier (!) is used
+	AbstractNodePtr absolute_root_node; // Result of tree evaluation
+	AbstractNodePtr root_node;          // Root if the root modifier (!) is used
 
 	class CSGTerm *root_raw_term;           // Result of CSG term rendering
 	CSGTerm *root_norm_term;          // Normalized CSG products
@@ -71,7 +75,7 @@ private slots:
 private:
 	void openFile(const QString &filename);
 	void load();
-	AbstractNode *find_root_tag(AbstractNode *n);
+	AbstractNodePtr find_root_tag(AbstractNodePtr n);
 	void compile(bool procevents);
 	void compileCSG(bool procevents);
 	bool maybeSave();

@@ -40,11 +40,7 @@ AbstractNode::AbstractNode(const ModuleInstantiation *mi)
 	idx = idx_counter++;
 }
 
-AbstractNode::~AbstractNode()
-{
-	foreach (AbstractNode *v, children)
-		delete v;
-}
+AbstractNode::~AbstractNode() {}
 
 QString AbstractNode::mk_cache_id() const
 {
@@ -76,7 +72,7 @@ static CGAL_Nef_polyhedron render_cgal_nef_polyhedron_backend(const AbstractNode
 
 	bool first = true;
 	CGAL_Nef_polyhedron N;
-	foreach (AbstractNode *v, that->children) {
+	foreach (AbstractNode::Pointer v, that->children) {
 		if (v->modinst->tag_background)
 			continue;
 		if (first) {
@@ -119,7 +115,7 @@ CGAL_Nef_polyhedron AbstractIntersectionNode::render_cgal_nef_polyhedron() const
 static CSGTerm *render_csg_term_backend(const AbstractNode *that, bool intersect, double m[20], QVector<CSGTerm*> *highlights, QVector<CSGTerm*> *background)
 {
 	CSGTerm *t1 = NULL;
-	foreach(AbstractNode *v, that->children) {
+	foreach(AbstractNode::Pointer v, that->children) {
 		CSGTerm *t2 = v->render_csg_term(m, highlights, background);
 		if (t2 && !t1) {
 			t1 = t2;
@@ -153,7 +149,7 @@ QString AbstractNode::dump(QString indent) const
 {
 	if (dump_cache.isEmpty()) {
 		QString text = indent + QString("n%1: group() {\n").arg(idx);
-		foreach (AbstractNode *v, children)
+		foreach (AbstractNode::Pointer v, children)
 			text += v->dump(indent + QString("\t"));
 		((AbstractNode*)this)->dump_cache = text + indent + "}\n";
 	}
@@ -164,7 +160,7 @@ QString AbstractIntersectionNode::dump(QString indent) const
 {
 	if (dump_cache.isEmpty()) {
 		QString text = indent + QString("n%1: intersection() {\n").arg(idx);
-		foreach (AbstractNode *v, children)
+		foreach (AbstractNode::Pointer v, children)
 			text += v->dump(indent + QString("\t"));
 		((AbstractNode*)this)->dump_cache = text + indent + "}\n";
 	}
@@ -173,14 +169,14 @@ QString AbstractIntersectionNode::dump(QString indent) const
 
 void AbstractNode::progress_prepare()
 {
-	foreach (AbstractNode *v, children)
+	foreach (AbstractNode::Pointer v, children)
 		v->progress_prepare();
 	this->progress_mark = ++progress_report_count;
 }
 
 void AbstractNode::progress_report() const
 {
-	progress_update(this, this->progress_mark);
+	progress_update(*this, this->progress_mark);
 }
 
 #ifdef ENABLE_CGAL

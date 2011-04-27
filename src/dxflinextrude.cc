@@ -40,17 +40,19 @@
 #include <QProgressDialog>
 #include <QDateTime>
 #include <QFileInfo>
+#include <boost/make_shared.hpp>
 
 class DxfLinearExtrudeModule : public AbstractModule
 {
 public:
 	DxfLinearExtrudeModule() { }
-	virtual AbstractNode *evaluate(const Context *ctx, const ModuleInstantiation *inst) const;
+	virtual AbstractNode::Pointer evaluate(const Context *ctx, const ModuleInstantiation *inst) const;
 };
 
 class DxfLinearExtrudeNode : public AbstractPolyNode
 {
 public:
+	typedef shared_ptr<DxfLinearExtrudeNode> Pointer;
 	int convexity, slices;
 	double fn, fs, fa, height, twist;
 	double origin_x, origin_y, scale;
@@ -66,9 +68,9 @@ public:
 	virtual QString dump(QString indent) const;
 };
 
-AbstractNode *DxfLinearExtrudeModule::evaluate(const Context *ctx, const ModuleInstantiation *inst) const
+AbstractNode::Pointer DxfLinearExtrudeModule::evaluate(const Context *ctx, const ModuleInstantiation *inst) const
 {
-	DxfLinearExtrudeNode *node = new DxfLinearExtrudeNode(inst);
+	DxfLinearExtrudeNode::Pointer node(boost::make_shared<DxfLinearExtrudeNode>(inst));
 
 	QVector<QString> argnames = QVector<QString>() << "file" << "layer" << "height" << "origin" << "scale" << "center" << "twist" << "slices";
 	QVector<Expression*> argexpr;
@@ -126,9 +128,8 @@ AbstractNode *DxfLinearExtrudeModule::evaluate(const Context *ctx, const ModuleI
 
 	if (node->filename.isEmpty()) {
 		foreach (ModuleInstantiation *v, inst->children) {
-			AbstractNode *n = v->evaluate(inst->ctx);
-			if (n)
-				node->children.append(n);
+			AbstractNode::Pointer n = v->evaluate(inst->ctx);
+			if (n) node->children.append(n);
 		}
 	}
 
@@ -232,7 +233,7 @@ PolySet *DxfLinearExtrudeNode::render_polyset(render_mode_e) const
 		// to a single DxfData, then tesselate this into a PolySet
 		CGAL_Nef_polyhedron N;
 		N.dim = 2;
-		foreach(AbstractNode * v, children) {
+		foreach(AbstractNode::Pointer v, children) {
 			if (v->modinst->tag_background)
 				continue;
 			N.p2 += v->render_cgal_nef_polyhedron().p2;
@@ -333,7 +334,7 @@ QString DxfLinearExtrudeNode::dump(QString indent) const
 		QString t3;
 		t3.sprintf(", $fn = %g, $fa = %g, $fs = %g) {\n", fn, fa, fs);
 		text += t3;
-		foreach (AbstractNode *v, children)
+		foreach (AbstractNode::Pointer v, children)
 			text += v->dump(indent + QString("\t"));
 		text += indent + "}\n";
 		((AbstractNode*)this)->dump_cache = indent + QString("n%1: ").arg(idx) + text;

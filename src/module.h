@@ -5,6 +5,10 @@
 #include <QVector>
 #include <QHash>
 #include "value.h"
+#include <boost/shared_ptr.hpp>
+using boost::shared_ptr;
+class AbstractNode;
+typedef shared_ptr<AbstractNode> AbstractNodePtr;
 
 class ModuleInstantiation
 {
@@ -25,7 +29,7 @@ public:
 	virtual ~ModuleInstantiation();
 
 	QString dump(QString indent) const;
-	class AbstractNode *evaluate(const Context *ctx) const;
+	AbstractNodePtr evaluate(const Context *ctx) const;
 };
 
 class IfElseModuleInstantiation : public ModuleInstantiation {
@@ -39,7 +43,7 @@ class AbstractModule
 {
 public:
 	virtual ~AbstractModule();
-	virtual class AbstractNode *evaluate(const Context *ctx, const ModuleInstantiation *inst) const;
+	virtual AbstractNodePtr evaluate(const Context *ctx, const ModuleInstantiation *inst) const;
 	virtual QString dump(QString indent, QString name) const;
 };
 
@@ -69,7 +73,7 @@ public:
 	Module() { }
 	virtual ~Module();
 
-	virtual AbstractNode *evaluate(const Context *ctx, const ModuleInstantiation *inst) const;
+	virtual AbstractNodePtr evaluate(const Context *ctx, const ModuleInstantiation *inst) const;
 	virtual QString dump(QString indent, QString name) const;
 };
 

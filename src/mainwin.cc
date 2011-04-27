@@ -138,7 +138,6 @@ MainWindow::MainWindow(const QString &filename)
 	root_ctx.set_variable("$vpr", zero3);
 
 	root_module = NULL;
-	absolute_root_node = NULL;
 	root_raw_term = NULL;
 	root_norm_term = NULL;
 	root_chain = NULL;
@@ -151,7 +150,6 @@ MainWindow::MainWindow(const QString &filename)
 
 	highlights_chain = NULL;
 	background_chain = NULL;
-	root_node = NULL;
 	enableOpenCSG = false;
 
 	tval = 0;
@@ -359,8 +357,6 @@ MainWindow::~MainWindow()
 {
 	if (root_module)
 		delete root_module;
-	if (root_node)
-		delete root_node;
 #ifdef ENABLE_CGAL
 	if (this->root_N)
 		delete this->root_N;
@@ -380,7 +376,7 @@ void MainWindow::showProgress()
 }
 #endif
 
-static void report_func(const class AbstractNode*, void *vp, int mark)
+static void report_func(const AbstractNode&, void *vp, int mark)
 {
 #ifdef USE_PROGRESSWIDGET
 	ProgressWidget *pw = static_cast<ProgressWidget*>(vp);
@@ -520,13 +516,13 @@ void MainWindow::load()
 	setCurrentOutput();
 }
 
-AbstractNode *MainWindow::find_root_tag(AbstractNode *n)
+AbstractNode::Pointer MainWindow::find_root_tag(AbstractNode::Pointer n)
 {
-	foreach(AbstractNode *v, n->children) {
+	foreach(AbstractNode::Pointer v, n->children) {
 		if (v->modinst->tag_root) return v;
-		if (AbstractNode *vroot = find_root_tag(v)) return vroot;
+		if (AbstractNode::Pointer vroot = find_root_tag(v)) return vroot;
 	}
-	return NULL;
+	return AbstractNode::Pointer();
 }
 
 /*!
@@ -544,12 +540,7 @@ void MainWindow::compile(bool procevents)
 		delete root_module;
 		root_module = NULL;
 	}
-
-	if (absolute_root_node) {
-		delete absolute_root_node;
-		absolute_root_node = NULL;
-	}
-
+	absolute_root_node.reset();
 	if (root_raw_term) {
 		root_raw_term->unlink();
 		root_raw_term = NULL;
@@ -581,7 +572,7 @@ void MainWindow::compile(bool procevents)
 		delete background_chain;
 		background_chain = NULL;
 	}
-	root_node = NULL;
+	root_node.reset();
 	enableOpenCSG = false;
 
 	// Initialize special variables
@@ -709,7 +700,7 @@ void MainWindow::compileCSG(bool procevents)
 #endif
 	QApplication::processEvents();
 
-	progress_report_prep(root_node, report_func, pd);
+	progress_report_prep(*root_node, report_func, pd);
 	try {
 		root_raw_term = root_node->render_csg_term(m, &highlight_terms, &background_terms);
 		if (!root_raw_term) {
@@ -1116,7 +1107,7 @@ void MainWindow::actionRenderCGAL()
 
 	QApplication::processEvents();
 
-	progress_report_prep(root_node, report_func, pd);
+	progress_report_prep(*root_node, report_func, pd);
 	try {
 		this->root_N = new CGAL_Nef_polyhedron(root_node->render_cgal_nef_polyhedron());
 	}

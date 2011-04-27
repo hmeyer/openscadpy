@@ -35,6 +35,9 @@
 #  include <CGAL/exceptions.h>
 #endif
 
+#include <boost/make_shared.hpp>
+using boost::make_shared;
+
 enum csg_type_e {
 	CSG_TYPE_UNION,
 	CSG_TYPE_DIFFERENCE,
@@ -46,12 +49,13 @@ class CsgModule : public AbstractModule
 public:
 	csg_type_e type;
 	CsgModule(csg_type_e type) : type(type) { }
-	virtual AbstractNode *evaluate(const Context *ctx, const ModuleInstantiation *inst) const;
+	virtual AbstractNode::Pointer evaluate(const Context *ctx, const ModuleInstantiation *inst) const;
 };
 
 class CsgNode : public AbstractNode
 {
 public:
+	typedef shared_ptr<CsgNode> Pointer;
 	csg_type_e type;
 	CsgNode(const ModuleInstantiation *mi, csg_type_e type) : AbstractNode(mi), type(type) { }
 #ifdef ENABLE_CGAL
@@ -61,13 +65,12 @@ public:
 	virtual QString dump(QString indent) const;
 };
 
-AbstractNode *CsgModule::evaluate(const Context*, const ModuleInstantiation *inst) const
+AbstractNode::Pointer CsgModule::evaluate(const Context*, const ModuleInstantiation *inst) const
 {
-	CsgNode *node = new CsgNode(inst, type);
+	CsgNode::Pointer node(make_shared<CsgNode>(inst, type));
 	foreach (ModuleInstantiation *v, inst->children) {
-		AbstractNode *n = v->evaluate(inst->ctx);
-		if (n != NULL)
-			node->children.append(n);
+		AbstractNode::Pointer n = v->evaluate(inst->ctx);
+		if (n) node->children.append(n);
 	}
 	return node;
 }
@@ -89,7 +92,7 @@ CGAL_Nef_polyhedron CsgNode::render_cgal_nef_polyhedron() const
 	bool first = true;
 	CGAL_Nef_polyhedron N;
 	try {
-	foreach (AbstractNode *v, children) {
+	foreach (AbstractNode::Pointer v, children) {
 		if (v->modinst->tag_background)
 			continue;
 		if (first) {
@@ -133,7 +136,7 @@ CGAL_Nef_polyhedron CsgNode::render_cgal_nef_polyhedron() const
 CSGTerm *CsgNode::render_csg_term(double m[20], QVector<CSGTerm*> *highlights, QVector<CSGTerm*> *background) const
 {
 	CSGTerm *t1 = NULL;
-	foreach (AbstractNode *v, children) {
+	foreach (AbstractNode::Pointer v, children) {
 		CSGTerm *t2 = v->render_csg_term(m, highlights, background);
 		if (t2 && !t1) {
 			t1 = t2;
@@ -166,7 +169,7 @@ QString CsgNode::dump(QString indent) const
 			text += "difference() {\n";
 		if (type == CSG_TYPE_INTERSECTION)
 			text += "intersection() {\n";
-		foreach (AbstractNode *v, children)
+		foreach (AbstractNode::Pointer v, children)
 			text += v->dump(indent + QString("\t"));
 		((AbstractNode*)this)->dump_cache = text + indent + "}\n";
 	}

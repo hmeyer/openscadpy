@@ -4,6 +4,10 @@
 #include <QHash>
 #include <QString>
 #include "value.h"
+#include <boost/shared_ptr.hpp>
+using boost::shared_ptr;
+class AbstractNode;
+typedef shared_ptr<AbstractNode> AbstractNodePtr;
 
 class Context
 {
@@ -30,7 +34,7 @@ public:
 	QString get_absolute_path(const QString &filename) const;
 
 	Value evaluate_function(QString name, const QVector<QString> &argnames, const QVector<Value> &argvalues) const;
-	class AbstractNode *evaluate_module(const ModuleInstantiation *inst) const;
+	AbstractNodePtr evaluate_module(const ModuleInstantiation *inst) const;
 };
 
 #endif

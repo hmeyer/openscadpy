@@ -121,7 +121,7 @@ Value Context::evaluate_function(QString name, const QVector<QString> &argnames,
 	return Value();
 }
 
-AbstractNode *Context::evaluate_module(const ModuleInstantiation *inst) const
+AbstractNodePtr Context::evaluate_module(const ModuleInstantiation *inst) const
 {
 	if (modules_p && modules_p->contains(inst->modname))
 		return modules_p->value(inst->modname)->evaluate(this, inst);
@@ -145,7 +145,7 @@ AbstractNode *Context::evaluate_module(const ModuleInstantiation *inst) const
 	if (parent)
 		return parent->evaluate_module(inst);
 	PRINTA("WARNING: Ignoring unkown module '%1'.", inst->modname);
-	return NULL;
+	return AbstractNodePtr();
 }
 
 QString Context::get_absolute_path(const QString &filename) const
