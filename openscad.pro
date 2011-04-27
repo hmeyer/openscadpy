@@ -126,6 +126,7 @@ HEADERS += src/CGAL_renderer.h \
            src/cgal.h \
            src/context.h \
            src/csgterm.h \
+	   src/csgops.h \
            src/dxfdata.h \
            src/dxfdim.h \
            src/dxftess.h \
@@ -134,11 +135,13 @@ HEADERS += src/CGAL_renderer.h \
            src/function.h \
            src/grid.h \
            src/highlighter.h \
+	   src/matrix.h \
            src/module.h \
            src/node.h \
            src/openscad.h \
            src/polyset.h \
            src/printutils.h \
+	   src/transform.h \
            src/value.h \
            src/progress.h \
            src/editor.h \

@@ -24,8 +24,8 @@
  *
  */
 
+#include "transform.h"
 #include "module.h"
-#include "node.h"
 #include "context.h"
 #include "dxfdata.h"
 #include "csgterm.h"
@@ -36,15 +36,6 @@
 #include <boost/make_shared.hpp>
 using boost::make_shared;
 
-enum transform_type_e {
-	SCALE,
-	ROTATE,
-	MIRROR,
-	TRANSLATE,
-	MULTMATRIX,
-	COLOR
-};
-
 class TransformModule : public AbstractModule
 {
 public:
@@ -53,191 +44,215 @@ public:
 	virtual AbstractNode::Pointer evaluate(const Context *ctx, const ModuleInstantiation *inst) const;
 };
 
-class TransformNode : public AbstractNode
-{
-public:
-	typedef shared_ptr< TransformNode > Pointer;
-	double m[20];
-	TransformNode(const ModuleInstantiation *mi) : AbstractNode(mi) { }
-#ifdef ENABLE_CGAL
-	virtual CGAL_Nef_polyhedron render_cgal_nef_polyhedron() const;
-#endif
-	virtual CSGTerm *render_csg_term(double m[20], QVector<CSGTerm*> *highlights, QVector<CSGTerm*> *background) const;
-	virtual QString dump(QString indent) const;
-};
+TransformNode::TransformNode(const NodeList &children, const Props p) 
+  :AbstractNode(p,children) {
+  for (int i = 0; i < 16; i++)
+    m[i] = i % 5 == 0 ? 1.0 : 0.0;
+  for (int i = 16; i < 20; i++)
+    m[i] = -1;
+}
+
+TransformScaleNode::TransformScaleNode(const Float3 &scale, const NodeList &children, const Props p) 
+  :TransformNode(children,p) {
+    m[0] = scale[0];
+    m[5] = scale[1];
+    m[10] = scale[2];
+    if (m[10] <= 0) m[10] = 1;
+}
+
+TransformRotateNode::TransformRotateNode(const Float3 &rotation, const NodeList &children, const Props p) 
+  :TransformNode(children,p) {
+  for (int i = 0; i < rotation.static_size; i++) {
+	  double c = cos(rotation[i]*M_PI/180.0);
+	  double s = sin(rotation[i]*M_PI/180.0);
+	  double x = i == 0, y = i == 1, z = i == 2;
+	  double mr[16] = {
+		  x*x*(1-c)+c,
+		  y*x*(1-c)+z*s,
+		  z*x*(1-c)-y*s,
+		  0,
+		  x*y*(1-c)-z*s,
+		  y*y*(1-c)+c,
+		  z*y*(1-c)+x*s,
+		  0,
+		  x*z*(1-c)+y*s,
+		  y*z*(1-c)-x*s,
+		  z*z*(1-c)+c,
+		  0,
+		  0, 0, 0, 1
+	  };
+	  double mt[16];
+	  for (int x = 0; x < 4; x++)
+	  for (int y = 0; y < 4; y++)
+	  {
+		  mt[x+y*4] = 0;
+		  for (int i = 0; i < 4; i++)
+			  mt[x+y*4] += m[i+y*4] * mr[x+i*4];
+	  }
+	  for (int i = 0; i < 16; i++)
+		  m[i] = mt[i];
+  }
+}
+
+TransformRotateAxisNode::TransformRotateAxisNode(const Float3 &axis, FloatType angle, const NodeList &children, const Props p) 
+  :TransformNode(children,p) {
+  FloatType x = axis[0], y = axis[1], z =axis[2];
+  if (x != 0.0 || y != 0.0 || z != 0.0) {
+      double sn = 1.0 / sqrt(x*x + y*y + z*z);
+      x *= sn, y *= sn, z *= sn;
+      double c = cos(angle*M_PI/180.0);
+      double s = sin(angle*M_PI/180.0);
+
+      m[ 0] = x*x*(1-c)+c;
+      m[ 1] = y*x*(1-c)+z*s;
+      m[ 2] = z*x*(1-c)-y*s;
+
+      m[ 4] = x*y*(1-c)-z*s;
+      m[ 5] = y*y*(1-c)+c;
+      m[ 6] = z*y*(1-c)+x*s;
+
+      m[ 8] = x*z*(1-c)+y*s;
+      m[ 9] = y*z*(1-c)-x*s;
+      m[10] = z*z*(1-c)+c;
+  }
+}
+
+TransformMirrorNode::TransformMirrorNode(const Float3 &axis, const NodeList &children, const Props p)
+  :TransformNode(children,p) {
+  FloatType x = axis[0], y = axis[1], z =axis[2];
+  if (x != 0.0 || y != 0.0 || z != 0.0) {
+    double sn = 1.0 / sqrt(x*x + y*y + z*z);
+    x *= sn, y *= sn, z *= sn;
+    m[ 0] = 1-2*x*x;
+    m[ 1] = -2*y*x;
+    m[ 2] = -2*z*x;
+
+    m[ 4] = -2*x*y;
+    m[ 5] = 1-2*y*y;
+    m[ 6] = -2*z*y;
+
+    m[ 8] = -2*x*z;
+    m[ 9] = -2*y*z;
+    m[10] = 1-2*z*z;
+  }
+}
+
+TransformTranslateNode::TransformTranslateNode(const Float3 &v, const NodeList &children, const Props p)
+  :TransformNode(children,p) {
+  m[12] = v[0]; m[13] = v[1]; m[14] = v[2];
+}
+
+TransformMatrixNode::TransformMatrixNode(const Float16 &mat, const NodeList &children, const Props p)
+  :TransformNode(children,p) {
+  for (int i = 0; i < mat.static_size; i++)
+    m[i] = mat[i];
+}
+
+TransformColorNode::TransformColorNode(const Float4 &color, const NodeList &children, const Props p)
+  :TransformNode(children,p) {
+  for (int i = 0; i < color.static_size; i++)
+    m[16+i] = color[i];
+}
 
 AbstractNode::Pointer TransformModule::evaluate(const Context *ctx, const ModuleInstantiation *inst) const
 {
-	TransformNode::Pointer node(make_shared<TransformNode>(inst) );
+  AbstractNode::NodeList children;
+  foreach (ModuleInstantiation *v, inst->children) {
+	  AbstractNode::Pointer n(v->evaluate(inst->ctx));
+	  if (n) children.append(n);
+  }
+  QVector<QString> argnames;
+  QVector<Expression*> argexpr;
 
-	for (int i = 0; i < 16; i++)
-		node->m[i] = i % 5 == 0 ? 1.0 : 0.0;
-	for (int i = 16; i < 20; i++)
-		node->m[i] = -1;
+  if (type == SCALE) {
+	  argnames = QVector<QString>() << "v";
+  }
+  if (type == ROTATE) {
+	  argnames = QVector<QString>() << "a" << "v";
+  }
+  if (type == MIRROR) {
+	  argnames = QVector<QString>() << "v";
+  }
+  if (type == TRANSLATE) {
+	  argnames = QVector<QString>() << "v";
+  }
+  if (type == MULTMATRIX) {
+	  argnames = QVector<QString>() << "m";
+  }
+  if (type == COLOR) {
+	  argnames = QVector<QString>() << "c";
+  }
 
-	QVector<QString> argnames;
-	QVector<Expression*> argexpr;
+  Context c(ctx);
+  c.args(argnames, argexpr, inst->argnames, inst->argvalues);
 
-	if (type == SCALE) {
-		argnames = QVector<QString>() << "v";
-	}
-	if (type == ROTATE) {
-		argnames = QVector<QString>() << "a" << "v";
-	}
-	if (type == MIRROR) {
-		argnames = QVector<QString>() << "v";
-	}
-	if (type == TRANSLATE) {
-		argnames = QVector<QString>() << "v";
-	}
-	if (type == MULTMATRIX) {
-		argnames = QVector<QString>() << "m";
-	}
-	if (type == COLOR) {
-		argnames = QVector<QString>() << "c";
-	}
-
-	Context c(ctx);
-	c.args(argnames, argexpr, inst->argnames, inst->argvalues);
-
-	if (type == SCALE)
-	{
-		Value v = c.lookup_variable("v");
-		v.getnum(node->m[0]);
-		v.getnum(node->m[5]);
-		v.getnum(node->m[10]);
-		v.getv3(node->m[0], node->m[5], node->m[10]);
-		if (node->m[10] <= 0)
-			node->m[10] = 1;
-	}
-	if (type == ROTATE)
-	{
-		Value val_a = c.lookup_variable("a");
-		if (val_a.type == Value::VECTOR)
-		{
-			for (int i = 0; i < 3 && i < val_a.vec.size(); i++) {
-				double a;
-				val_a.vec[i]->getnum(a);
-				double c = cos(a*M_PI/180.0);
-				double s = sin(a*M_PI/180.0);
-				double x = i == 0, y = i == 1, z = i == 2;
-				double mr[16] = {
-					x*x*(1-c)+c,
-					y*x*(1-c)+z*s,
-					z*x*(1-c)-y*s,
-					0,
-					x*y*(1-c)-z*s,
-					y*y*(1-c)+c,
-					z*y*(1-c)+x*s,
-					0,
-					x*z*(1-c)+y*s,
-					y*z*(1-c)-x*s,
-					z*z*(1-c)+c,
-					0,
-					0, 0, 0, 1
-				};
-				double m[16];
-				for (int x = 0; x < 4; x++)
-				for (int y = 0; y < 4; y++)
-				{
-					m[x+y*4] = 0;
-					for (int i = 0; i < 4; i++)
-						m[x+y*4] += node->m[i+y*4] * mr[x+i*4];
-				}
-				for (int i = 0; i < 16; i++)
-					node->m[i] = m[i];
-			}
-		}
-		else
-		{
-			Value val_v = c.lookup_variable("v");
-			double a = 0, x = 0, y = 0, z = 1;
-
-			val_a.getnum(a);
-
-			if (val_v.getv3(x, y, z)) {
-				if (x != 0.0 || y != 0.0 || z != 0.0) {
-					double sn = 1.0 / sqrt(x*x + y*y + z*z);
-					x *= sn, y *= sn, z *= sn;
-				}
-			}
-
-			if (x != 0.0 || y != 0.0 || z != 0.0)
-			{
-				double c = cos(a*M_PI/180.0);
-				double s = sin(a*M_PI/180.0);
-
-				node->m[ 0] = x*x*(1-c)+c;
-				node->m[ 1] = y*x*(1-c)+z*s;
-				node->m[ 2] = z*x*(1-c)-y*s;
-
-				node->m[ 4] = x*y*(1-c)-z*s;
-				node->m[ 5] = y*y*(1-c)+c;
-				node->m[ 6] = z*y*(1-c)+x*s;
-
-				node->m[ 8] = x*z*(1-c)+y*s;
-				node->m[ 9] = y*z*(1-c)-x*s;
-				node->m[10] = z*z*(1-c)+c;
-			}
-		}
-	}
-	if (type == MIRROR)
-	{
-		Value val_v = c.lookup_variable("v");
-		double x = 1, y = 0, z = 0;
-	
-		if (val_v.getv3(x, y, z)) {
-			if (x != 0.0 || y != 0.0 || z != 0.0) {
-				double sn = 1.0 / sqrt(x*x + y*y + z*z);
-				x *= sn, y *= sn, z *= sn;
-			}
-		}
-
-		if (x != 0.0 || y != 0.0 || z != 0.0)
-		{
-			node->m[ 0] = 1-2*x*x;
-			node->m[ 1] = -2*y*x;
-			node->m[ 2] = -2*z*x;
-
-			node->m[ 4] = -2*x*y;
-			node->m[ 5] = 1-2*y*y;
-			node->m[ 6] = -2*z*y;
-
-			node->m[ 8] = -2*x*z;
-			node->m[ 9] = -2*y*z;
-			node->m[10] = 1-2*z*z;
-		}
-	}
-	if (type == TRANSLATE)
-	{
-		Value v = c.lookup_variable("v");
-		v.getv3(node->m[12], node->m[13], node->m[14]);
-	}
-	if (type == MULTMATRIX)
-	{
-		Value v = c.lookup_variable("m");
-		if (v.type == Value::VECTOR) {
-			for (int i = 0; i < 16; i++) {
-				int x = i / 4, y = i % 4;
-				if (y < v.vec.size() && v.vec[y]->type == Value::VECTOR && x < v.vec[y]->vec.size())
-					v.vec[y]->vec[x]->getnum(node->m[i]);
-			}
-		}
-	}
-	if (type == COLOR)
-	{
-		Value v = c.lookup_variable("c");
-		if (v.type == Value::VECTOR) {
-			for (int i = 0; i < 4; i++)
-				node->m[16+i] = i < v.vec.size() ? v.vec[i]->num : 1.0;
-		}
-	}
-
-	foreach (ModuleInstantiation *v, inst->children) {
-		AbstractNode::Pointer n(v->evaluate(inst->ctx));
-		if (n) node->children.append(n);
-	}
-	return node;
+  if (type == SCALE)
+  {
+    Value v = c.lookup_variable("v");
+    Float3 scale;
+    v.getnum(scale[0]);
+    v.getnum(scale[1]);
+    v.getnum(scale[2]);
+    v.getv3(scale[0],scale[1],scale[2]);
+    return make_shared<TransformScaleNode>(scale, children, inst);
+  }
+  if (type == ROTATE)
+  {
+    Value val_a = c.lookup_variable("a");
+    if (val_a.type == Value::VECTOR)
+    {
+      Float3 rotation;
+      for (int i = 0; i < 3 && i < val_a.vec.size(); i++)
+	      val_a.vec[i]->getnum(rotation[i]);
+      return make_shared<TransformRotateNode>(rotation,children,inst);
+    }
+    else
+    {
+      Value val_v = c.lookup_variable("v");
+      Float3 v={{0,0,1}};
+      FloatType angle = 0;
+      val_a.getnum(angle);
+      val_v.getv3(v[0], v[1], v[2]);
+      return make_shared<TransformRotateAxisNode>(v,angle,children,inst);
+    }
+  }
+  if (type == MIRROR)
+  {
+    Value val_v = c.lookup_variable("v");
+    Float3 v={{1,0,0}};
+    val_v.getv3(v[0], v[1], v[2]);
+    return make_shared<TransformMirrorNode>(v,children,inst);
+  }
+  if (type == TRANSLATE)
+  {
+    Value val_v = c.lookup_variable("v");
+    Float3 v;
+    val_v.getv3(v[0], v[1], v[2]);
+    return make_shared<TransformTranslateNode>(v,children,inst);
+  }
+  if (type == MULTMATRIX)
+  {
+	  Value v = c.lookup_variable("m");
+	  Float16 mat;
+	  if (v.type == Value::VECTOR) {
+		  for (int i = 0; i < 16; i++) {
+			  int x = i / 4, y = i % 4;
+			  if (y < v.vec.size() && v.vec[y]->type == Value::VECTOR && x < v.vec[y]->vec.size())
+				  v.vec[y]->vec[x]->getnum(mat[i]);
+		  }
+	  }
+	  return make_shared<TransformMatrixNode>(mat,children,inst);
+  }
+//  if (type == COLOR)
+  {
+	  Value v = c.lookup_variable("c");
+	  Float4 color;
+	  if (v.type == Value::VECTOR) {
+		  for (int i = 0; i < 4; i++)
+			  color[i] = i < v.vec.size() ? v.vec[i]->num : 1.0;
+	  }
+	  return make_shared<TransformColorNode>(color,children,inst);
+  }
 }
 
 #ifdef ENABLE_CGAL
@@ -313,9 +328,9 @@ CGAL_Nef_polyhedron TransformNode::render_cgal_nef_polyhedron() const
 
 #endif /* ENABLE_CGAL */
 
-CSGTerm *TransformNode::render_csg_term(double c[20], QVector<CSGTerm*> *highlights, QVector<CSGTerm*> *background) const
+CSGTerm *TransformNode::render_csg_term(const Float20 &c, QVector<CSGTerm*> *highlights, QVector<CSGTerm*> *background) const
 {
-	double x[20];
+	Float20 x;
 
 	for (int i = 0; i < 16; i++)
 	{

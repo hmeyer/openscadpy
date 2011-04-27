@@ -9,6 +9,7 @@
 #endif
 
 #include <boost/shared_ptr.hpp>
+#include "matrix.h"
 
 using boost::shared_ptr;
 
@@ -27,6 +28,7 @@ public:
 	  bool root;
 	  bool highlight;
 	  bool background;
+	  inline Props():root(false),highlight(false),background(false) {}
 	  inline Props(bool root, bool highlight, bool background)
 	    :root(root),highlight(highlight),background(background) {}
 	  Props(const class ModuleInstantiation *mi);
@@ -46,6 +48,7 @@ public:
 	QString dump_cache;
 
 	AbstractNode(const Props &p);
+	AbstractNode(const Props &p, const NodeList &children);
 	virtual ~AbstractNode();
 	virtual QString mk_cache_id() const;
 #ifdef ENABLE_CGAL
@@ -56,9 +59,9 @@ public:
 	};
 	static QCache<QString, cgal_nef_cache_entry> cgal_nef_cache;
 	virtual CGAL_Nef_polyhedron render_cgal_nef_polyhedron() const;
-	class CSGTerm *render_csg_term_from_nef(double m[20], QVector<CSGTerm*> *highlights, QVector<CSGTerm*> *background, const char *statement, int convexity) const;
+	class CSGTerm *render_csg_term_from_nef(const Float20 &m, QVector<CSGTerm*> *highlights, QVector<CSGTerm*> *background, const char *statement, int convexity) const;
 #endif
-	virtual class CSGTerm *render_csg_term(double m[20], QVector<CSGTerm*> *highlights, QVector<CSGTerm*> *background) const;
+	virtual class CSGTerm *render_csg_term(const Float20 &m, QVector<CSGTerm*> *highlights, QVector<CSGTerm*> *background) const;
 	virtual QString dump(QString indent) const;
 };
 
@@ -69,7 +72,7 @@ public:
 #ifdef ENABLE_CGAL
 	virtual CGAL_Nef_polyhedron render_cgal_nef_polyhedron() const;
 #endif
-	virtual CSGTerm *render_csg_term(double m[20], QVector<CSGTerm*> *highlights, QVector<CSGTerm*> *background) const;
+	virtual CSGTerm *render_csg_term(const Float20 &m, QVector<CSGTerm*> *highlights, QVector<CSGTerm*> *background) const;
 	virtual QString dump(QString indent) const;
 };
 
@@ -85,8 +88,8 @@ public:
 #ifdef ENABLE_CGAL
 	virtual CGAL_Nef_polyhedron render_cgal_nef_polyhedron() const;
 #endif
-	virtual CSGTerm *render_csg_term(double m[20], QVector<CSGTerm*> *highlights, QVector<CSGTerm*> *background) const;
-	static CSGTerm *render_csg_term_from_ps(double m[20], QVector<CSGTerm*> *highlights, QVector<CSGTerm*> *background, PolySet *ps, const Props &p, int idx);
+	virtual CSGTerm *render_csg_term(const Float20 &m, QVector<CSGTerm*> *highlights, QVector<CSGTerm*> *background) const;
+	static CSGTerm *render_csg_term_from_ps(const Float20 &m, QVector<CSGTerm*> *highlights, QVector<CSGTerm*> *background, PolySet *ps, const Props &p, int idx);
 };
 
 #endif

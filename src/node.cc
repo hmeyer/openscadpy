@@ -43,6 +43,12 @@ AbstractNode::AbstractNode(const Props &p):props(p)
 	idx = idx_counter++;
 }
 
+AbstractNode::AbstractNode(const Props &p, const NodeList &children):children(children),props(p)
+{
+	idx = idx_counter++;
+}
+
+
 AbstractNode::~AbstractNode() {}
 
 QString AbstractNode::mk_cache_id() const
@@ -115,7 +121,7 @@ CGAL_Nef_polyhedron AbstractIntersectionNode::render_cgal_nef_polyhedron() const
 
 #endif /* ENABLE_CGAL */
 
-static CSGTerm *render_csg_term_backend(const AbstractNode *that, bool intersect, double m[20], QVector<CSGTerm*> *highlights, QVector<CSGTerm*> *background)
+static CSGTerm *render_csg_term_backend(const AbstractNode *that, bool intersect, const Float20 &m, QVector<CSGTerm*> *highlights, QVector<CSGTerm*> *background)
 {
 	CSGTerm *t1 = NULL;
 	foreach(AbstractNode::Pointer v, that->children) {
@@ -138,12 +144,12 @@ static CSGTerm *render_csg_term_backend(const AbstractNode *that, bool intersect
 	return t1;
 }
 
-CSGTerm *AbstractNode::render_csg_term(double m[20], QVector<CSGTerm*> *highlights, QVector<CSGTerm*> *background) const
+CSGTerm *AbstractNode::render_csg_term(const Float20 &m, QVector<CSGTerm*> *highlights, QVector<CSGTerm*> *background) const
 {
 	return render_csg_term_backend(this, false, m, highlights, background);
 }
 
-CSGTerm *AbstractIntersectionNode::render_csg_term(double m[20], QVector<CSGTerm*> *highlights, QVector<CSGTerm*> *background) const
+CSGTerm *AbstractIntersectionNode::render_csg_term(const Float20 &m, QVector<CSGTerm*> *highlights, QVector<CSGTerm*> *background) const
 {
 	return render_csg_term_backend(this, true, m, highlights, background);
 }
@@ -213,13 +219,13 @@ CGAL_Nef_polyhedron AbstractPolyNode::render_cgal_nef_polyhedron() const
 
 #endif /* ENABLE_CGAL */
 
-CSGTerm *AbstractPolyNode::render_csg_term(double m[20], QVector<CSGTerm*> *highlights, QVector<CSGTerm*> *background) const
+CSGTerm *AbstractPolyNode::render_csg_term(const Float20 &m, QVector<CSGTerm*> *highlights, QVector<CSGTerm*> *background) const
 {
 	PolySet *ps = render_polyset(RENDER_OPENCSG);
 	return render_csg_term_from_ps(m, highlights, background, ps, props, idx);
 }
 
-CSGTerm *AbstractPolyNode::render_csg_term_from_ps(double m[20], QVector<CSGTerm*> *highlights, QVector<CSGTerm*> *background, PolySet *ps, const AbstractNode::Props &p, int idx)
+CSGTerm *AbstractPolyNode::render_csg_term_from_ps(const Float20 &m, QVector<CSGTerm*> *highlights, QVector<CSGTerm*> *background, PolySet *ps, const AbstractNode::Props &p, int idx)
 {
 	CSGTerm *t = new CSGTerm(ps, m, QString("n%1").arg(idx));
 	if (p.highlight && highlights)

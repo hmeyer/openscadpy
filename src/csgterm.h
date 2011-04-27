@@ -3,6 +3,8 @@
 
 #include <QString>
 #include <QVector>
+#include "matrix.h"
+#include <boost/shared_ptr.hpp>
 
 class CSGTerm
 {
@@ -19,10 +21,10 @@ public:
 	QString label;
 	CSGTerm *left;
 	CSGTerm *right;
-	double m[20];
+	Float20 m;
 	int refcounter;
 
-	CSGTerm(PolySet *polyset, double m[20], QString label);
+	CSGTerm(PolySet *polyset, const Float20 &m, QString label);
 	CSGTerm(type_e type, CSGTerm *left, CSGTerm *right);
 
 	CSGTerm *normalize();
@@ -37,13 +39,13 @@ class CSGChain
 {
 public:
 	QVector<PolySet*> polysets;
-	QVector<double*> matrices;
+	QVector<Float20Ptr> matrices;
 	QVector<CSGTerm::type_e> types;
 	QVector<QString> labels;
 
 	CSGChain();
 
-	void add(PolySet *polyset, double *m, CSGTerm::type_e type, QString label);
+	void add(PolySet *polyset, const Float20 &m, CSGTerm::type_e type, QString label);
 	void import(CSGTerm *term, CSGTerm::type_e type = CSGTerm::TYPE_UNION);
 	QString dump();
 };

@@ -26,27 +26,14 @@
 
 #include "csgterm.h"
 #include "polyset.h"
+#include <boost/make_shared.hpp>
 
-CSGTerm::CSGTerm(PolySet *polyset, double m[20], QString label)
-{
-	this->type = TYPE_PRIMITIVE;
-	this->polyset = polyset;
-	this->label = label;
-	this->left = NULL;
-	this->right = NULL;
-	for (int i = 0; i < 20; i++)
-		this->m[i] = m[i];
-	refcounter = 1;
-}
+CSGTerm::CSGTerm(PolySet *polyset, const Float20 &m, QString label)
+  :type(TYPE_PRIMITIVE),polyset(polyset),label(label),left(NULL),right(NULL),
+  m(m),refcounter(1) {}
 
 CSGTerm::CSGTerm(type_e type, CSGTerm *left, CSGTerm *right)
-{
-	this->type = type;
-	this->polyset = NULL;
-	this->left = left;
-	this->right = right;
-	refcounter = 1;
-}
+  :type(type), polyset(NULL), left(left), right(right), refcounter(1) {}
 
 CSGTerm *CSGTerm::normalize()
 {
@@ -172,10 +159,11 @@ CSGChain::CSGChain()
 {
 }
 
-void CSGChain::add(PolySet *polyset, double *m, CSGTerm::type_e type, QString label)
+void CSGChain::add(PolySet *polyset, const Float20 &m, CSGTerm::type_e type, QString label)
 {
 	polysets.append(polyset);
-	matrices.append(m);
+	Float20Ptr mp(boost::make_shared<Float20>(m));
+	matrices.append(mp);
 	types.append(type);
 	labels.append(label);
 }

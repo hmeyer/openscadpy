@@ -136,7 +136,7 @@ static void gl_draw_triangle(GLint *shaderinfo, const PolySet::Point *p0, const 
 	}
 }
 
-void PolySet::render_surface(colormode_e colormode, csgmode_e csgmode, double *m, GLint *shaderinfo) const
+void PolySet::render_surface(colormode_e colormode, csgmode_e csgmode, const Float20 &m, GLint *shaderinfo) const
 {
 	Eigen::Matrix3f m3f;
 	m3f << m[0], m[4], m[8],

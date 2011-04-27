@@ -1,6 +1,7 @@
 #include "render-opencsg.h"
 #include "polyset.h"
 #include "csgterm.h"
+#include "matrix.h"
 
 class OpenCSGPrim : public OpenCSG::Primitive
 {
@@ -8,12 +9,12 @@ public:
 	OpenCSGPrim(OpenCSG::Operation operation, unsigned int convexity) :
 			OpenCSG::Primitive(operation, convexity) { }
 	PolySet *p;
-	double *m;
+	Float20Ptr m;
 	int csgmode;
 	virtual void render() {
 		glPushMatrix();
-		glMultMatrixd(m);
-		p->render_surface(PolySet::COLORMODE_NONE, PolySet::csgmode_e(csgmode), m);
+		glMultMatrixd(m->c_array());
+		p->render_surface(PolySet::COLORMODE_NONE, PolySet::csgmode_e(csgmode), *m);
 		glPopMatrix();
 	}
 };
@@ -35,9 +36,9 @@ void renderCSGChainviaOpenCSG(CSGChain *chain, GLint *shaderinfo, bool highlight
 			if (shaderinfo)
 				glUseProgram(shaderinfo[0]);
 			for (; j < i; j++) {
-				double *m = chain->matrices[j];
+				Float20 &m = *chain->matrices[j];
 				glPushMatrix();
-				glMultMatrixd(m);
+				glMultMatrixd(m.c_array());
 				int csgmode = chain->types[j] == CSGTerm::TYPE_DIFFERENCE ? PolySet::CSGMODE_DIFFERENCE : PolySet::CSGMODE_NORMAL;
 				if (highlight) {
 					chain->polysets[j]->render_surface(PolySet::COLORMODE_HIGHLIGHT, PolySet::csgmode_e(csgmode + 20), m, shaderinfo);

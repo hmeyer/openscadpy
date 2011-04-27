@@ -24,13 +24,12 @@
  *
  */
 
+
 #include "module.h"
-#include "node.h"
-#include "csgterm.h"
+#include "csgops.h"
 #include "builtin.h"
 #include "printutils.h"
 #ifdef ENABLE_CGAL
-#  include "cgal.h"
 #  include <CGAL/assertions_behaviour.h>
 #  include <CGAL/exceptions.h>
 #endif
@@ -38,11 +37,6 @@
 #include <boost/make_shared.hpp>
 using boost::make_shared;
 
-enum csg_type_e {
-	CSG_TYPE_UNION,
-	CSG_TYPE_DIFFERENCE,
-	CSG_TYPE_INTERSECTION
-};
 
 class CsgModule : public AbstractModule
 {
@@ -52,26 +46,15 @@ public:
 	virtual AbstractNode::Pointer evaluate(const Context *ctx, const ModuleInstantiation *inst) const;
 };
 
-class CsgNode : public AbstractNode
-{
-public:
-	typedef shared_ptr<CsgNode> Pointer;
-	csg_type_e type;
-	CsgNode(const ModuleInstantiation *mi, csg_type_e type) : AbstractNode(mi), type(type) { }
-#ifdef ENABLE_CGAL
-	virtual CGAL_Nef_polyhedron render_cgal_nef_polyhedron() const;
-#endif
-	CSGTerm *render_csg_term(double m[20], QVector<CSGTerm*> *highlights, QVector<CSGTerm*> *background) const;
-	virtual QString dump(QString indent) const;
-};
-
 AbstractNode::Pointer CsgModule::evaluate(const Context*, const ModuleInstantiation *inst) const
 {
-	CsgNode::Pointer node(make_shared<CsgNode>(inst, type));
+	AbstractNode::NodeList children;
 	foreach (ModuleInstantiation *v, inst->children) {
 		AbstractNode::Pointer n = v->evaluate(inst->ctx);
-		if (n) node->children.append(n);
+		if (n) children.append(n);
 	}
+	AbstractNode::Props p(inst);
+	CsgNode::Pointer node(make_shared<CsgNode>(type, children, p));
 	return node;
 }
 
@@ -133,7 +116,7 @@ CGAL_Nef_polyhedron CsgNode::render_cgal_nef_polyhedron() const
 
 #endif /* ENABLE_CGAL */
 
-CSGTerm *CsgNode::render_csg_term(double m[20], QVector<CSGTerm*> *highlights, QVector<CSGTerm*> *background) const
+CSGTerm *CsgNode::render_csg_term(const Float20 &m, QVector<CSGTerm*> *highlights, QVector<CSGTerm*> *background) const
 {
 	CSGTerm *t1 = NULL;
 	foreach (AbstractNode::Pointer v, children) {

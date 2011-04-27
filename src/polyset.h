@@ -16,6 +16,7 @@
 #endif
 
 #include <QCache>
+#include "matrix.h"
 
 class PolySet
 {
@@ -74,7 +75,7 @@ public:
 
 	static QCache<QString,ps_cache_entry> ps_cache;
 
-	void render_surface(colormode_e colormode, csgmode_e csgmode, double *m, GLint *shaderinfo = NULL) const;
+	void render_surface(colormode_e colormode, csgmode_e csgmode, const Float20 &m, GLint *shaderinfo = NULL) const;
 	void render_edges(colormode_e colormode, csgmode_e csgmode) const;
 
 #ifdef ENABLE_CGAL

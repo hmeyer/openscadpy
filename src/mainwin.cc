@@ -46,6 +46,8 @@
 #include "ProgressWidget.h"
 #endif
 
+#include <map>
+
 #include <QMenu>
 #include <QTime>
 #include <QMenuBar>
@@ -675,7 +677,7 @@ void MainWindow::compileCSG(bool procevents)
 	if (procevents)
 		QApplication::processEvents();
 
-	double m[20];
+	Float20 m;
 
 	for (int i = 0; i < 16; i++)
 		m[i] = i % 5 == 0 ? 1.0 : 0.0;
@@ -1541,14 +1543,15 @@ void MainWindow::viewModeCGALGrid()
 static void renderGLThrownTogetherChain(MainWindow *m, CSGChain *chain, bool highlight, bool background, bool fberror)
 {
 	glDepthFunc(GL_LEQUAL);
-	QHash<QPair<PolySet*,double*>,int> polySetVisitMark;
+	typedef std::pair< PolySet*, Float20Ptr > PolySetInst;
+	std::map<PolySetInst,int> polySetVisitMark;
 	bool showEdges = m->viewActionShowEdges->isChecked();
 	for (int i = 0; i < chain->polysets.size(); i++) {
-		if (polySetVisitMark[QPair<PolySet*,double*>(chain->polysets[i], chain->matrices[i])]++ > 0)
+		if (polySetVisitMark[PolySetInst(chain->polysets[i], chain->matrices[i])]++ > 0)
 			continue;
-		double *m = chain->matrices[i];
+		Float20 &m = *chain->matrices[i];
 		glPushMatrix();
-		glMultMatrixd(m);
+		glMultMatrixd(m.c_array());
 		int csgmode = chain->types[i] == CSGTerm::TYPE_DIFFERENCE ? PolySet::CSGMODE_DIFFERENCE : PolySet::CSGMODE_NORMAL;
 		if (highlight) {
 			chain->polysets[i]->render_surface(PolySet::COLORMODE_HIGHLIGHT, PolySet::csgmode_e(csgmode + 20), m);
