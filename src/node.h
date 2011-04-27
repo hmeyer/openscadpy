@@ -24,9 +24,10 @@ class AbstractNode
 	static int idx_counter;   // Node instantiation index
 public:
 	typedef shared_ptr<AbstractNode> Pointer;
+	typedef QVector<Pointer> NodeList;
 	static void resetIndexCounter() { idx_counter = 1; }
 
-	QVector<Pointer> children;
+	NodeList children;
 	const class ModuleInstantiation *modinst;
 
 	int progress_mark;
