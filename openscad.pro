@@ -143,6 +143,7 @@ HEADERS += src/CGAL_renderer.h \
            src/printutils.h \
 	   src/transform.h \
            src/value.h \
+	   src/primitives.h \
            src/progress.h \
            src/editor.h \
            src/mathc99.h
@@ -154,6 +155,7 @@ SOURCES += src/openscad.cc \
            src/value.cc \
            src/expr.cc \
            src/func.cc \
+	   src/matrix.cc \
            src/module.cc \
            src/node.cc \
            src/context.cc \
