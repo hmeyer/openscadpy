@@ -43,13 +43,10 @@ public:
 	  double fs;
 	  double fa;
 	  Accuracy():fn(0),fs(3),fa(2) {}
+	  Accuracy(double fn, double fs, double fa):fn(fn),fs(fs),fa(fa) {}
 	};
 	typedef shared_ptr<PrimitiveNode> Pointer;
 	static const double F_MINIMUM = 0.01;
-/*	bool center;
-	double x, y, z, h, r1, r2;
-	double fn, fs, fa;
-	Value points, paths, triangles;*/
 	int convexity;
 	PrimitiveNode(int convex=1, const Props p=Props()) : AbstractPolyNode(p), convexity(convex) { }
 	virtual QString dump(QString indent) const;
