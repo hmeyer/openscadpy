@@ -39,6 +39,9 @@
 #include "builtin.h"
 #include "dxftess.h"
 #include "progress.h"
+
+#include "rubyscript.h"
+
 #ifdef ENABLE_OPENCSG
 #include "render-opencsg.h"
 #endif
@@ -596,6 +599,8 @@ void MainWindow::compile(bool procevents)
 
 	// Parse
 	last_compiled_doc = editor->toPlainText();
+	RubyScript rubyvm;
+/*	
 	root_module = parse((last_compiled_doc + "\n" + commandline_commands).toAscii().data(), this->fileName.isEmpty() ? "" : QFileInfo(this->fileName).absolutePath().toLocal8Bit(), false);
 
 	// Error highlighting
@@ -629,6 +634,13 @@ void MainWindow::compile(bool procevents)
 	AbstractNode::resetIndexCounter();
 	root_inst = ModuleInstantiation();
 	absolute_root_node = root_module->evaluate(&root_ctx, &root_inst);
+*/
+	absolute_root_node = rubyvm.evaluate((last_compiled_doc + "\n" + commandline_commands).toAscii().data(), "");
+	if (!absolute_root_node && rubyvm.error()) {
+	  std::string t = rubyvm.getStatusText();
+	  PRINTF("Ruby:%s\n", t.c_str());
+	}
+	
 
 	if (!absolute_root_node)
 		goto fail;

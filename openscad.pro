@@ -84,6 +84,7 @@ CONFIG += cgal
 CONFIG += opencsg
 CONFIG += progresswidget
 CONFIG += boost
+CONFIG += rubyscript
 
 #Uncomment the following line to enable QCodeEdit
 #CONFIG += qcodeedit
@@ -104,6 +105,7 @@ include(cgal.pri)
 include(opencsg.pri)
 include(eigen2.pri)
 include(boost.pri)
+include(rubyscript.pri)
 
 # Standard include path for misc external libs
 #macx {
