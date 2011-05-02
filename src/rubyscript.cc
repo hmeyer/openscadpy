@@ -26,12 +26,11 @@ class RBAbstractNode {
 protected:
   AbstractNode::Pointer node;
 public:
-  AbstractNode::Pointer getNode() const;
+  AbstractNode::Pointer getNode() const { return node; }
+  std::string to_s() const {
+    return node->dump("").toStdString();
+  }
 };
-
-AbstractNode::Pointer RBAbstractNode::getNode() const {
-  return node;
-}
 
 AbstractNode::NodeList Array2NodeList(const Array &a) {
   AbstractNode::NodeList list;
@@ -57,25 +56,51 @@ typedef RBCSGNode< CSG_TYPE_UNION > RBUnionNode;
 typedef RBCSGNode< CSG_TYPE_DIFFERENCE > RBDifferenceNode;
 typedef RBCSGNode< CSG_TYPE_INTERSECTION > RBIntersectionNode;
 
-
-Float3 Array2Float3(const Array &a) {
-  Float3 p;
+template<class StdArray>
+StdArray Array2StdArray(const Array &a) {
+  StdArray p;
   try {
     int i=0;
     for(Array::const_iterator it = a.begin(); it!=a.end() && i < p.static_size; ++it,++i)
       p[i] = from_ruby<double>(it->value());
   } catch( std::exception &e) {
-    std::cerr << "Array to Float3 warning:" << e.what() << std::endl;
+    std::cerr << "Array to StdArray warning:" << e.what() << std::endl;
   }
   return p;
 }
 
-class RBTranslateNode: public RBAbstractNode {
+template<class NodeClass>
+class RBTransformNode: public RBAbstractNode {
 public:
-  RBTranslateNode(const Array &va, const Array &a) {
-    node = make_shared<TransformTranslateNode>(Array2Float3(va), Array2NodeList(a));
+  RBTransformNode(const Array &va, const Array &a) {
+    node = make_shared<NodeClass>(Array2StdArray<Float3>(va), Array2NodeList(a));
   }
 };
+
+typedef RBTransformNode<TransformScaleNode> RBScaleNode;
+typedef RBTransformNode<TransformTranslateNode> RBTranslateNode;
+typedef RBTransformNode<TransformRotateNode> RBRotateNode;
+typedef RBTransformNode<TransformMirrorNode> RBMirrorNode;
+class RBRotateAxisNode: public RBAbstractNode {
+public:
+  RBRotateAxisNode(const Array &va, double ang, const Array &a) {
+    node = make_shared<TransformRotateAxisNode>(Array2StdArray<Float3>(va), ang, Array2NodeList(a));
+  }
+};
+class RBMatrixNode: public RBAbstractNode {
+public:
+  RBMatrixNode(const Array &ma, const Array &a) {
+    node = make_shared<TransformMatrixNode>(Array2StdArray<Float16>(ma), Array2NodeList(a));
+  }
+};
+class RBColorNode: public RBAbstractNode {
+public:
+  RBColorNode(const Array &ca, const Array &a) {
+    node = make_shared<TransformColorNode>(Array2StdArray<Float4>(ca), Array2NodeList(a));
+  }
+};
+
+
 
 
 
@@ -94,7 +119,7 @@ PrimitiveNode::Accuracy getAcc(void) {
 class RBCubeNode: public RBAbstractNode {
 public:
   RBCubeNode(const Array &adim, bool center) {  
-    node = make_shared<CubeNode>(Array2Float3(adim), center);  
+    node = make_shared<CubeNode>(Array2StdArray<Float3>(adim), center);  
   }
 };
 
@@ -109,7 +134,8 @@ public:
 RubyScript::RubyScript():status(0) {
   ruby_init();
   Data_Type<RBAbstractNode> rb_AbstractNode =
-    define_class<RBAbstractNode>("AbstractNode");
+    define_class<RBAbstractNode>("AbstractNode")
+    .define_method("to_s", &RBAbstractNode::to_s);
   Data_Type<RBUnionNode> rb_UnionNode =
     define_class<RBUnionNode, RBAbstractNode>("Union")
     .define_constructor(Constructor<RBUnionNode, const Array>(),(Arg("children")));
@@ -119,9 +145,27 @@ RubyScript::RubyScript():status(0) {
   Data_Type<RBIntersectionNode> rb_IntersectionNode =
     define_class<RBIntersectionNode, RBAbstractNode>("Intersection")
     .define_constructor(Constructor<RBIntersectionNode, const Array>(),(Arg("children")));    
+  Data_Type<RBScaleNode> rb_ScaleNode =
+    define_class<RBScaleNode, RBAbstractNode>("Scale")
+    .define_constructor(Constructor<RBScaleNode, const Array, const Array>(),(Arg("vector"),Arg("children")));    
+  Data_Type<RBRotateNode> rb_RotateNode =
+    define_class<RBRotateNode, RBAbstractNode>("Rotate")
+    .define_constructor(Constructor<RBRotateNode, const Array, const Array>(),(Arg("vector"),Arg("children")));    
+  Data_Type<RBRotateAxisNode> rb_RotateAxisNode =
+    define_class<RBRotateAxisNode, RBAbstractNode>("RotateAxis")
+    .define_constructor(Constructor<RBRotateAxisNode, const Array, double, const Array>(),(Arg("vector"),Arg("ang"),Arg("children")));    
+  Data_Type<RBMirrorNode> rb_MirrorNode =
+    define_class<RBMirrorNode, RBAbstractNode>("Mirror")
+    .define_constructor(Constructor<RBMirrorNode, const Array, const Array>(),(Arg("vector"),Arg("children")));    
   Data_Type<RBTranslateNode> rb_TranslateNode =
     define_class<RBTranslateNode, RBAbstractNode>("Translate")
     .define_constructor(Constructor<RBTranslateNode, const Array, const Array>(),(Arg("vector"),Arg("children")));    
+  Data_Type<RBMatrixNode> rb_MatrixTransformNode =
+    define_class<RBMatrixNode, RBAbstractNode>("MatrixTransform")
+    .define_constructor(Constructor<RBMatrixNode, const Array, const Array>(),(Arg("vector"),Arg("children")));    
+  Data_Type<RBColorNode> rb_ColorNode =
+    define_class<RBColorNode, RBAbstractNode>("Color")
+    .define_constructor(Constructor<RBColorNode, const Array, const Array>(),(Arg("vector"),Arg("children")));    
   Data_Type<RBCubeNode> rb_CubeNode =
     define_class<RBCubeNode, RBAbstractNode>("Cube")
     .define_constructor(Constructor<RBCubeNode, const Array, bool>(),(Arg("dim")=Array(),Arg("center")=false));
