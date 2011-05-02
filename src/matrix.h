@@ -12,24 +12,15 @@ typedef boost::shared_ptr<Float20> Float20Ptr;
 typedef boost::array< FloatType, 16 > Float16;
 typedef boost::array< FloatType, 4 > Float4;
 typedef boost::array< FloatType, 3 > Float3;
+typedef boost::array< FloatType, 2 > Float2;
 
-struct Point2D {
-	double x, y;
-	Point2D():x(1),y(1) {}
-};
-struct Point3D {
-	double x, y, z;
-	Point3D(double x=.0, double y=.0, double z=.0):x(x),y(y),z(z) {}
-};
-
-typedef boost::array< double, 4> VecDouble4;
-typedef boost::array< VecDouble4, 4> MatDouble4x4;
-typedef boost::array< unsigned int, 3> Triangle;
+typedef boost::array< Float4, 4> MatFloat4x4;
+typedef boost::array< unsigned int, 3> UInt3;
 typedef std::vector<unsigned int> VecPoints;
 typedef std::vector<VecPoints> VecPaths;
-typedef std::vector<Triangle> VecTriangles;
-typedef std::vector<Point2D> Vec2D;
-typedef std::vector<Point3D> Vec3D;
+typedef std::vector<UInt3> VecTriangles;
+typedef std::vector<Float2> Vec2D;
+typedef std::vector<Float3> Vec3D;
 
 void value2points2d(const Value &v, Vec2D &points);
 void value2paths(const Value &v, VecPaths &paths);
