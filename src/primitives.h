@@ -54,9 +54,9 @@ public:
 
 class CubeNode : public PrimitiveNode {
 	bool center;
-	Point3D dim;
+	Float3 dim;
 public:
-	CubeNode(const Point3D &dim, bool center=false, const Props p=Props())
+	CubeNode(const Float3 &dim, bool center=false, const Props p=Props())
 	  :PrimitiveNode(1,p), center(center), dim(dim) {}
 	virtual PolySet *render_polyset(render_mode_e mode) const;
 	virtual QString dump(QString indent) const;
@@ -98,9 +98,9 @@ public:
 
 class SquareNode : public PrimitiveNode {
 	bool center;
-	Point2D dim;
+	Float2 dim;
 public:
-	SquareNode(const Point2D &dim, bool center, const Props p=Props())
+	SquareNode(const Float2 &dim, bool center, const Props p=Props())
 	  :PrimitiveNode(1,p), center(center), dim(dim) {}
 	virtual PolySet *render_polyset(render_mode_e mode) const;
 	virtual QString dump(QString indent) const;

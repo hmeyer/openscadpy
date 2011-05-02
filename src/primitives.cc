@@ -110,11 +110,11 @@ AbstractNode::Pointer PrimitiveModule::evaluate(const Context *ctx, const Module
 	if (type == CUBE) {
 		Value size = c.lookup_variable("size");
 		Value center = c.lookup_variable("center");
-		Point3D dim;
-		size.getnum(dim.x);
-		size.getnum(dim.y);
-		size.getnum(dim.z);
-		size.getv3(dim.x, dim.y, dim.z);
+		Float3 dim;
+		size.getnum(dim[0]);
+		size.getnum(dim[1]);
+		size.getnum(dim[2]);
+		size.getv3(dim[0], dim[1], dim[2]);
 		bool c(false);
 		if (center.type == Value::BOOL) {
 			c = center.b;
@@ -175,11 +175,11 @@ AbstractNode::Pointer PrimitiveModule::evaluate(const Context *ctx, const Module
 	if (type == SQUARE) {
 		Value val_size = c.lookup_variable("size");
 		Value val_center = c.lookup_variable("center");
-		Point2D dim;
+		Float2 dim;
 		bool center = false;
-		val_size.getnum(dim.x);
-		val_size.getnum(dim.y);
-		val_size.getv2(dim.x, dim.y);
+		val_size.getnum(dim[0]);
+		val_size.getnum(dim[1]);
+		val_size.getv2(dim[0], dim[1]);
 		if (val_center.type == Value::BOOL) {
 			center = val_center.b;
 		}
@@ -241,8 +241,8 @@ static void generate_circle(Vec2D &circle, double r)
 {
 	for (unsigned int i=0; i<circle.size(); i++) {
 		double phi = (M_PI*2* (i + 0.5)) / circle.size();
-		circle[i].x = r*cos(phi);
-		circle[i].y = r*sin(phi);
+		circle[i][0] = r*cos(phi);
+		circle[i][1] = r*sin(phi);
 	}
 }
 
@@ -253,7 +253,7 @@ struct ring_s {
 
 PolySet *CubeNode::render_polyset(render_mode_e) const {
   PolySet *p = new PolySet();
-  const double &x = dim.x, &y = dim.y, &z = dim.z;
+  const double &x = dim[0], &y = dim[1], &z = dim[2];
   if (x > 0 && y > 0 && z > 0)
   {
     double x1, x2, y1, y2, z1, z2;
@@ -332,7 +332,7 @@ PolySet *SphereNode::render_polyset(render_mode_e) const {
 
     p->append_poly();
     for (int i = 0; i < fragments; i++)
-      p->append_vertex(ring[0].points[i].x, ring[0].points[i].y, ring[0].z);
+      p->append_vertex(ring[0].points[i][0], ring[0].points[i][1], ring[0].z);
 
     for (int i = 0; i < rings-1; i++) {
       ring_s &r1(ring[i]);
@@ -350,24 +350,24 @@ PolySet *SphereNode::render_polyset(render_mode_e) const {
 sphere_next_r1:
 	  p->append_poly();
 	  int r1j = (r1i+1) % fragments;
-	  p->insert_vertex(r1.points[r1i].x, r1.points[r1i].y, r1.z);
-	  p->insert_vertex(r1.points[r1j].x, r1.points[r1j].y, r1.z);
-	  p->insert_vertex(r2.points[r2i % fragments].x, r2.points[r2i % fragments].y, r2.z);
+	  p->insert_vertex(r1.points[r1i][0], r1.points[r1i][1], r1.z);
+	  p->insert_vertex(r1.points[r1j][0], r1.points[r1j][1], r1.z);
+	  p->insert_vertex(r2.points[r2i % fragments][0], r2.points[r2i % fragments][1], r2.z);
 	  r1i++;
 	} else {
 sphere_next_r2:
 	  p->append_poly();
 	  int r2j = (r2i+1) % fragments;
-	  p->append_vertex(r2.points[r2i].x, r2.points[r2i].y, r2.z);
-	  p->append_vertex(r2.points[r2j].x, r2.points[r2j].y, r2.z);
-	  p->append_vertex(r1.points[r1i % fragments].x, r1.points[r1i % fragments].y, r1.z);
+	  p->append_vertex(r2.points[r2i][0], r2.points[r2i][1], r2.z);
+	  p->append_vertex(r2.points[r2j][0], r2.points[r2j][1], r2.z);
+	  p->append_vertex(r1.points[r1i % fragments][0], r1.points[r1i % fragments][1], r1.z);
 	  r2i++;
 	}
       }
     }
     p->append_poly();
     for (int i = 0; i < fragments; i++)
-      p->insert_vertex(ring[rings-1].points[i].x, ring[rings-1].points[i].y, ring[rings-1].z);
+      p->insert_vertex(ring[rings-1].points[i][0], ring[rings-1].points[i][1], ring[rings-1].z);
   }
 
   return p;
@@ -397,22 +397,22 @@ PolySet *CylinderNode::render_polyset(render_mode_e) const {
       int j = (i+1) % fragments;
       if (r1 == r2) {
 	p->append_poly();
-	p->insert_vertex(circle1[i].x, circle1[i].y, z1);
-	p->insert_vertex(circle2[i].x, circle2[i].y, z2);
-	p->insert_vertex(circle2[j].x, circle2[j].y, z2);
-	p->insert_vertex(circle1[j].x, circle1[j].y, z1);
+	p->insert_vertex(circle1[i][0], circle1[i][1], z1);
+	p->insert_vertex(circle2[i][0], circle2[i][1], z2);
+	p->insert_vertex(circle2[j][0], circle2[j][1], z2);
+	p->insert_vertex(circle1[j][0], circle1[j][1], z1);
       } else {
 	if (r1 > 0) {
 	  p->append_poly();
-	  p->insert_vertex(circle1[i].x, circle1[i].y, z1);
-	  p->insert_vertex(circle2[i].x, circle2[i].y, z2);
-	  p->insert_vertex(circle1[j].x, circle1[j].y, z1);
+	  p->insert_vertex(circle1[i][0], circle1[i][1], z1);
+	  p->insert_vertex(circle2[i][0], circle2[i][1], z2);
+	  p->insert_vertex(circle1[j][0], circle1[j][1], z1);
 	}
 	if (r2 > 0) {
 	  p->append_poly();
-	  p->insert_vertex(circle2[i].x, circle2[i].y, z2);
-	  p->insert_vertex(circle2[j].x, circle2[j].y, z2);
-	  p->insert_vertex(circle1[j].x, circle1[j].y, z1);
+	  p->insert_vertex(circle2[i][0], circle2[i][1], z2);
+	  p->insert_vertex(circle2[j][0], circle2[j][1], z2);
+	  p->insert_vertex(circle1[j][0], circle1[j][1], z1);
 	}
       }
     }
@@ -420,13 +420,13 @@ PolySet *CylinderNode::render_polyset(render_mode_e) const {
     if (r1 > 0) {
       p->append_poly();
       for (int i=0; i<fragments; i++)
-	p->insert_vertex(circle1[i].x, circle1[i].y, z1);
+	p->insert_vertex(circle1[i][0], circle1[i][1], z1);
     }
 
     if (r2 > 0) {
       p->append_poly();
       for (int i=0; i<fragments; i++)
-	p->append_vertex(circle2[i].x, circle2[i].y, z2);
+	p->append_vertex(circle2[i][0], circle2[i][1], z2);
     }
   }
   return p;
@@ -435,12 +435,12 @@ PolySet *CylinderNode::render_polyset(render_mode_e) const {
 PolySet *PolyhedronNode::render_polyset(render_mode_e) const {
   PolySet *p = new PolySet();
   p->convexity = convexity;
-  BOOST_FOREACH(const Triangle &t, triangles) {
+  BOOST_FOREACH(const UInt3 &t, triangles) {
     p->append_poly();
     BOOST_FOREACH(unsigned int pt, t) {
       if (pt < points.size()) {
-	const Point3D &point(points[pt]);
-	p->insert_vertex(point.x, point.y, point.z);
+	const Float3 &point(points[pt]);
+	p->insert_vertex(point[0], point[1], point[2]);
       }
     }
   }
@@ -449,7 +449,7 @@ PolySet *PolyhedronNode::render_polyset(render_mode_e) const {
 
 PolySet *SquareNode::render_polyset(render_mode_e) const {
   PolySet *p = new PolySet();
-  const double &x=dim.x,&y=dim.y;
+  const double &x=dim[0],&y=dim[1];
   double x1, x2, y1, y2;
   if (center) {
 	  x1 = -x/2;
@@ -488,8 +488,8 @@ PolySet *CircleNode::render_polyset(render_mode_e) const {
 PolySet *PolygonNode::render_polyset(render_mode_e) const {
   PolySet *p = new PolySet();
   DxfData dd;
-  BOOST_FOREACH(const Point2D &p, points) {
-	  dd.points.append(DxfData::Point(p.x, p.y));
+  BOOST_FOREACH(const Float2 &p, points) {
+	  dd.points.append(DxfData::Point(p[0], p[1]));
   }
 
   if (paths.size() == 0) {
@@ -542,7 +542,7 @@ QString CubeNode::dump(QString indent) const
 {
   if (dump_cache.isEmpty()) {
     QString text;
-    text.sprintf("cube(size = [%g, %g, %g], center = %s);\n", dim.x, dim.y, dim.z, center ? "true" : "false");
+    text.sprintf("cube(size = [%g, %g, %g], center = %s);\n", dim[0], dim[1], dim[2], center ? "true" : "false");
     ((AbstractNode*)this)->dump_cache = indent + QString("n%1: ").arg(idx) + text;
   }
   return dump_cache;
@@ -584,7 +584,7 @@ QString SquareNode::dump(QString indent) const
 {
   if (dump_cache.isEmpty()) {
     QString text;
-    text.sprintf("square(size = [%g, %g], center = %s);\n", dim.x, dim.y, center ? "true" : "false");
+    text.sprintf("square(size = [%g, %g], center = %s);\n", dim[0], dim[1], center ? "true" : "false");
     ((AbstractNode*)this)->dump_cache = indent + QString("n%1: ").arg(idx) + text;
   }
   return dump_cache;
