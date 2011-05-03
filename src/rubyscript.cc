@@ -11,6 +11,7 @@
 #include "rice/Constructor.hpp"
 #include <ruby.h>
 #include <boost/make_shared.hpp>
+#include <boost/typeof/typeof.hpp>
 
 using namespace Rice;
 using boost::make_shared;
@@ -32,14 +33,23 @@ public:
   }
 };
 
-AbstractNode::NodeList Array2NodeList(const Array &a) {
+AbstractNode::NodeList Object2NodeList(const Object &o) {
   AbstractNode::NodeList list;
-  for(Array::const_iterator it = a.begin(); it != a.end(); ++it) {
-    try {
-      list.push_back(from_ruby<RBAbstractNode>(it->value()).getNode());
-    } catch( std::exception &e) {
-      std::cerr << "Array2NodeList warning:" << e.what() << std::endl;
-    }        
+  if (o.class_of() == Array().class_of()) {
+    const Array &a(o);
+    for(Array::const_iterator it = a.begin(); it != a.end(); ++it) {
+      try {
+	list.push_back(from_ruby<RBAbstractNode>(it->value()).getNode());
+      } catch( std::exception &e) {
+	std::cerr << "Array2NodeList warning:" << e.what() << std::endl;
+      }        
+    }
+  } else {
+      try {
+	list.push_back(from_ruby<RBAbstractNode>(o.value()).getNode());
+      } catch( std::exception &e) {
+	std::cerr << "Array2NodeList warning:" << e.what() << std::endl;
+      }  
   }
   return list;
 }
@@ -48,7 +58,7 @@ template<csg_type_e type>
 class RBCSGNode: public RBAbstractNode {
 public:
   RBCSGNode(const Array &a) {
-    node = make_shared<CsgNode>(type, Array2NodeList(a));
+    node = make_shared<CsgNode>(type, Object2NodeList(a));
   }
 };
 
@@ -56,24 +66,42 @@ typedef RBCSGNode< CSG_TYPE_UNION > RBUnionNode;
 typedef RBCSGNode< CSG_TYPE_DIFFERENCE > RBDifferenceNode;
 typedef RBCSGNode< CSG_TYPE_INTERSECTION > RBIntersectionNode;
 
+
+template<class Iterator>
+void Array2Container(const Array &a, Iterator begin, Iterator end) {
+  try {
+    for(Array::const_iterator it = a.begin(); it!=a.end() && begin != end; ++it,++begin)
+      *begin = from_ruby<BOOST_TYPEOF(*begin)>(it->value());
+  } catch( std::exception &e) {
+    std::cerr << "Array to Array2Container warning:" << e.what() << std::endl;
+  }
+}
+
+template<class Iterator>
+void Array2ContainerContainer(const Array &a, Iterator begin, Iterator end) {
+  try {
+    for(Array::const_iterator it = a.begin(); it!=a.end() && begin != end; ++it,++begin) {
+      const Array &aa(*it);
+      Array2Container(aa, begin->begin(), begin->end());
+    }
+  } catch( std::exception &e) {
+    std::cerr << "Array to Array2Container warning:" << e.what() << std::endl;
+  }
+}
+
 template<class StdArray>
 StdArray Array2StdArray(const Array &a) {
   StdArray p;
-  try {
-    int i=0;
-    for(Array::const_iterator it = a.begin(); it!=a.end() && i < p.static_size; ++it,++i)
-      p[i] = from_ruby<double>(it->value());
-  } catch( std::exception &e) {
-    std::cerr << "Array to StdArray warning:" << e.what() << std::endl;
-  }
+  Array2Container(a,p.begin(),p.end());
   return p;
 }
+
 
 template<class NodeClass>
 class RBTransformNode: public RBAbstractNode {
 public:
-  RBTransformNode(const Array &va, const Array &a) {
-    node = make_shared<NodeClass>(Array2StdArray<Float3>(va), Array2NodeList(a));
+  RBTransformNode(const Array &va, const Object &a) {
+    node = make_shared<NodeClass>(Array2StdArray<Float3>(va), Object2NodeList(a));
   }
 };
 
@@ -83,20 +111,20 @@ typedef RBTransformNode<TransformRotateNode> RBRotateNode;
 typedef RBTransformNode<TransformMirrorNode> RBMirrorNode;
 class RBRotateAxisNode: public RBAbstractNode {
 public:
-  RBRotateAxisNode(const Array &va, double ang, const Array &a) {
-    node = make_shared<TransformRotateAxisNode>(Array2StdArray<Float3>(va), ang, Array2NodeList(a));
+  RBRotateAxisNode(const Array &va, double ang, const Object &a) {
+    node = make_shared<TransformRotateAxisNode>(Array2StdArray<Float3>(va), ang, Object2NodeList(a));
   }
 };
 class RBMatrixNode: public RBAbstractNode {
 public:
-  RBMatrixNode(const Array &ma, const Array &a) {
-    node = make_shared<TransformMatrixNode>(Array2StdArray<Float16>(ma), Array2NodeList(a));
+  RBMatrixNode(const Array &ma, const Object &a) {
+    node = make_shared<TransformMatrixNode>(Array2StdArray<Float16>(ma), Object2NodeList(a));
   }
 };
 class RBColorNode: public RBAbstractNode {
 public:
-  RBColorNode(const Array &ca, const Array &a) {
-    node = make_shared<TransformColorNode>(Array2StdArray<Float4>(ca), Array2NodeList(a));
+  RBColorNode(const Array &ca, const Object &a) {
+    node = make_shared<TransformColorNode>(Array2StdArray<Float4>(ca), Object2NodeList(a));
   }
 };
 
@@ -130,6 +158,35 @@ public:
   }
 };
 
+class RBCylinderNode: public RBAbstractNode {
+public:
+  RBCylinderNode(const Object &r, double h, bool center) {
+    Float2 rr={{1.0,1.0}};
+    try {
+      if (r.class_of() == Array().class_of()) {
+	const Array &a(r);
+	int i=0;
+	for(Array::const_iterator it = a.begin(); it != a.end() && i<rr.static_size; ++it,++i)
+	    rr[i] = from_ruby<double>(it->value());
+      }
+      else rr[0] = rr[1] = from_ruby<double>(r.value());    
+    } catch( std::exception &e) {
+      std::cerr << "CylinderNode warning:" << e.what() << std::endl;
+    }        
+    node = make_shared<CylinderNode>(rr[0], rr[1], h, center, getAcc());
+  }
+};
+
+class RBPolyhedronNode: public RBAbstractNode {
+public:
+  RBPolyhedronNode(const Array &rpoints, const Array &rtriangles, unsigned int convexity) {
+    Vec3D points(rpoints.size());
+    VecTriangles triangles(rtriangles.size());
+    Array2ContainerContainer(rpoints, points.begin(), points.end());
+    Array2ContainerContainer(rtriangles, triangles.begin(), triangles.end());
+    node = make_shared<PolyhedronNode>(points, triangles, convexity);
+  }
+};
 
 RubyScript::RubyScript():status(0) {
   ruby_init();
@@ -147,31 +204,37 @@ RubyScript::RubyScript():status(0) {
     .define_constructor(Constructor<RBIntersectionNode, const Array>(),(Arg("children")));    
   Data_Type<RBScaleNode> rb_ScaleNode =
     define_class<RBScaleNode, RBAbstractNode>("Scale")
-    .define_constructor(Constructor<RBScaleNode, const Array, const Array>(),(Arg("vector"),Arg("children")));    
+    .define_constructor(Constructor<RBScaleNode, const Array, const Object>(),(Arg("vector"),Arg("children")));    
   Data_Type<RBRotateNode> rb_RotateNode =
     define_class<RBRotateNode, RBAbstractNode>("Rotate")
-    .define_constructor(Constructor<RBRotateNode, const Array, const Array>(),(Arg("vector"),Arg("children")));    
+    .define_constructor(Constructor<RBRotateNode, const Array, const Object>(),(Arg("vector"),Arg("children")));    
   Data_Type<RBRotateAxisNode> rb_RotateAxisNode =
     define_class<RBRotateAxisNode, RBAbstractNode>("RotateAxis")
-    .define_constructor(Constructor<RBRotateAxisNode, const Array, double, const Array>(),(Arg("vector"),Arg("ang"),Arg("children")));    
+    .define_constructor(Constructor<RBRotateAxisNode, const Array, double, const Object>(),(Arg("vector"),Arg("ang"),Arg("children")));    
   Data_Type<RBMirrorNode> rb_MirrorNode =
     define_class<RBMirrorNode, RBAbstractNode>("Mirror")
-    .define_constructor(Constructor<RBMirrorNode, const Array, const Array>(),(Arg("vector"),Arg("children")));    
+    .define_constructor(Constructor<RBMirrorNode, const Array, const Object>(),(Arg("vector"),Arg("children")));    
   Data_Type<RBTranslateNode> rb_TranslateNode =
     define_class<RBTranslateNode, RBAbstractNode>("Translate")
-    .define_constructor(Constructor<RBTranslateNode, const Array, const Array>(),(Arg("vector"),Arg("children")));    
+    .define_constructor(Constructor<RBTranslateNode, const Array, const Object>(),(Arg("vector"),Arg("children")));    
   Data_Type<RBMatrixNode> rb_MatrixTransformNode =
     define_class<RBMatrixNode, RBAbstractNode>("MatrixTransform")
-    .define_constructor(Constructor<RBMatrixNode, const Array, const Array>(),(Arg("vector"),Arg("children")));    
+    .define_constructor(Constructor<RBMatrixNode, const Array, const Object>(),(Arg("vector"),Arg("children")));    
   Data_Type<RBColorNode> rb_ColorNode =
     define_class<RBColorNode, RBAbstractNode>("Color")
-    .define_constructor(Constructor<RBColorNode, const Array, const Array>(),(Arg("vector"),Arg("children")));    
+    .define_constructor(Constructor<RBColorNode, const Array, const Object>(),(Arg("vector"),Arg("children")));    
   Data_Type<RBCubeNode> rb_CubeNode =
     define_class<RBCubeNode, RBAbstractNode>("Cube")
-    .define_constructor(Constructor<RBCubeNode, const Array, bool>(),(Arg("dim")=Array(),Arg("center")=false));
+    .define_constructor(Constructor<RBCubeNode, const Array, bool>(),(Arg("dim"),Arg("center")=(bool)false));
   Data_Type<RBSphereNode> rb_SphereNode =
     define_class<RBSphereNode, RBAbstractNode>("Sphere")
     .define_constructor(Constructor<RBSphereNode, double>(),(Arg("r")=1));
+  Data_Type<RBCylinderNode> rb_CylinderNode =
+    define_class<RBCylinderNode, RBAbstractNode>("Cylinder")
+    .define_constructor(Constructor<RBCylinderNode, const Object, double, bool>(),(Arg("r"),Arg("h"),Arg("center")=(bool)false));
+  Data_Type<RBPolyhedronNode> rb_PolyhedronNode =
+    define_class<RBPolyhedronNode, RBAbstractNode>("Polyhedron")
+    .define_constructor(Constructor<RBPolyhedronNode, const Array, const Array, unsigned int>(),(Arg("points"),Arg("triangles"),Arg("convexity")=(unsigned int)5));
   rb_define_variable(FNVarName.c_str(), &fn);
   rb_define_variable(FSVarName.c_str(), &fs);
   rb_define_variable(FAVarName.c_str(), &fa);    
