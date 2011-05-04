@@ -19,9 +19,9 @@ using boost::make_shared;
 const std::string FNVarName("$fn");
 const std::string FSVarName("$fs");
 const std::string FAVarName("$fa");
-VALUE fn = 0.0;
-VALUE fs = 1.0;
-VALUE fa = 1.0;
+VALUE fn = (double)0.0;
+VALUE fs = (double)1.0;
+VALUE fa = (double)12.0;
 
 class RBAbstractNode {
 protected:
@@ -33,32 +33,34 @@ public:
   }
 };
 
-AbstractNode::NodeList Object2NodeList(const Object &o) {
+template<>
+AbstractNode::NodeList from_ruby<AbstractNode::NodeList>(Object x) {
   AbstractNode::NodeList list;
-  if (o.class_of() == Array().class_of()) {
-    const Array &a(o);
+  if (x.class_of() == Array().class_of()) {
+    const Array &a(x);
     for(Array::const_iterator it = a.begin(); it != a.end(); ++it) {
       try {
 	list.push_back(from_ruby<RBAbstractNode>(it->value()).getNode());
       } catch( std::exception &e) {
-	std::cerr << "Array2NodeList warning:" << e.what() << std::endl;
+	std::cerr << "from_ruby<AbstractNode::NodeList> warning:" << e.what() << std::endl;
       }        
     }
   } else {
       try {
-	list.push_back(from_ruby<RBAbstractNode>(o.value()).getNode());
+	list.push_back(from_ruby<RBAbstractNode>(x.value()).getNode());
       } catch( std::exception &e) {
-	std::cerr << "Array2NodeList warning:" << e.what() << std::endl;
+	std::cerr << "from_ruby<AbstractNode::NodeList> warning:" << e.what() << std::endl;
       }  
   }
   return list;
 }
 
+
 template<csg_type_e type> 
 class RBCSGNode: public RBAbstractNode {
 public:
   RBCSGNode(const Array &a) {
-    node = make_shared<CsgNode>(type, Object2NodeList(a));
+    node = make_shared<CsgNode>(type, from_ruby<AbstractNode::NodeList>(a));
   }
 };
 
@@ -96,12 +98,11 @@ StdArray Array2StdArray(const Array &a) {
   return p;
 }
 
-
 template<class NodeClass>
 class RBTransformNode: public RBAbstractNode {
 public:
   RBTransformNode(const Array &va, const Object &a) {
-    node = make_shared<NodeClass>(Array2StdArray<Float3>(va), Object2NodeList(a));
+    node = make_shared<NodeClass>(Array2StdArray<Float3>(va), from_ruby<AbstractNode::NodeList>(a));
   }
 };
 
@@ -112,19 +113,19 @@ typedef RBTransformNode<TransformMirrorNode> RBMirrorNode;
 class RBRotateAxisNode: public RBAbstractNode {
 public:
   RBRotateAxisNode(const Array &va, double ang, const Object &a) {
-    node = make_shared<TransformRotateAxisNode>(Array2StdArray<Float3>(va), ang, Object2NodeList(a));
+    node = make_shared<TransformRotateAxisNode>(Array2StdArray<Float3>(va), ang, from_ruby<AbstractNode::NodeList>(a));
   }
 };
 class RBMatrixNode: public RBAbstractNode {
 public:
   RBMatrixNode(const Array &ma, const Object &a) {
-    node = make_shared<TransformMatrixNode>(Array2StdArray<Float16>(ma), Object2NodeList(a));
+    node = make_shared<TransformMatrixNode>(Array2StdArray<Float16>(ma), from_ruby<AbstractNode::NodeList>(a));
   }
 };
 class RBColorNode: public RBAbstractNode {
 public:
   RBColorNode(const Array &ca, const Object &a) {
-    node = make_shared<TransformColorNode>(Array2StdArray<Float4>(ca), Object2NodeList(a));
+    node = make_shared<TransformColorNode>(Array2StdArray<Float4>(ca), from_ruby<AbstractNode::NodeList>(a));
   }
 };
 
