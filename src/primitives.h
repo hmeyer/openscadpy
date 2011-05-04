@@ -42,7 +42,7 @@ public:
 	  double fn;
 	  double fs;
 	  double fa;
-	  Accuracy():fn(0),fs(3),fa(2) {}
+	  Accuracy():fn(0.0),fs(1.0),fa(12.0) {}
 	  Accuracy(double fn, double fs, double fa):fn(fn),fs(fs),fa(fa) {}
 	};
 	typedef shared_ptr<PrimitiveNode> Pointer;
