@@ -24,8 +24,9 @@
  *
  */
 
+
+#include "dxfrotextrude.h"
 #include "module.h"
-#include "node.h"
 #include "context.h"
 #include "printutils.h"
 #include "builtin.h"
@@ -48,67 +49,48 @@ public:
 	virtual AbstractNode::Pointer evaluate(const Context *ctx, const ModuleInstantiation *inst) const;
 };
 
-class DxfRotateExtrudeNode : public AbstractPolyNode
-{
-public:
-	typedef shared_ptr<DxfRotateExtrudeNode> Pointer;
-	int convexity;
-	double fn, fs, fa;
-	double origin_x, origin_y, scale;
-	QString filename, layername;
-	DxfRotateExtrudeNode(const ModuleInstantiation *mi) : AbstractPolyNode(mi) {
-		convexity = 0;
-		fn = fs = fa = 0;
-		origin_x = origin_y = scale = 0;
-	}
-	virtual PolySet *render_polyset(render_mode_e mode) const;
-	virtual QString dump(QString indent) const;
-};
-
 AbstractNode::Pointer DxfRotateExtrudeModule::evaluate(const Context *ctx, const ModuleInstantiation *inst) const
 {
-	DxfRotateExtrudeNode::Pointer node(boost::make_shared<DxfRotateExtrudeNode>(inst));
+  AbstractNode::NodeList children;
+  foreach (ModuleInstantiation *v, inst->children) {
+	  AbstractNode::Pointer n(v->evaluate(inst->ctx));
+	  if (n) children.append(n);
+  }
+  QVector<QString> argnames = QVector<QString>() << "file" << "layer" << "origin" << "scale";
+  QVector<Expression*> argexpr;
 
-	QVector<QString> argnames = QVector<QString>() << "file" << "layer" << "origin" << "scale";
-	QVector<Expression*> argexpr;
+  Context c(ctx);
+  c.args(argnames, argexpr, inst->argnames, inst->argvalues);
 
-	Context c(ctx);
-	c.args(argnames, argexpr, inst->argnames, inst->argvalues);
+  Accuracy acc;
+  acc.fn = c.lookup_variable("$fn").num;
+  acc.fs = c.lookup_variable("$fs").num;
+  acc.fa = c.lookup_variable("$fa").num;
 
-	node->fn = c.lookup_variable("$fn").num;
-	node->fs = c.lookup_variable("$fs").num;
-	node->fa = c.lookup_variable("$fa").num;
+  Value vfile = c.lookup_variable("file");
+  Value vlayer = c.lookup_variable("layer", true);
+  Value vconvexity = c.lookup_variable("convexity", true);
+  Value vorigin = c.lookup_variable("origin", true);
+  Value vscale = c.lookup_variable("scale", true);  
 
-	Value file = c.lookup_variable("file");
-	Value layer = c.lookup_variable("layer", true);
-	Value convexity = c.lookup_variable("convexity", true);
-	Value origin = c.lookup_variable("origin", true);
-	Value scale = c.lookup_variable("scale", true);
+  int convexity = (int)vconvexity.num;
 
-	if(!file.text.isNull())
-		node->filename = c.get_absolute_path(file.text);
-	else
-		node->filename = file.text;
+  if (convexity <= 0)
+	  convexity = 1;
+  
+  QString file;
+  if(!vfile.text.isNull())
+    file = c.get_absolute_path(vfile.text);
+  else
+    file = vfile.text;
+  double ox=0,oy=0;
+  vorigin.getv2(ox, oy);
+  
+  double scale = vscale.num;
+  if (scale <= 0.0)
+    scale = 1.0;
 
-	node->layername = layer.text;
-	node->convexity = (int)convexity.num;
-	origin.getv2(node->origin_x, node->origin_y);
-	node->scale = scale.num;
-
-	if (node->convexity <= 0)
-		node->convexity = 1;
-
-	if (node->scale <= 0)
-		node->scale = 1;
-
-	if (node->filename.isEmpty()) {
-		foreach (ModuleInstantiation *v, inst->children) {
-			AbstractNode::Pointer n = v->evaluate(inst->ctx);
-			if (n) node->children.append(n);
-		}
-	}
-
-	return node;
+  return boost::make_shared<DxfRotateExtrudeNode>(children, file, vlayer.text, ox, oy, scale, convexity, acc, inst);	
 }
 
 void register_builtin_dxf_rotate_extrude()
@@ -145,7 +127,7 @@ PolySet *DxfRotateExtrudeNode::render_polyset(render_mode_e) const
 		dxf = new DxfData();
 #endif // ENABLE_CGAL
 	} else {
-		dxf = new DxfData(fn, fs, fa, filename, layername, origin_x, origin_y, scale);
+		dxf = new DxfData(acc, filename, layername, origin_x, origin_y, scale);
 	}
 
 	PolySet *ps = new PolySet();
@@ -158,7 +140,7 @@ PolySet *DxfRotateExtrudeNode::render_polyset(render_mode_e) const
 			max_x = fmax(max_x, dxf->paths[i].points[j]->x);
 		}
 
-		int fragments = get_fragments_from_r(max_x, fn, fs, fa);
+		int fragments = get_fragments_from_r(max_x, acc);
 
         double ***points;
         points = new double**[fragments];
@@ -236,7 +218,7 @@ QString DxfRotateExtrudeNode::dump(QString indent) const
 				"$fn = %g, $fa = %g, $fs = %g) {\n",
 				filename.toAscii().data(), (int)fileInfo.lastModified().toTime_t(),
 				(int)fileInfo.size(),layername.toAscii().data(), origin_x, origin_y, 
-				scale, convexity, fn, fa, fs);
+				scale, convexity, acc.fn, acc.fa, acc.fs);
 		foreach (AbstractNode::Pointer v, children)
 			text += v->dump(indent + QString("\t"));
 		text += indent + "}\n";

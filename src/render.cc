@@ -24,8 +24,8 @@
  *
  */
 
+#include "render.h"
 #include "module.h"
-#include "node.h"
 #include "polyset.h"
 #include "context.h"
 #include "dxfdata.h"
@@ -34,9 +34,7 @@
 #include "builtin.h"
 #include "printutils.h"
 #include "progress.h"
-#ifdef ENABLE_CGAL
-#  include "cgal.h"
-#endif
+
 
 #include <QProgressDialog>
 #include <QApplication>
@@ -50,39 +48,26 @@ public:
 	virtual AbstractNode::Pointer evaluate(const Context *ctx, const ModuleInstantiation *inst) const;
 };
 
-class RenderNode : public AbstractNode
-{
-public:
-	typedef shared_ptr< RenderNode > Pointer;
-	int convexity;
-	RenderNode(const ModuleInstantiation *mi) : AbstractNode(mi), convexity(1) { }
-#ifdef ENABLE_CGAL
-	virtual CGAL_Nef_polyhedron render_cgal_nef_polyhedron() const;
-#endif
-	CSGTerm *render_csg_term(const Float20 &m, QVector<CSGTerm*> *highlights, QVector<CSGTerm*> *background) const;
-	virtual QString dump(QString indent) const;
-};
-
 AbstractNode::Pointer RenderModule::evaluate(const Context *ctx, const ModuleInstantiation *inst) const
 {
-	RenderNode::Pointer node(boost::make_shared<RenderNode>(inst));
+  AbstractNode::NodeList children;
+  foreach (ModuleInstantiation *v, inst->children) {
+	  AbstractNode::Pointer n(v->evaluate(inst->ctx));
+	  if (n) children.append(n);
+  }
 
-	QVector<QString> argnames = QVector<QString>() << "convexity";
-	QVector<Expression*> argexpr;
+  QVector<QString> argnames = QVector<QString>() << "convexity";
+  QVector<Expression*> argexpr;
 
-	Context c(ctx);
-	c.args(argnames, argexpr, inst->argnames, inst->argvalues);
+  Context c(ctx);
+  c.args(argnames, argexpr, inst->argnames, inst->argvalues);
 
-	Value v = c.lookup_variable("convexity");
-	if (v.type == Value::NUMBER)
-		node->convexity = (int)v.num;
+  Value v = c.lookup_variable("convexity");
+  int convexity = 1;
+  if (v.type == Value::NUMBER)
+	  convexity = (int)v.num;
 
-	foreach (ModuleInstantiation *v, inst->children) {
-		AbstractNode::Pointer n(v->evaluate(inst->ctx));
-		if (n) node->children.append(n);
-	}
-
-	return node;
+  return boost::make_shared<RenderNode>(children, convexity, inst);
 }
 
 void register_builtin_render()

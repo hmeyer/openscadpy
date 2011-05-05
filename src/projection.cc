@@ -24,8 +24,8 @@
  *
  */
 
+#include "projection.h"
 #include "module.h"
-#include "node.h"
 #include "context.h"
 #include "printutils.h"
 #include "builtin.h"
@@ -54,43 +54,29 @@ public:
 	virtual AbstractNode::Pointer evaluate(const Context *ctx, const ModuleInstantiation *inst) const;
 };
 
-class ProjectionNode : public AbstractPolyNode
-{
-public:
-	typedef shared_ptr<ProjectionNode> Pointer;
-	int convexity;
-	bool cut_mode;
-	ProjectionNode(const ModuleInstantiation *mi) : AbstractPolyNode(mi) {
-		cut_mode = false;
-	}
-	virtual PolySet *render_polyset(render_mode_e mode) const;
-	virtual QString dump(QString indent) const;
-};
+AbstractNode::Pointer ProjectionModule::evaluate(const Context *ctx, const ModuleInstantiation *inst) const {
+  AbstractNode::NodeList children;
+  foreach (ModuleInstantiation *v, inst->children) {
+	  AbstractNode::Pointer n(v->evaluate(inst->ctx));
+	  if (n) children.append(n);
+  }
 
-AbstractNode::Pointer ProjectionModule::evaluate(const Context *ctx, const ModuleInstantiation *inst) const
-{
-	ProjectionNode::Pointer node(boost::make_shared<ProjectionNode>(inst));
+  QVector<QString> argnames = QVector<QString>() << "cut";
+  QVector<Expression*> argexpr;
 
-	QVector<QString> argnames = QVector<QString>() << "cut";
-	QVector<Expression*> argexpr;
+  Context c(ctx);
+  c.args(argnames, argexpr, inst->argnames, inst->argvalues);
 
-	Context c(ctx);
-	c.args(argnames, argexpr, inst->argnames, inst->argvalues);
+  Value vconvexity = c.lookup_variable("convexity", true);
+  Value vcut = c.lookup_variable("cut", true);
 
-	Value convexity = c.lookup_variable("convexity", true);
-	Value cut = c.lookup_variable("cut", true);
+  int convexity = (int)vconvexity.num;
+  bool cut = true;
 
-	node->convexity = (int)convexity.num;
+  if (vcut.type == Value::BOOL)
+	  cut = vcut.b;
 
-	if (cut.type == Value::BOOL)
-		node->cut_mode = cut.b;
-
-	foreach (ModuleInstantiation *v, inst->children) {
-		AbstractNode::Pointer n = v->evaluate(inst->ctx);
-		if (n) node->children.append(n);
-	}
-
-	return node;
+  return boost::make_shared<ProjectionNode>(children, cut, convexity, inst);
 }
 
 void register_builtin_projection()

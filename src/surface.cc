@@ -24,10 +24,10 @@
  *
  */
 
+#include "surface.h"
 #include "module.h"
-#include "node.h"
-#include "polyset.h"
 #include "context.h"
+#include "polyset.h"
 #include "builtin.h"
 #include "dxftess.h"
 #include "printutils.h"
@@ -44,43 +44,27 @@ public:
 	virtual AbstractNode::Pointer evaluate(const Context *ctx, const ModuleInstantiation *inst) const;
 };
 
-class SurfaceNode : public AbstractPolyNode
-{
-public:
-	typedef shared_ptr< SurfaceNode > Pointer;
-	QString filename;
-	bool center;
-	int convexity;
-	SurfaceNode(const ModuleInstantiation *mi) : AbstractPolyNode(mi) { }
-	virtual PolySet *render_polyset(render_mode_e mode) const;
-	virtual QString dump(QString indent) const;
-};
 
 AbstractNode::Pointer SurfaceModule::evaluate(const Context *ctx, const ModuleInstantiation *inst) const
 {
-	SurfaceNode::Pointer node(make_shared<SurfaceNode>(inst));
-	node->center = false;
-	node->convexity = 1;
-
 	QVector<QString> argnames = QVector<QString>() << "file" << "center" << "convexity";
 	QVector<Expression*> argexpr;
-
 	Context c(ctx);
 	c.args(argnames, argexpr, inst->argnames, inst->argvalues);
+	QString filename = c.get_absolute_path(c.lookup_variable("file").text);
 
-	node->filename = c.get_absolute_path(c.lookup_variable("file").text);
-
-	Value center = c.lookup_variable("center", true);
-	if (center.type == Value::BOOL) {
-		node->center = center.b;
+	Value vcenter = c.lookup_variable("center", true);
+	bool center = false;
+	if (vcenter.type == Value::BOOL) {
+		center = vcenter.b;
 	}
 
-	Value convexity = c.lookup_variable("convexity", true);
-	if (convexity.type == Value::NUMBER) {
-		node->convexity = (int)convexity.num;
+	Value vconvexity = c.lookup_variable("convexity", true);
+	int convexity = 1;
+	if (vconvexity.type == Value::NUMBER) {
+		convexity = (int)vconvexity.num;
 	}
-
-	return node;
+	return make_shared<SurfaceNode>(filename, convexity, center, inst);
 }
 
 void register_builtin_surface()

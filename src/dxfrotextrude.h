@@ -1,3 +1,6 @@
+#ifndef DXFROTEXTRUDE_H
+#define DXFROTEXTRUDE_H
+
 /*
  *  OpenSCAD (www.openscad.org)
  *  Copyright (C) 2009-2011 Clifford Wolf <clifford@clifford.at> and
@@ -24,35 +27,25 @@
  *
  */
 
-#ifndef OPENSCAD_H
-#define OPENSCAD_H
-
-#ifdef ENABLE_OPENCSG
-// this must be included before the GL headers
-#  include <GL/glew.h>
-#endif
-
-// for win32 and maybe others..
-#ifndef M_PI
-#  define M_PI 3.14159265358979323846
-#endif
-
+#include "node.h"
 #include "accuracy.h"
 
-extern class AbstractModule *parse(const char *text, const char *path, int debug);
+class DxfRotateExtrudeNode : public AbstractPolyNode
+{
+public:
+	typedef shared_ptr<DxfRotateExtrudeNode> Pointer;
+	int convexity;
+	double origin_x, origin_y, scale;
+	QString filename, layername;
+	Accuracy acc;
+	DxfRotateExtrudeNode(const AbstractNode::NodeList &children, const QString &filename, const QString &layer,
+	  double origin_x, double origin_y, double scale, 
+	  int convexity, const Accuracy &acc=Accuracy(), const Props p=Props())
+	    :AbstractPolyNode(p,children), convexity(convexity),
+	    origin_x(origin_x), origin_y(origin_y), scale(scale), filename(filename), layername(layer), acc(acc) {}
+	virtual PolySet *render_polyset(render_mode_e mode) const;
+	virtual QString dump(QString indent) const;
+};
 
-#include <QString>
-extern QString commandline_commands;
-extern int parser_error_pos;
-
-extern void handle_dep(QString filename);
-
-// The CWD when application started. We shouldn't change CWD, but until we stop
-// doing this, use currentdir to get the original CWD.
-extern QString currentdir;
-
-extern QString examplesdir;
-extern QString librarydir;
 
 #endif
-

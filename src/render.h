@@ -1,3 +1,6 @@
+#ifndef RENDER_H
+#define RENDER_H
+
 /*
  *  OpenSCAD (www.openscad.org)
  *  Copyright (C) 2009-2011 Clifford Wolf <clifford@clifford.at> and
@@ -24,35 +27,26 @@
  *
  */
 
-#ifndef OPENSCAD_H
-#define OPENSCAD_H
 
-#ifdef ENABLE_OPENCSG
-// this must be included before the GL headers
-#  include <GL/glew.h>
+#include "node.h"
+#ifdef ENABLE_CGAL
+#  include "cgal.h"
 #endif
 
-// for win32 and maybe others..
-#ifndef M_PI
-#  define M_PI 3.14159265358979323846
+
+
+
+class RenderNode : public AbstractNode
+{
+public:
+	typedef shared_ptr< RenderNode > Pointer;
+	int convexity;
+	RenderNode(const AbstractNode::NodeList &children, int convexity = 1, const Props p=Props()) : AbstractNode(p, children), convexity(convexity) { }
+#ifdef ENABLE_CGAL
+	virtual CGAL_Nef_polyhedron render_cgal_nef_polyhedron() const;
 #endif
-
-#include "accuracy.h"
-
-extern class AbstractModule *parse(const char *text, const char *path, int debug);
-
-#include <QString>
-extern QString commandline_commands;
-extern int parser_error_pos;
-
-extern void handle_dep(QString filename);
-
-// The CWD when application started. We shouldn't change CWD, but until we stop
-// doing this, use currentdir to get the original CWD.
-extern QString currentdir;
-
-extern QString examplesdir;
-extern QString librarydir;
+	CSGTerm *render_csg_term(const Float20 &m, QVector<CSGTerm*> *highlights, QVector<CSGTerm*> *background) const;
+	virtual QString dump(QString indent) const;
+};
 
 #endif
-

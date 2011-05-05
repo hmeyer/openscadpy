@@ -3,6 +3,7 @@
 
 #include <QList>
 #include <QString>
+#include "accuracy.h"
 
 class DxfData
 {
@@ -38,7 +39,7 @@ public:
 	QList<Dim> dims;
 
 	DxfData();
-	DxfData(double fn, double fs, double fa, QString filename, QString layername = QString(), double xorigin = 0.0, double yorigin = 0.0, double scale = 1.0);
+	DxfData(const Accuracy &acc, const QString &filename, const QString &layername = QString(), double xorigin = 0.0, double yorigin = 0.0, double scale = 1.0);
 #ifdef ENABLE_CGAL
 	DxfData(const struct CGAL_Nef_polyhedron &N);
 #endif
