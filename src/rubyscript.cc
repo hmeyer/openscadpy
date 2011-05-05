@@ -27,6 +27,8 @@ class RBAbstractNode {
 protected:
   AbstractNode::Pointer node;
 public:
+  RBAbstractNode() { std::cerr << "RBAstractNode ctor " << this << std::endl;}
+  ~RBAbstractNode() { std::cerr << "RBAstractNode dtor " << this << std::endl;}
   AbstractNode::Pointer getNode() const { return node; }
   std::string to_s() const {
     return node->dump("").toStdString();
@@ -133,10 +135,10 @@ public:
 
 
 
-PrimitiveNode::Accuracy getAcc(void) {
-  PrimitiveNode::Accuracy acc;
+Accuracy getAcc(void) {
+  Accuracy acc;
   try {
-    acc = PrimitiveNode::Accuracy(fn, fs, fa);
+    acc = Accuracy(fn, fs, fa);
   } catch( std::exception &e) {
     std::cerr << "global variable warning:" << e.what() << std::endl;
   }
@@ -191,6 +193,7 @@ public:
 
 RubyScript::RubyScript():status(0) {
   ruby_init();
+  ruby_init_loadpath();
   Data_Type<RBAbstractNode> rb_AbstractNode =
     define_class<RBAbstractNode>("AbstractNode")
     .define_method("to_s", &RBAbstractNode::to_s);
@@ -242,6 +245,7 @@ RubyScript::RubyScript():status(0) {
 }
 
 RubyScript::~RubyScript() {
+  ruby_finalize();
 }
 
 
