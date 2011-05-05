@@ -1,3 +1,5 @@
+#ifndef PROJECTION_H
+#define PROJECTION_H
 /*
  *  OpenSCAD (www.openscad.org)
  *  Copyright (C) 2009-2011 Clifford Wolf <clifford@clifford.at> and
@@ -24,35 +26,19 @@
  *
  */
 
-#ifndef OPENSCAD_H
-#define OPENSCAD_H
+#include "node.h"
 
-#ifdef ENABLE_OPENCSG
-// this must be included before the GL headers
-#  include <GL/glew.h>
-#endif
+class ProjectionNode : public AbstractPolyNode
+{
+public:
+	typedef shared_ptr<ProjectionNode> Pointer;
+	int convexity;
+	bool cut_mode;
+	ProjectionNode(const AbstractNode::NodeList &children, bool cut_mode, int convexity, const Props p=Props()) 
+	  : AbstractPolyNode(p, children), convexity(convexity), cut_mode(cut_mode) {}
+	virtual PolySet *render_polyset(render_mode_e mode) const;
+	virtual QString dump(QString indent) const;
+};
 
-// for win32 and maybe others..
-#ifndef M_PI
-#  define M_PI 3.14159265358979323846
-#endif
-
-#include "accuracy.h"
-
-extern class AbstractModule *parse(const char *text, const char *path, int debug);
-
-#include <QString>
-extern QString commandline_commands;
-extern int parser_error_pos;
-
-extern void handle_dep(QString filename);
-
-// The CWD when application started. We shouldn't change CWD, but until we stop
-// doing this, use currentdir to get the original CWD.
-extern QString currentdir;
-
-extern QString examplesdir;
-extern QString librarydir;
 
 #endif
-

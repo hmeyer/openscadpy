@@ -32,13 +32,15 @@
 #include "printutils.h"
 #include "context.h"
 
-#include "mathc99.h"
+#include <cmath>
 #include <QHash>
 #include <QDateTime>
 #include <QFileInfo>
 
-QHash<QString,Value> dxf_dim_cache;
-QHash<QString,Value> dxf_cross_cache;
+using namespace std;
+
+QHash<QString,double> dxf_dim_cache;
+QHash<QString,Float2> dxf_cross_cache;
 
 Value builtin_dxf_dim(const Context *ctx, const QVector<QString> &argnames, const QVector<Value> &args)
 {
@@ -61,7 +63,10 @@ Value builtin_dxf_dim(const Context *ctx, const QVector<QString> &argnames, cons
 		if (argnames[i] == "name")
 			name = args[i].text;
 	}
+	return dxf_dim(filename, layername, name, xorigin, yorigin, scale);
+}
 
+double dxf_dim(const QString &filename, const QString &layername, const QString &name, double xorigin, double yorigin, double scale) {
 	QFileInfo fileInfo(filename);
 
 	QString key = filename + "|" + layername + "|" + name + "|" + QString::number(xorigin) + "|" + QString::number(yorigin) +
@@ -69,8 +74,8 @@ Value builtin_dxf_dim(const Context *ctx, const QVector<QString> &argnames, cons
 
 	if (dxf_dim_cache.contains(key))
 		return dxf_dim_cache[key];
-
-	DxfData dxf(36, 0, 0, filename, layername, xorigin, yorigin, scale);
+	
+	DxfData dxf(Accuracy(36,0,0), filename, layername, xorigin, yorigin, scale);
 
 	for (int i = 0; i < dxf.dims.count(); i++)
 	{
@@ -86,41 +91,41 @@ Value builtin_dxf_dim(const Context *ctx, const QVector<QString> &argnames, cons
 			double y = d->coords[4][1] - d->coords[3][1];
 			double angle = d->angle;
 			double distance_projected_on_line = fabs(x * cos(angle*M_PI/180) + y * sin(angle*M_PI/180));
-			return dxf_dim_cache[key] = Value(distance_projected_on_line);
+			return dxf_dim_cache[key] = distance_projected_on_line;
 		}
 		else if (type == 1) {
 			// Aligned
 			double x = d->coords[4][0] - d->coords[3][0];
 			double y = d->coords[4][1] - d->coords[3][1];
-			return dxf_dim_cache[key] = Value(sqrt(x*x + y*y));
+			return dxf_dim_cache[key] = sqrt(x*x + y*y);
 		}
 		else if (type == 2) {
 			// Angular
 			double a1 = atan2(d->coords[0][0] - d->coords[5][0], d->coords[0][1] - d->coords[5][1]);
 			double a2 = atan2(d->coords[4][0] - d->coords[3][0], d->coords[4][1] - d->coords[3][1]);
-			return dxf_dim_cache[key] = Value(fabs(a1 - a2) * 180 / M_PI);
+			return dxf_dim_cache[key] = abs(a1 - a2) * 180 / M_PI;
 		}
 		else if (type == 3 || type == 4) {
 			// Diameter or Radius
 			double x = d->coords[5][0] - d->coords[0][0];
 			double y = d->coords[5][1] - d->coords[0][1];
-			return dxf_dim_cache[key] = Value(sqrt(x*x + y*y));
+			return dxf_dim_cache[key] = sqrt(x*x + y*y);
 		}
 		else if (type == 5) {
 			// Angular 3 Point
 		}
 		else if (type == 6) {
 			// Ordinate
-			return dxf_dim_cache[key] = Value((d->type & 64) ? d->coords[3][0] : d->coords[3][1]);
+			return dxf_dim_cache[key] = (d->type & 64) ? d->coords[3][0] : d->coords[3][1];
 		}
 
 		PRINTA("WARNING: Dimension `%1' in `%2', layer `%3' has unsupported type!", name, filename, layername);
-		return Value();
+		return -1;
 	}
 
 	PRINTA("WARNING: Can't find dimension `%1' in `%2', layer `%3'!", name, filename, layername);
 
-	return Value();
+	return -1;
 }
 
 Value builtin_dxf_cross(const Context *ctx, const QVector<QString> &argnames, const QVector<Value> &args)
@@ -141,7 +146,15 @@ Value builtin_dxf_cross(const Context *ctx, const QVector<QString> &argnames, co
 		if (argnames[i] == "scale")
 			args[i].getnum(scale);
 	}
-
+	Float2 ret = dxf_cross(filename, layername, xorigin, yorigin, scale);
+	Value vret;
+	vret.type = Value::VECTOR;
+	vret.vec.append(new Value(ret[0]));
+	vret.vec.append(new Value(ret[1]));
+	return vret;
+}
+	
+Float2 dxf_cross(const QString &filename, const QString &layername, double xorigin, double yorigin, double scale) {
 	QFileInfo fileInfo(filename);
 
 	QString key = filename + "|" + layername + "|" + QString::number(xorigin) + "|" + QString::number(yorigin) +
@@ -150,7 +163,7 @@ Value builtin_dxf_cross(const Context *ctx, const QVector<QString> &argnames, co
 	if (dxf_cross_cache.contains(key))
 		return dxf_cross_cache[key];
 
-	DxfData dxf(36, 0, 0, filename, layername, xorigin, yorigin, scale);
+	DxfData dxf(Accuracy(36, 0, 0), filename, layername, xorigin, yorigin, scale);
 
 	double coords[4][2];
 
@@ -174,17 +187,14 @@ Value builtin_dxf_cross(const Context *ctx, const QVector<QString> &argnames, co
 			// double ub = ((x2 - x1)*(y1 - y3) - (y2 - y1)*(x1 - x3)) / dem;
 			double x = x1 + ua*(x2 - x1);
 			double y = y1 + ua*(y2 - y1);
-			Value ret;
-			ret.type = Value::VECTOR;
-			ret.vec.append(new Value(x));
-			ret.vec.append(new Value(y));
+			Float2 ret = {{x,y}};
 			return dxf_cross_cache[key] = ret;
 		}
 	}
 
 	PRINTA("WARNING: Can't find cross in `%1', layer `%2'!", filename, layername);
-
-	return Value();
+	Float2 inv={{-1,-1}};
+	return inv;
 }
 
 void initialize_builtin_dxf_dim()

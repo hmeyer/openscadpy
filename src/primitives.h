@@ -29,27 +29,19 @@
 
 #include "module.h"
 #include "node.h"
-#include <boost/concept_check.hpp>
+#include "accuracy.h"
 
 class PolySet;
 
 
 
-class PrimitiveNode : public AbstractPolyNode
-{
+class PrimitiveNode : public AbstractPolyNode {
 public:
-	struct Accuracy {
-	  double fn;
-	  double fs;
-	  double fa;
-	  Accuracy():fn(0.0),fs(1.0),fa(12.0) {}
-	  Accuracy(double fn, double fs, double fa):fn(fn),fs(fs),fa(fa) {}
-	};
-	typedef shared_ptr<PrimitiveNode> Pointer;
-	static const double F_MINIMUM = 0.01;
-	int convexity;
-	PrimitiveNode(int convex=1, const Props p=Props()) : AbstractPolyNode(p), convexity(convex) { }
-	virtual QString dump(QString indent) const;
+    typedef shared_ptr<PrimitiveNode> Pointer;
+    static const double F_MINIMUM = 0.01;
+    int convexity;
+    PrimitiveNode(int convex=1, const Props p=Props()) : AbstractPolyNode(p), convexity(convex) { }
+    virtual QString dump(QString indent) const;
 };
 
 class CubeNode : public PrimitiveNode {
@@ -66,7 +58,7 @@ class SphereNode : public PrimitiveNode {
 	double r;
 	Accuracy acc;
 public:
-	SphereNode(double r, Accuracy acc=Accuracy(), const Props p=Props())
+	SphereNode(double r, const Accuracy &acc=Accuracy(), const Props p=Props())
 	  :PrimitiveNode(1,p), r(r), acc(acc) {}
 	virtual PolySet *render_polyset(render_mode_e mode) const;
 	virtual QString dump(QString indent) const;
@@ -78,9 +70,9 @@ class CylinderNode : public PrimitiveNode {
 	double h;
 	Accuracy acc;
 public:
-	CylinderNode(double r1, double r2, double h, bool center=false, Accuracy acc=Accuracy(), const Props p=Props())
+	CylinderNode(double r1, double r2, double h, bool center=false, const Accuracy &acc=Accuracy(), const Props p=Props())
 	  :PrimitiveNode(1,p), center(center), r1(r1), r2(r2), h(h), acc(acc) {}
-	CylinderNode(double r, double h, bool center=false, Accuracy acc=Accuracy(), const Props p=Props())
+	CylinderNode(double r, double h, bool center=false, const Accuracy &acc=Accuracy(), const Props p=Props())
 	  :PrimitiveNode(1,p), center(center), r1(r), r2(r), h(h), acc(acc) {}
 	virtual PolySet *render_polyset(render_mode_e mode) const;
 	virtual QString dump(QString indent) const;
@@ -110,7 +102,7 @@ class CircleNode : public PrimitiveNode {
 	double r;
 	Accuracy acc;
 public:
-	CircleNode(double r, Accuracy acc=Accuracy(), const Props p=Props())
+	CircleNode(double r, const Accuracy &acc=Accuracy(), const Props p=Props())
 	  :PrimitiveNode(1,p), r(r), acc(acc) {}
 	virtual PolySet *render_polyset(render_mode_e mode) const;
 	virtual QString dump(QString indent) const;

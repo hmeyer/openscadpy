@@ -126,7 +126,7 @@ HEADERS += src/CGAL_renderer.h \
            src/cgal.h \
            src/context.h \
            src/csgterm.h \
-	   src/csgops.h \
+           src/csgops.h \
            src/dxfdata.h \
            src/dxfdim.h \
            src/dxftess.h \
@@ -135,17 +135,26 @@ HEADERS += src/CGAL_renderer.h \
            src/function.h \
            src/grid.h \
            src/highlighter.h \
-	   src/matrix.h \
+           src/matrix.h \
            src/module.h \
            src/node.h \
            src/openscad.h \
            src/polyset.h \
            src/printutils.h \
-	   src/transform.h \
+           src/transform.h \
            src/value.h \
-	   src/primitives.h \
+           src/primitives.h \
            src/progress.h \
            src/editor.h \
+           src/accuracy.h \
+           src/cgaladv.h \
+           src/dxflinextrude.h \
+           src/dxfrotextrude.h \
+           src/import.h \
+           src/projection.h \
+           src/render.h \
+           src/render-opencsg.h \
+           src/surface.h \
            src/mathc99.h
 
 SOURCES += src/openscad.cc \
@@ -186,6 +195,7 @@ SOURCES += src/openscad.cc \
            src/Preferences.cc \
            src/progress.cc \
            src/editor.cc \
+	   src/accuracy.cc \
 	   src/mathc99.cc
 
 macx {

@@ -24,8 +24,8 @@
  *
  */
 
+#include "dxflinextrude.h"
 #include "module.h"
-#include "node.h"
 #include "context.h"
 #include "printutils.h"
 #include "builtin.h"
@@ -41,6 +41,19 @@
 #include <QDateTime>
 #include <QFileInfo>
 #include <boost/make_shared.hpp>
+#include <boost/concept_check.hpp>
+DxfLinearExtrudeNode::DxfLinearExtrudeNode(const AbstractNode::NodeList &children, const QString &filename, const QString &layer,
+			      double height, double twist, double origin_x, double origin_y, double scale, 
+			     int convexity, int slices, bool center, const Accuracy &acc, const Props p)
+  :AbstractPolyNode(p,children), convexity(convexity), slices(slices), height(height), twist(twist), 
+  origin_x(origin_x), origin_y(origin_y), scale(scale), filename(filename), layername(layer), acc(acc), 
+  center(center), has_twist(twist!=0.0) {
+  if (has_twist && slices<2) {
+	  slices = (int)std::max(2.0, std::abs(get_fragments_from_r(height,
+			  acc) * twist / 360));
+  }    
+}
+
 
 class DxfLinearExtrudeModule : public AbstractModule
 {
@@ -49,92 +62,70 @@ public:
 	virtual AbstractNode::Pointer evaluate(const Context *ctx, const ModuleInstantiation *inst) const;
 };
 
-class DxfLinearExtrudeNode : public AbstractPolyNode
-{
-public:
-	typedef shared_ptr<DxfLinearExtrudeNode> Pointer;
-	int convexity, slices;
-	double fn, fs, fa, height, twist;
-	double origin_x, origin_y, scale;
-	bool center, has_twist;
-	QString filename, layername;
-	DxfLinearExtrudeNode(const ModuleInstantiation *mi) : AbstractPolyNode(mi) {
-		convexity = slices = 0;
-		fn = fs = fa = height = twist = 0;
-		origin_x = origin_y = scale = 0;
-		center = has_twist = false;
-	}
-	virtual PolySet *render_polyset(render_mode_e mode) const;
-	virtual QString dump(QString indent) const;
-};
+AbstractNode::Pointer DxfLinearExtrudeModule::evaluate(const Context *ctx, const ModuleInstantiation *inst) const {
+  AbstractNode::NodeList children;
+  foreach (ModuleInstantiation *v, inst->children) {
+	  AbstractNode::Pointer n(v->evaluate(inst->ctx));
+	  if (n) children.append(n);
+  }
+  QVector<QString> argnames = QVector<QString>() << "file" << "layer" << "height" << "origin" << "scale" << "center" << "twist" << "slices";
+  QVector<Expression*> argexpr;
 
-AbstractNode::Pointer DxfLinearExtrudeModule::evaluate(const Context *ctx, const ModuleInstantiation *inst) const
-{
-	DxfLinearExtrudeNode::Pointer node(boost::make_shared<DxfLinearExtrudeNode>(inst));
+  Context c(ctx);
+  c.args(argnames, argexpr, inst->argnames, inst->argvalues);
 
-	QVector<QString> argnames = QVector<QString>() << "file" << "layer" << "height" << "origin" << "scale" << "center" << "twist" << "slices";
-	QVector<Expression*> argexpr;
+  Accuracy acc;
+  acc.fn = c.lookup_variable("$fn").num;
+  acc.fs = c.lookup_variable("$fs").num;
+  acc.fa = c.lookup_variable("$fa").num;
 
-	Context c(ctx);
-	c.args(argnames, argexpr, inst->argnames, inst->argvalues);
+  Value vfile = c.lookup_variable("file");
+  Value vlayer = c.lookup_variable("layer", true);
+  Value vheight = c.lookup_variable("height", true);
+  Value vconvexity = c.lookup_variable("convexity", true);
+  Value vorigin = c.lookup_variable("origin", true);
+  Value vscale = c.lookup_variable("scale", true);  
+  Value vcenter = c.lookup_variable("center", true);
+  Value vtwist = c.lookup_variable("twist", true);
+  Value vslices = c.lookup_variable("slices", true);
 
-	node->fn = c.lookup_variable("$fn").num;
-	node->fs = c.lookup_variable("$fs").num;
-	node->fa = c.lookup_variable("$fa").num;
+  double height = vheight.num;
+  int convexity = (int)vconvexity.num;
+  bool center = false;
+  double twist = 0.0;
+  int slices = -1;
 
-	Value file = c.lookup_variable("file");
-	Value layer = c.lookup_variable("layer", true);
-	Value height = c.lookup_variable("height", true);
-	Value convexity = c.lookup_variable("convexity", true);
-	Value origin = c.lookup_variable("origin", true);
-	Value scale = c.lookup_variable("scale", true);
-	Value center = c.lookup_variable("center", true);
-	Value twist = c.lookup_variable("twist", true);
-	Value slices = c.lookup_variable("slices", true);
+  if (vcenter.type == Value::BOOL)
+	  center = vcenter.b;
 
-	if(!file.text.isNull())
-		node->filename = c.get_absolute_path(file.text);
-	else
-		node->filename = file.text;
+  if (height <= 0)
+	  height = 100;
 
-	node->layername = layer.text;
-	node->height = height.num;
-	node->convexity = (int)convexity.num;
-	origin.getv2(node->origin_x, node->origin_y);
-	node->scale = scale.num;
+  if (convexity <= 0)
+	  convexity = 1;
 
-	if (center.type == Value::BOOL)
-		node->center = center.b;
+  if (vtwist.type == Value::NUMBER) {
+	  twist = vtwist.num;
+	  if (vslices.type == Value::NUMBER) {
+		  slices = (int)vslices.num;
+	  }
+  }
+  
+  QString file;
+  if(!vfile.text.isNull())
+    file = c.get_absolute_path(vfile.text);
+  else
+    file = vfile.text;
+  double ox=0,oy=0;
+  vorigin.getv2(ox, oy);
+  
+  double scale = vscale.num;
+  if (scale <= 0.0)
+    scale = 1.0;
 
-	if (node->height <= 0)
-		node->height = 100;
-
-	if (node->convexity <= 0)
-		node->convexity = 1;
-
-	if (node->scale <= 0)
-		node->scale = 1;
-
-	if (twist.type == Value::NUMBER) {
-		node->twist = twist.num;
-		if (slices.type == Value::NUMBER) {
-			node->slices = (int)slices.num;
-		} else {
-			node->slices = (int)fmax(2, fabs(get_fragments_from_r(node->height,
-					node->fn, node->fs, node->fa) * node->twist / 360));
-		}
-		node->has_twist = true;
-	}
-
-	if (node->filename.isEmpty()) {
-		foreach (ModuleInstantiation *v, inst->children) {
-			AbstractNode::Pointer n = v->evaluate(inst->ctx);
-			if (n) node->children.append(n);
-		}
-	}
-
-	return node;
+  return DxfLinearExtrudeNode::Pointer(new DxfLinearExtrudeNode(children, file, vlayer.text, height, twist, ox, oy, scale, convexity, slices, center, acc, inst));
 }
+
 
 void register_builtin_dxf_linear_extrude()
 {
@@ -224,30 +215,27 @@ PolySet *DxfLinearExtrudeNode::render_polyset(render_mode_e) const
 
 	print_messages_push();
 	DxfData *dxf;
-
-	if (filename.isEmpty())
-	{
+	
+	if (filename.isEmpty()) {
 #ifdef ENABLE_CGAL
-
-		// Before extruding, union all (2D) children nodes
-		// to a single DxfData, then tesselate this into a PolySet
-		CGAL_Nef_polyhedron N;
-		N.dim = 2;
-		foreach(AbstractNode::Pointer v, children) {
-			if (v->props.background)
-				continue;
-			N.p2 += v->render_cgal_nef_polyhedron().p2;
-		}
-		dxf = new DxfData(N);
+	  // Before extruding, union all (2D) children nodes
+	  // to a single DxfData, then tesselate this into a PolySet
+	  CGAL_Nef_polyhedron N;
+	  N.dim = 2;
+	  foreach(AbstractNode::Pointer v, children) {
+		  if (v->props.background)
+			  continue;
+		  N.p2 += v->render_cgal_nef_polyhedron().p2;
+	  }
+	  dxf = new DxfData(N);
 
 #else // ENABLE_CGAL
-		PRINT("WARNING: Found linear_extrude() statement without dxf file but compiled without CGAL support!");
-		dxf = new DxfData();
+	  PRINT("WARNING: Found linear_extrude() statement without dxf file but compiled without CGAL support!");
+	  dxf = new DxfData();
 #endif // ENABLE_CGAL
 	} else {
-		dxf = new DxfData(fn, fs, fa, filename, layername, origin_x, origin_y, scale);
+	  dxf = new DxfData(acc, filename, layername, origin_x, origin_y, scale);
 	}
-
 	PolySet *ps = new PolySet();
 	ps->convexity = convexity;
 
@@ -320,7 +308,7 @@ QString DxfLinearExtrudeNode::dump(QString indent) const
 {
 	if (dump_cache.isEmpty()) {
 		QString text;
-        QFileInfo fileInfo(filename);
+		QFileInfo fileInfo(filename);
 		text.sprintf("linear_extrude(file = \"%s\", cache = \"%x.%x\", layer = \"%s\", "
 				"height = %g, origin = [ %g %g ], scale = %g, center = %s, convexity = %d",
 				filename.toAscii().data(), (int)fileInfo.lastModified().toTime_t(), 
@@ -332,7 +320,7 @@ QString DxfLinearExtrudeNode::dump(QString indent) const
 			text += t2;
 		}
 		QString t3;
-		t3.sprintf(", $fn = %g, $fa = %g, $fs = %g) {\n", fn, fa, fs);
+		t3.sprintf(", $fn = %g, $fa = %g, $fs = %g) {\n", acc.fn, acc.fa, acc.fs);
 		text += t3;
 		foreach (AbstractNode::Pointer v, children)
 			text += v->dump(indent + QString("\t"));

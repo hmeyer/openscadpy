@@ -51,7 +51,7 @@ DxfData::DxfData()
 /*!
 	Reads a layer from the given file, or all layers if layename.isNull()
  */
-DxfData::DxfData(double fn, double fs, double fa, QString filename, QString layername, double xorigin, double yorigin, double scale)
+DxfData::DxfData(const Accuracy &acc, const QString &filename, const QString &layername, double xorigin, double yorigin, double scale)
 {
 	handle_dep(filename); // Register ourselves as a dependency
 
@@ -161,7 +161,7 @@ DxfData::DxfData(double fn, double fs, double fa, QString filename, QString laye
 				}
 			}
 			else if (mode == "CIRCLE") {
-				int n = get_fragments_from_r(radius, fn, fs, fa);
+				int n = get_fragments_from_r(radius, acc);
 				Point center(xverts[0], yverts[0]);
 				for (int i = 0; i < n; i++) {
 					double a1 = (2*M_PI*i)/n;
@@ -172,7 +172,7 @@ DxfData::DxfData(double fn, double fs, double fa, QString filename, QString laye
 			}
 			else if (mode == "ARC") {
 				Point center(xverts[0], yverts[0]);
-				int n = get_fragments_from_r(radius, fn, fs, fa);
+				int n = get_fragments_from_r(radius, acc);
 				while (arc_start_angle > arc_stop_angle)
 					arc_stop_angle += 360.0;
 				n = (int)ceil(n * (arc_stop_angle-arc_start_angle) / 360);
@@ -209,7 +209,7 @@ DxfData::DxfData(double fn, double fs, double fa, QString filename, QString laye
 				// the ratio stored in 'radius; due to the parser code not checking entity type
 				double r_minor = r_major * radius;
 				double sweep_angle = ellipse_stop_angle-ellipse_start_angle;
-				int n = get_fragments_from_r(r_major, fn, fs, fa);
+				int n = get_fragments_from_r(r_major, acc);
 				n = (int)ceil(n * sweep_angle / (2 * M_PI));
 //				Vector2d p1;
 				Point p1;

@@ -84,6 +84,7 @@ public:
 		RENDER_OPENCSG
 	};
 	AbstractPolyNode(const Props &p) : AbstractNode(p) { };
+	AbstractPolyNode(const Props &p, const NodeList &children): AbstractNode(p, children) { };
 	virtual class PolySet *render_polyset(render_mode_e mode) const = 0;
 #ifdef ENABLE_CGAL
 	virtual CGAL_Nef_polyhedron render_cgal_nef_polyhedron() const;

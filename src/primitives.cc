@@ -88,7 +88,7 @@ AbstractNode::Pointer PrimitiveModule::evaluate(const Context *ctx, const Module
 	Context c(ctx);
 	c.args(argnames, argexpr, inst->argnames, inst->argvalues);
 	
-	PrimitiveNode::Accuracy acc;
+	Accuracy acc;
 
 	acc.fn = c.lookup_variable("$fn").num;
 	acc.fs = c.lookup_variable("$fs").num;
@@ -219,23 +219,6 @@ void register_builtin_primitives()
 	builtin_modules["circle"] = new PrimitiveModule(CIRCLE);
 	builtin_modules["polygon"] = new PrimitiveModule(POLYGON);
 }
-
-/*!
-	Returns the number of subdivision of a whole circle, given radius and
-	the three special variables $fn, $fs and $fa
-*/
-int get_fragments_from_r(double r, double fn, double fs, double fa)
-{
-	if (r < GRID_FINE) return 0;
-	if (fn > 0.0)
-		return (int)fn;
-	return (int)ceil(fmax(fmin(360.0 / fa, r*M_PI / fs), 5));
-}
-
-inline int get_fragments_from_r(double r, const PrimitiveNode::Accuracy &acc) {
-	return get_fragments_from_r(r, acc.fn, acc.fs, acc.fa);
-}
-
 
 static void generate_circle(Vec2D &circle, double r)
 {
