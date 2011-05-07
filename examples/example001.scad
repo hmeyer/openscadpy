@@ -1,26 +1,20 @@
+def example001():
+	def rotcy(rot, r, h):
+		return RotateAxis(rot, 90, 
+			Cylinder(r,h,True))
+	def r_from_dia(d):
+		return d/2.0
 
-module example001()
-{
-	function r_from_dia(d) = d / 2;
+	size = 50
+	hole = 25
+	cy_r = r_from_dia(hole)
+	cy_h = r_from_dia(size * 2.5)
 
-	module rotcy(rot, r, h) {
-		rotate(90, rot)
-			cylinder(r = r, h = h, center = true);
-	}
+	return Difference([
+		Sphere(r_from_dia(size)),
+			rotcy([0,0,0], cy_r, cy_h),
+			rotcy([1,0,0], cy_r, cy_h),
+			rotcy([0,1,0], cy_r, cy_h)
+		])
 
-	difference() {
-		sphere(r = r_from_dia(size));
-		rotcy([0, 0, 0], cy_r, cy_h);
-		rotcy([1, 0, 0], cy_r, cy_h);
-		rotcy([0, 1, 0], cy_r, cy_h);
-	}
-
-	size = 50;
-	hole = 25;
-
-	cy_r = r_from_dia(hole);
-	cy_h = r_from_dia(size * 2.5);
-}
-
-example001();
-
+result = example001()

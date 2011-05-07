@@ -39,6 +39,7 @@
 #include "builtin.h"
 #include "dxftess.h"
 #include "progress.h"
+#include "pythonscripting.h"
 #ifdef ENABLE_OPENCSG
 #include "render-opencsg.h"
 #endif
@@ -596,6 +597,8 @@ void MainWindow::compile(bool procevents)
 
 	// Parse
 	last_compiled_doc = editor->toPlainText();
+	PythonScript pyvm;
+/*	
 	root_module = parse((last_compiled_doc + "\n" + commandline_commands).toAscii().data(), this->fileName.isEmpty() ? "" : QFileInfo(this->fileName).absolutePath().toLocal8Bit(), false);
 
 	// Error highlighting
@@ -629,6 +632,11 @@ void MainWindow::compile(bool procevents)
 	AbstractNode::resetIndexCounter();
 	root_inst = ModuleInstantiation();
 	absolute_root_node = root_module->evaluate(&root_ctx, &root_inst);
+*/	
+	absolute_root_node = pyvm.evaluate((last_compiled_doc + "\n" + commandline_commands).toAscii().data(),"");
+	if (!absolute_root_node) {
+	  PRINT(pyvm.error().c_str());
+	}
 
 	if (!absolute_root_node)
 		goto fail;

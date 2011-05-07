@@ -1,11 +1,9 @@
 
-module example004()
-{
-	difference() {
-		cube(30, center = true);
-		sphere(20);
-	}
-}
+def example004():
+	return Difference([
+		Cube(30, True),
+		Sphere(20)
+	])
 
-example004();
+result = example004()
 

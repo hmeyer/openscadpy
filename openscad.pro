@@ -84,6 +84,7 @@ CONFIG += cgal
 CONFIG += opencsg
 CONFIG += progresswidget
 CONFIG += boost
+CONFIG += python
 
 #Uncomment the following line to enable QCodeEdit
 #CONFIG += qcodeedit
@@ -104,6 +105,7 @@ include(cgal.pri)
 include(opencsg.pri)
 include(eigen2.pri)
 include(boost.pri)
+include(python.pri)
 
 # Standard include path for misc external libs
 #macx {
@@ -155,6 +157,7 @@ HEADERS += src/CGAL_renderer.h \
            src/render.h \
            src/render-opencsg.h \
            src/surface.h \
+           src/pythonscripting.h \
            src/mathc99.h
 
 SOURCES += src/openscad.cc \
@@ -196,6 +199,7 @@ SOURCES += src/openscad.cc \
            src/progress.cc \
            src/editor.cc \
 	   src/accuracy.cc \
+           src/pythonscripting.cc \
 	   src/mathc99.cc
 
 macx {

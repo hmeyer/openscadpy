@@ -1,20 +1,18 @@
 
-module example003()
-{
-	difference() {
-		union() {
-			cube([30, 30, 30], center = true);
-			cube([40, 15, 15], center = true);
-			cube([15, 40, 15], center = true);
-			cube([15, 15, 40], center = true);
-		}
-		union() {
-			cube([50, 10, 10], center = true);
-			cube([10, 50, 10], center = true);
-			cube([10, 10, 50], center = true);
-		}
-	}
-}
+def example003():
+	return Difference([
+		Union([
+			Cube(30, True),
+			Cube([40, 15, 15], True),
+			Cube([15, 40, 15], True),
+			Cube([15, 15, 40], True)
+		]),
+		Union([
+			Cube([50, 10, 10], True),
+			Cube([10, 50, 10], True),
+			Cube([10, 10, 50], True)
+		])
+	])
 
-example003();
+result = example003()
 
