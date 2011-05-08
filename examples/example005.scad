@@ -1,20 +1,19 @@
+import math
+def example005():
+	return Translate([0, 0, -120],
+		[Difference([
+			Cylinder(100,50),
+			Translate([0, 0, 10], Cylinder(80, 50)),
+			Translate([100, 0, 35], Cube(50, True))
+		])]
+		+ map(lambda i:
+			Translate([math.sin(math.pi*i/3)*80, 
+				math.cos(math.pi*i/3)*80, 0 ],
+				Cylinder(10,200)), range(0,6))
+		+ [Translate([0, 0, 200],
+			Cylinder(120,0,80.0)
+		)]
+	)
 
-module example005()
-{
-	translate([0, 0, -120]) {
-		difference() {
-			cylinder(h = 50, r = 100);
-			translate([0, 0, 10]) cylinder(h = 50, r = 80);
-			translate([100, 0, 35]) cube(50, center = true);
-		}
-		for (i = [0:5]) {
-			echo(360*i/6, sin(360*i/6)*80, cos(360*i/6)*80);
-			translate([sin(360*i/6)*80, cos(360*i/6)*80, 0 ])
-				cylinder(h = 200, r=10);
-		}
-		translate([0, 0, 200])
-			cylinder(h = 80, r1 = 120, r2 = 0);
-	}
-}
 
-example005();
+result = example005()

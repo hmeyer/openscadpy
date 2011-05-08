@@ -122,10 +122,10 @@ public:
 
 class PyCubeNode: public PyAbstractNode {
 public:
-  PyCubeNode(const list &dim, bool center) {
+  PyCubeNode(const list &dim, bool center=false) {
     node = make_shared<CubeNode>(list2StdArray<Float3>(dim), center);  
   }
-  PyCubeNode(double l, bool center) {
+  PyCubeNode(double l, bool center=false) {
     Float3 dim = {{ l,l,l }};
     node = make_shared<CubeNode>(dim, center);  
   }  
@@ -140,10 +140,10 @@ public:
 
 class PyCylinderNode: public PyAbstractNode {
 public:
-  PyCylinderNode(double r1, double r2, double h, bool center) {
+  PyCylinderNode(double r1, double r2, double h, bool center=false) {
     node = make_shared<CylinderNode>(r1, r2, h, center, ctx.getAcc());
   }
-  PyCylinderNode(double r, double h, bool center) {
+  PyCylinderNode(double r, double h, bool center=false) {
     node = make_shared<CylinderNode>(r, r, h, center, ctx.getAcc());
   }
 };
@@ -190,10 +190,10 @@ public:
 
 class PySquareNode: public PyAbstractNode {
 public:
-  PySquareNode(const list &dim, bool center) {
+  PySquareNode(const list &dim, bool center=false) {
     node = make_shared<SquareNode>(list2StdArray<Float2>(dim), center);  
   }
-  PySquareNode(double l, bool center) {
+  PySquareNode(double l, bool center=false) {
     Float2 dim = {{ l,l }};
     node = make_shared<SquareNode>(dim, center);  
   }
@@ -232,13 +232,26 @@ PythonScript::PythonScript() {
   ctx.main_namespace["RotateAxis"] = class_<PyRotateAxisNode, bases<PyAbstractNode> >("RotateAxis", init<list, double, PyAbstractNode>()).def(init<list, double, list>());
   ctx.main_namespace["Matrix"] = class_<PyMatrixNode, bases<PyAbstractNode> >("Matrix", init<list, PyAbstractNode>()).def(init<list, list>());
   ctx.main_namespace["Color"] = class_<PyColorNode, bases<PyAbstractNode> >("Color", init<list, PyAbstractNode>()).def(init<list, list>());
-  ctx.main_namespace["Cube"] = class_<PyCubeNode, bases<PyAbstractNode> >("Cube", init<list, bool>()).def(init<double, bool>());
+  ctx.main_namespace["Cube"] = class_<PyCubeNode, bases<PyAbstractNode> >("Cube", init<list, optional<bool> >()).def(init<double, optional<bool> >());
   ctx.main_namespace["Sphere"] = class_<PySphereNode, bases<PyAbstractNode> >("Sphere", init<double>());
-  ctx.main_namespace["Cylinder"] = class_<PyCylinderNode, bases<PyAbstractNode> >("Cylinder", init<double, double, double, bool>()).def(init<double, double, bool>());
+  ctx.main_namespace["Cylinder"] = class_<PyCylinderNode, bases<PyAbstractNode> >("Cylinder", init<double, double, double, optional<bool> >()).def(init<double, double, optional< bool> >());
   ctx.main_namespace["Polyhedron"] = class_<PyPolyhedronNode, bases<PyAbstractNode> >("Polyhedron", init<list, list, unsigned int>());
-  ctx.main_namespace["Square"] = class_<PySquareNode, bases<PyAbstractNode> >("Square", init<list, bool>()).def(init<double, bool>());
+  ctx.main_namespace["Square"] = class_<PySquareNode, bases<PyAbstractNode> >("Square", init<list, optional<bool> >()).def(init<double, optional<bool> >());
   ctx.main_namespace["Circle"] = class_<PyCircleNode, bases<PyAbstractNode> >("Circle", init<double>());
   ctx.main_namespace["Polygon"] = class_<PyPolygonNode, bases<PyAbstractNode> >("Polygon", init<list, list, unsigned int>());
+  //SurfaceNode
+  //RenderNode
+  //ImportSTLNode
+  //ImportDXFNode
+  //ImportOFFNode
+  //ProjectionNode
+  //CgaladvMinkowskiNode
+  //CgaladvGlideNode
+  //CgaladvSubdivNode
+  //DxfLinearExtrudeNode
+  //DxfRotateExtrudeNode
+  //dxf_dim
+  //dxf_
 }
 
 PythonScript::~PythonScript() {}
