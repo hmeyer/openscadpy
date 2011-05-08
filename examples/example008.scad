@@ -1,32 +1,23 @@
+def ext(layer):
+	return DxfLinearExtrude( "example008.dxf",
+			layer, 50,0,0,0,1,3)
 
-difference()
-{
-	intersection()
-	{
-		translate([ -25, -25, -25])
-		dxf_linear_extrude(file = "example008.dxf",
-			layer = "G", height = 50, convexity = 3);
+
+result = Difference([
+	Intersection([
+		Translate([ -25, -25, -25], ext("G")),
+
+		RotateAxis(90,[1, 0, 0],
+			Translate([ -25, -125, -25], ext("E"))),
 		
-		rotate(90, [1, 0, 0])
-		translate([ -25, -125, -25])
-		dxf_linear_extrude(file = "example008.dxf",
-			layer = "E", height = 50, convexity = 3);
-		
-		rotate(90, [0, 1, 0])
-		translate([ -125, -125, -25])
-		dxf_linear_extrude(file = "example008.dxf",
-			layer = "B", height = 50, convexity = 3);
-	}
+		RotateAxis(90, [0, 1, 0],
+			Translate([ -125, -125, -25], ext("B")))
+	]),
 
-	intersection()
-	{
-		translate([ -125, -25, -25])
-		dxf_linear_extrude(file = "example008.dxf",
-			layer = "X", height = 50, convexity = 1);
+	Intersection([
+		Translate([ -125, -25, -25], ext("X")),
 
-		rotate(90, [0, 1, 0])
-		translate([ -125, -25, -25])
-		dxf_linear_extrude(file = "example008.dxf",
-			layer = "X", height = 50, convexity = 1);
-	}
-}
+		RotateAxis(90, [0, 1, 0],
+			Translate([ -125, -25, -25], ext("X")))
+	])
+])

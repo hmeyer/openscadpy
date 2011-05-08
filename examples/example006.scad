@@ -1,44 +1,43 @@
+def example006():
+	def edgeprofile():
+		return Render(Difference([
+			Cube([20, 20, 150], True),
+			Translate([-10, -10, 0],
+				Cylinder(10, 80, True)),
+			Translate([-10, -10, +40],
+				Sphere(10)),
+			Translate([-10, -10, -40],
+				Sphere(10))
+		]))
 
-module example006()
-{
-	module edgeprofile()
-	{
-		render(convexity = 2) difference() {
-			cube([20, 20, 150], center = true);
-			translate([-10, -10, 0])
-				cylinder(h = 80, r = 10, center = true);
-			translate([-10, -10, +40])
-				sphere(r = 10);
-			translate([-10, -10, -40])
-				sphere(r = 10);
-		}
-	}
+	return Difference([
+		Cube(100, True)]
+		+map(lambda rot: RotateAxis(90, rot,
+			map(lambda p: Translate([ p[0]*50, p[1]*50, 0 ],
+				RotateAxis(p[2], [0,0,1], edgeprofile())
+				), [	[+1, +1, 0], 
+					[-1, +1, 90], 
+					[-1, -1, 180], 
+					[+1, -1, 270]])
+			)
+			,[ [0, 0, 0], [1, 0, 0], [0, 1, 0] ])
+		+ map(lambda i: RotateAxis(i[0],[0,0,1],
+				RotateAxis(i[1],[1,0,0], 
+					Translate([0,-50,0],
+						map(lambda j: Translate([j[0],0,j[1]],
+							Sphere(10)), i[2]
+						)
+					)
+				)
+			), 
+			[
+				[ 0, 0, [ [0, 0] ] ],
+				[ 90, 0, [ [-20, -20], [+20, +20] ] ],
+				[ 180, 0, [ [-20, -25], [-20, 0], [-20, +25], [+20, -25], [+20, 0], [+20, +25] ] ],
+				[ 270, 0, [ [0, 0], [-25, -25], [+25, -25], [-25, +25], [+25, +25] ] ],
+				[ 0, 90, [ [-25, -25], [0, 0], [+25, +25] ] ],
+				[ 0, -90, [ [-25, -25], [+25, -25], [-25, +25], [+25, +25] ] ]
+			])
+		)
 
-	difference()
-	{
-		cube(100, center = true);
-		for (rot = [ [0, 0, 0], [1, 0, 0], [0, 1, 0] ]) {
-			rotate(90, rot)
-				for (p = [[+1, +1, 0], [-1, +1, 90], [-1, -1, 180], [+1, -1, 270]]) {
-					translate([ p[0]*50, p[1]*50, 0 ])
-						rotate(p[2], [0, 0, 1])
-							edgeprofile();
-				}
-		}
-		for (i = [
-			[ 0, 0, [ [0, 0] ] ],
-			[ 90, 0, [ [-20, -20], [+20, +20] ] ],
-			[ 180, 0, [ [-20, -25], [-20, 0], [-20, +25], [+20, -25], [+20, 0], [+20, +25] ] ],
-			[ 270, 0, [ [0, 0], [-25, -25], [+25, -25], [-25, +25], [+25, +25] ] ],
-			[ 0, 90, [ [-25, -25], [0, 0], [+25, +25] ] ],
-			[ 0, -90, [ [-25, -25], [+25, -25], [-25, +25], [+25, +25] ] ]
-		]) {
-			rotate(i[0], [0, 0, 1]) rotate(i[1], [1, 0, 0]) translate([0, -50, 0])
-				for (j = i[2])
-					translate([j[0], 0, j[1]]) sphere(10);
-		}
-	}
-}
-
-example006();
-
+result = example006()

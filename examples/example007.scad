@@ -1,70 +1,48 @@
+def clip():
+	return Difference(
+		[DxfRotateExtrude(
+				"example007.dxf",
+				"dorn",
+				0,0,1,3)]
+		+ map(lambda r: RotateAxis(r, [0,0,1], cutout()), [0, 90])
+		)
 
-module cutout()
-{
-		intersection()
-		{
-			rotate(90, [1, 0, 0])
-			translate([0, 0, -50])
-				dxf_linear_extrude(
-						file = "example007.dxf",
-						layer = "cutout1",
-						height = 100,
-						convexity = 1);
-			
-			rotate(90, [0, 0, 1])
-			rotate(90, [1, 0, 0])
-			translate([0, 0, -50])
-				dxf_linear_extrude(
-						file = "example007.dxf",
-						layer = "cutout2",
-						height = 100,
-						convexity = 2);
-		}
-}
+def cutout():
+	ext = map(lambda layer: Translate([0, 0, -50], 
+					DxfLinearExtrude(
+						"example007.dxf",
+						layer,
+						100,0,0,0,1,
+						2)), ["cutout1", "cutout2"])
+	return Intersection([
+		RotateAxis(90, [1, 0, 0], ext[0]),
+		RotateAxis(90, [0, 0, 1], 
+			RotateAxis(90, [1, 0, 0], ext[1])
+		)
+	])
 
-module clip()
-{
-	difference() {
-		dxf_rotate_extrude(
-				file = "example007.dxf",
-				layer="dorn",
-				convexity = 3);
-		for (r = [0, 90])
-			rotate(r, [0, 0, 1])
-				cutout();
-	}
-}
 
-module cutview()
-{
-	difference()
-	{
-		difference()
-		{
-			translate([0, 0, -10])
-				clip();
 
-			rotate(20, [0, 0, 1])
-				rotate(-20, [0, 1, 0])
-				translate([18, 0, 0])
-				cube(30, center = true);
-		}
+def cutview():
+	combo = [
+			Translate([0, 0, -10],
+				clip()),
+			RotateAxis(20, [0, 0, 1],
+				RotateAxis(-20, [0, 1, 0],
+					Translate([18, 0, 0],
+						Cube(30, True)
+					)
+				)
+			)
+		]
+	r = Render(Intersection(combo))
+	r.highlight()
+	return Difference([
+		Difference(combo),r
+	])
 
-		# render(convexity = 5) intersection()
-		{
-			translate([0, 0, -10])
-				clip();
-		
-			rotate(20, [0, 0, 1])
-				rotate(-20, [0, 1, 0])
-				translate([18, 0, 0])
-				cube(30, center = true);
-		}
-	}
-}
+result = Translate([0, 0, -10],
+	clip())
 
-translate([0, 0, -10])
-	clip();
-
-// cutview();
+#result = cutview()
 

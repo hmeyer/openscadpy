@@ -1,6 +1,6 @@
 def example001():
 	def rotcy(rot, r, h):
-		return RotateAxis(rot, 90, 
+		return RotateAxis(90, rot,
 			Cylinder(r,h,True))
 	def r_from_dia(d):
 		return d/2.0
