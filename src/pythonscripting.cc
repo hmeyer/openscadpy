@@ -3,6 +3,9 @@
 #include "csgops.h"
 #include "primitives.h"
 #include "transform.h"
+#include "render.h"
+#include "dxflinextrude.h"
+#include "dxfrotextrude.h"
 #include <boost/python.hpp>
 #include <boost/make_shared.hpp>
 
@@ -13,9 +16,11 @@ using boost::make_shared;
 class PyContext {
   Accuracy acc;
   object main_module;
+  std::string path;
   public:
     PyContext() {};
     void init(){
+      path.clear();
       main_module = object((handle<>(borrowed(PyImport_AddModule("__main__")))));
       main_namespace = main_module.attr("__dict__");
       main_namespace["fn"] = acc.fn;
@@ -23,6 +28,8 @@ class PyContext {
       main_namespace["fa"] = acc.fa;
       if (main_namespace.contains("result")) main_namespace["result"].del();
     }
+    const std::string &getPath() const { return path;}
+    void setPath(const std::string &p) { path = p;}
     Accuracy &getAcc() {
       acc.fn = extract<double>(main_namespace["fn"]);
       acc.fa = extract<double>(main_namespace["fa"]);
@@ -51,8 +58,12 @@ protected:
   AbstractNode::Pointer node;
 public:
   AbstractNode::Pointer getNode() const { return node; }
+  void highlight(bool set=true) {
+    node->props.highlight = set;
+  }
 };
 
+BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(PyAbstractNode_overloads, highlight, 0, 1)
 
 AbstractNode::NodeList list2NodeList(const list &l) {
   AbstractNode::NodeList nl;
@@ -94,10 +105,10 @@ typedef PyTransformNode<TransformMirrorNode> PyMirrorNode;
 
 class PyRotateAxisNode: public PyAbstractNode {
 public:
-  PyRotateAxisNode(const list &va, double ang, const PyAbstractNode &n) {
+  PyRotateAxisNode(double ang, const list &va, const PyAbstractNode &n) {
     node = make_shared<TransformRotateAxisNode>(list2StdArray<Float3>(va), ang, AbstractNode::NodeList(1, n.getNode()));
   }
-  PyRotateAxisNode(const list &va, double ang, const list &a) {
+  PyRotateAxisNode(double ang, const list &va, const list &a) {
     node = make_shared<TransformRotateAxisNode>(list2StdArray<Float3>(va), ang, list2NodeList(a));
   }
 };
@@ -180,7 +191,7 @@ VecVec list2VecVec(const list &l) {
 
 class PyPolyhedronNode: public PyAbstractNode {
 public:
-  PyPolyhedronNode(const list &points, const list &triangles, unsigned int convexity) {
+  PyPolyhedronNode(const list &points, const list &triangles, unsigned int convexity=5) {
     node = make_shared<PolyhedronNode>(
       list2ArrayVec<Vec3D>(points), 
       list2ArrayVec<VecTriangles>(triangles), convexity);
@@ -208,20 +219,96 @@ public:
 
 class PyPolygonNode: public PyAbstractNode {
 public:
-  PyPolygonNode(const list &points, const list &paths, unsigned int convexity) {
+  PyPolygonNode(const list &points, const list &paths, unsigned int convexity=5) {
     node = make_shared<PolygonNode>(
       list2ArrayVec<Vec2D>(points), 
       list2VecVec<VecPaths>(paths), convexity);
   }
 };
 
+class PyRenderNode: public PyAbstractNode {
+public:
+  PyRenderNode(const PyAbstractNode &n, unsigned int convexity=5) {
+    node = make_shared<RenderNode>(AbstractNode::NodeList(1, n.getNode()), convexity);
+  }
+  PyRenderNode(const list &a, unsigned int convexity=5) {
+    node = make_shared<RenderNode>(list2NodeList(a), convexity);
+  }
+};
 
+class PyDxfLinearExtrudeNode: public PyAbstractNode {
+public:
+  PyDxfLinearExtrudeNode(const std::string &filename, const std::string &layer,
+	double height, double twist, double origin_x, double origin_y, double scale, 
+	unsigned int convexity=5, int slices = -1, bool center = false) {
+      node.reset(new DxfLinearExtrudeNode(
+	AbstractNode::NodeList(), QString::fromStdString(filename), QString::fromStdString(layer),
+	height, twist, origin_x, origin_y, scale,
+	convexity, slices, center, ctx.getAcc()
+      ));
+  }
+};
+
+class PyLinearExtrudeNode: public PyAbstractNode {
+public:
+  PyLinearExtrudeNode(const PyAbstractNode &n,
+	double height, double twist,
+	unsigned int convexity=5, int slices = -1, bool center = false) {
+      node.reset(new DxfLinearExtrudeNode(
+	AbstractNode::NodeList(1, n.getNode()), QString(), QString(),
+	height, twist, 0, 0, 0,
+	convexity, slices, center, ctx.getAcc()
+      ));
+  }
+  PyLinearExtrudeNode(const list &a,
+	double height, double twist,
+	unsigned int convexity=5, int slices = -1, bool center = false) {
+      node.reset(new DxfLinearExtrudeNode(
+	list2NodeList(a), QString(), QString(),
+	height, twist, 0, 0, 0,
+	convexity, slices, center, ctx.getAcc()
+      ));
+  }
+};
+
+
+class PyDxfRotateExtrudeNode: public PyAbstractNode {
+public:
+  PyDxfRotateExtrudeNode(const std::string &filename, const std::string &layer,
+	double origin_x, double origin_y, double scale, 
+	unsigned int convexity=5) {
+      node = make_shared<DxfRotateExtrudeNode>(
+	AbstractNode::NodeList(), QString::fromStdString(filename), QString::fromStdString(layer),
+	origin_x, origin_y, scale,
+	convexity, ctx.getAcc()
+      );
+  }
+};
+class PyRotateExtrudeNode: public PyAbstractNode {
+public:
+  PyRotateExtrudeNode(const PyAbstractNode &n,
+	unsigned int convexity=5) {
+      node = make_shared<DxfRotateExtrudeNode>(
+	AbstractNode::NodeList(1, n.getNode()), QString(), QString(),
+	0, 0, 0,
+	convexity, ctx.getAcc()
+      );
+  }
+  PyRotateExtrudeNode(const list &a,
+	unsigned int convexity=5) {
+      node = make_shared<DxfRotateExtrudeNode>(
+	list2NodeList(a), QString(), QString(),
+	0, 0, 0,
+	convexity, ctx.getAcc()
+      );
+  }
+};
 
 
 PythonScript::PythonScript() {
   Py_Initialize();
   ctx.init();
-  ctx.main_namespace["AbstractNode"] = class_<PyAbstractNode>("AbstractNode");
+  ctx.main_namespace["AbstractNode"] = class_<PyAbstractNode>("AbstractNode").def("highlight", &PyAbstractNode::highlight, PyAbstractNode_overloads());
   ctx.main_namespace["Union"] = class_<PyUnionNode, bases<PyAbstractNode> >("Union", init<list>());
   ctx.main_namespace["Difference"] = class_<PyDifferenceNode, bases<PyAbstractNode> >("Difference", init<list>());
   ctx.main_namespace["Intersection"] = class_<PyIntersectionNode, bases<PyAbstractNode> >("Intersection", init<list>());
@@ -229,18 +316,35 @@ PythonScript::PythonScript() {
   ctx.main_namespace["Translate"] = class_<PyTranslateNode, bases<PyAbstractNode> >("Translate", init<list, PyAbstractNode>()).def(init<list, list>());
   ctx.main_namespace["Rotate"] = class_<PyRotateNode, bases<PyAbstractNode> >("Rotate", init<list, PyAbstractNode>()).def(init<list, list>());
   ctx.main_namespace["Mirror"] = class_<PyMirrorNode, bases<PyAbstractNode> >("Mirror", init<list, PyAbstractNode>()).def(init<list, list>());
-  ctx.main_namespace["RotateAxis"] = class_<PyRotateAxisNode, bases<PyAbstractNode> >("RotateAxis", init<list, double, PyAbstractNode>()).def(init<list, double, list>());
+  ctx.main_namespace["RotateAxis"] = class_<PyRotateAxisNode, bases<PyAbstractNode> >("RotateAxis", init<double, list, PyAbstractNode>()).def(init<double, list, list>());
   ctx.main_namespace["Matrix"] = class_<PyMatrixNode, bases<PyAbstractNode> >("Matrix", init<list, PyAbstractNode>()).def(init<list, list>());
   ctx.main_namespace["Color"] = class_<PyColorNode, bases<PyAbstractNode> >("Color", init<list, PyAbstractNode>()).def(init<list, list>());
   ctx.main_namespace["Cube"] = class_<PyCubeNode, bases<PyAbstractNode> >("Cube", init<list, optional<bool> >()).def(init<double, optional<bool> >());
   ctx.main_namespace["Sphere"] = class_<PySphereNode, bases<PyAbstractNode> >("Sphere", init<double>());
   ctx.main_namespace["Cylinder"] = class_<PyCylinderNode, bases<PyAbstractNode> >("Cylinder", init<double, double, double, optional<bool> >()).def(init<double, double, optional< bool> >());
-  ctx.main_namespace["Polyhedron"] = class_<PyPolyhedronNode, bases<PyAbstractNode> >("Polyhedron", init<list, list, unsigned int>());
+  ctx.main_namespace["Polyhedron"] = class_<PyPolyhedronNode, bases<PyAbstractNode> >("Polyhedron", init<list, list, optional<unsigned int> >());
   ctx.main_namespace["Square"] = class_<PySquareNode, bases<PyAbstractNode> >("Square", init<list, optional<bool> >()).def(init<double, optional<bool> >());
   ctx.main_namespace["Circle"] = class_<PyCircleNode, bases<PyAbstractNode> >("Circle", init<double>());
-  ctx.main_namespace["Polygon"] = class_<PyPolygonNode, bases<PyAbstractNode> >("Polygon", init<list, list, unsigned int>());
+  ctx.main_namespace["Polygon"] = class_<PyPolygonNode, bases<PyAbstractNode> >("Polygon", init<list, list, optional<unsigned int> >());
+  ctx.main_namespace["Render"] = class_<PyRenderNode, bases<PyAbstractNode> >("Render", init<PyAbstractNode, optional<unsigned int> >()).def(init<list, optional<unsigned int> >());
+  ctx.main_namespace["DxfLinearExtrude"] = class_<PyDxfLinearExtrudeNode, bases<PyAbstractNode> >("DxfLinearExtrude", 
+					    init<std::string, std::string,
+					      double, double, double, double, double,
+					      optional< unsigned int, int, bool > >());
+  ctx.main_namespace["LinearExtrude"] = class_<PyLinearExtrudeNode, bases<PyAbstractNode> >("LinearExtrude", 
+					    init<PyAbstractNode,
+					      double, double,
+					      optional< unsigned int, int, bool > >()).def(
+					    init<list, 
+					      double, double,
+					      optional< unsigned int, int, bool > >());
+  ctx.main_namespace["DxfRotateExtrude"] = class_<PyDxfRotateExtrudeNode, bases<PyAbstractNode> >("DxfRotateExtrude", 
+					    init<std::string, std::string,
+					      double, double, double, optional< unsigned int > >());
+  ctx.main_namespace["RotateExtrude"] = class_<PyRotateExtrudeNode, bases<PyAbstractNode> >("RotateExtrude", 
+					    init<PyAbstractNode, optional< unsigned int> >()).def(
+					    init<list, optional< unsigned int > >());
   //SurfaceNode
-  //RenderNode
   //ImportSTLNode
   //ImportDXFNode
   //ImportOFFNode
@@ -248,8 +352,6 @@ PythonScript::PythonScript() {
   //CgaladvMinkowskiNode
   //CgaladvGlideNode
   //CgaladvSubdivNode
-  //DxfLinearExtrudeNode
-  //DxfRotateExtrudeNode
   //dxf_dim
   //dxf_
 }
@@ -257,6 +359,7 @@ PythonScript::PythonScript() {
 PythonScript::~PythonScript() {}
 
 AbstractNode::Pointer PythonScript::evaluate(const std::string &code, const std::string &path) {
+  ctx.setPath(path);
   try {
     exec(code.c_str(), ctx.main_namespace);
     PyAbstractNode &resNode = extract<PyAbstractNode&>(ctx.main_namespace["result"]);

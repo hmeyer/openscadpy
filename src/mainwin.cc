@@ -633,7 +633,7 @@ void MainWindow::compile(bool procevents)
 	root_inst = ModuleInstantiation();
 	absolute_root_node = root_module->evaluate(&root_ctx, &root_inst);
 */	
-	absolute_root_node = pyvm.evaluate((last_compiled_doc + "\n" + commandline_commands).toAscii().data(),"");
+	absolute_root_node = pyvm.evaluate((last_compiled_doc + "\n" + commandline_commands).toStdString(), this->fileName.isEmpty() ? "" : QFileInfo(this->fileName).absolutePath().toStdString());
 	if (!absolute_root_node) {
 	  PRINT(pyvm.error().c_str());
 	}
