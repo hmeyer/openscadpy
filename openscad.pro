@@ -157,7 +157,6 @@ HEADERS += src/CGAL_renderer.h \
            src/render.h \
            src/render-opencsg.h \
            src/surface.h \
-           src/pythonscripting.h \
            src/mathc99.h
 
 SOURCES += src/openscad.cc \
@@ -199,7 +198,6 @@ SOURCES += src/openscad.cc \
            src/progress.cc \
            src/editor.cc \
 	   src/accuracy.cc \
-           src/pythonscripting.cc \
 	   src/mathc99.cc
 
 macx {

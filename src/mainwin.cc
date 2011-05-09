@@ -39,7 +39,9 @@
 #include "builtin.h"
 #include "dxftess.h"
 #include "progress.h"
+#ifdef ENABLE_PYTHON
 #include "pythonscripting.h"
+#endif
 #ifdef ENABLE_OPENCSG
 #include "render-opencsg.h"
 #endif
@@ -597,8 +599,13 @@ void MainWindow::compile(bool procevents)
 
 	// Parse
 	last_compiled_doc = editor->toPlainText();
+#ifdef ENABLE_PYTHON
 	PythonScript pyvm;
-/*	
+	absolute_root_node = pyvm.evaluate((last_compiled_doc + "\n" + commandline_commands).toStdString(), this->fileName.isEmpty() ? "" : QFileInfo(this->fileName).absolutePath().toStdString());
+	if (!absolute_root_node) {
+	  PRINT(pyvm.error().c_str());
+	}
+#else	
 	root_module = parse((last_compiled_doc + "\n" + commandline_commands).toAscii().data(), this->fileName.isEmpty() ? "" : QFileInfo(this->fileName).absolutePath().toLocal8Bit(), false);
 
 	// Error highlighting
@@ -632,11 +639,7 @@ void MainWindow::compile(bool procevents)
 	AbstractNode::resetIndexCounter();
 	root_inst = ModuleInstantiation();
 	absolute_root_node = root_module->evaluate(&root_ctx, &root_inst);
-*/	
-	absolute_root_node = pyvm.evaluate((last_compiled_doc + "\n" + commandline_commands).toStdString(), this->fileName.isEmpty() ? "" : QFileInfo(this->fileName).absolutePath().toStdString());
-	if (!absolute_root_node) {
-	  PRINT(pyvm.error().c_str());
-	}
+#endif	
 
 	if (!absolute_root_node)
 		goto fail;
