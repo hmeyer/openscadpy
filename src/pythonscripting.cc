@@ -16,28 +16,43 @@ using boost::make_shared;
 class PyContext {
   Accuracy acc;
   object main_module;
+  object openscad_namespace;
+  
   std::string path;
   public:
-    PyContext() {};
-    void init(){
+  static const std::string nsresult;
+  static const std::string nsopenscad;
+  PyContext() {};
+    void init(object &openscad_module){
       path.clear();
       main_module = object((handle<>(borrowed(PyImport_AddModule("__main__")))));
       main_namespace = main_module.attr("__dict__");
-      main_namespace["fn"] = acc.fn;
-      main_namespace["fs"] = acc.fs;
-      main_namespace["fa"] = acc.fa;
-      if (main_namespace.contains("result")) main_namespace["result"].del();
+      main_namespace[nsopenscad] = openscad_module;
+      openscad_namespace = openscad_module.attr("__dict__");
+      if (openscad_namespace.contains(nsresult)) openscad_namespace[nsresult].del();
+      openscad_namespace["fn"] = acc.fn;
+      openscad_namespace["fs"] = acc.fs;
+      openscad_namespace["fa"] = acc.fa;      
+    }
+    object getResult() {
+      if (openscad_namespace.contains(nsresult))
+	return openscad_namespace[nsresult];
+      return object();
     }
     const std::string &getPath() const { return path;}
     void setPath(const std::string &p) { path = p;}
     Accuracy &getAcc() {
-      acc.fn = extract<double>(main_namespace["fn"]);
-      acc.fa = extract<double>(main_namespace["fa"]);
-      acc.fs = extract<double>(main_namespace["fs"]);
+      acc.fn = extract<double>(openscad_namespace["fn"]);
+      acc.fa = extract<double>(openscad_namespace["fa"]);
+      acc.fs = extract<double>(openscad_namespace["fs"]);
       return acc;
     }
-  object main_namespace;
+    object main_namespace;
 };
+
+const std::string PyContext::nsresult("result");
+const std::string PyContext::nsopenscad("openscad");
+
 
 PyContext ctx;
 
@@ -304,46 +319,50 @@ public:
   }
 };
 
+BOOST_PYTHON_MODULE(openscad) {
+  class_<PyAbstractNode>("AbstractNode").def("highlight", &PyAbstractNode::highlight, PyAbstractNode_overloads());
+  class_<PyUnionNode, bases<PyAbstractNode> >("Union", init<list>());
+  class_<PyDifferenceNode, bases<PyAbstractNode> >("Difference", init<list>());
+  class_<PyIntersectionNode, bases<PyAbstractNode> >("Intersection", init<list>());
+  class_<PyScaleNode, bases<PyAbstractNode> >("Scale", init<list, PyAbstractNode>()).def(init<list, list>());
+  class_<PyTranslateNode, bases<PyAbstractNode> >("Translate", init<list, PyAbstractNode>()).def(init<list, list>());
+  class_<PyRotateNode, bases<PyAbstractNode> >("Rotate", init<list, PyAbstractNode>()).def(init<list, list>());
+  class_<PyMirrorNode, bases<PyAbstractNode> >("Mirror", init<list, PyAbstractNode>()).def(init<list, list>());
+  class_<PyRotateAxisNode, bases<PyAbstractNode> >("RotateAxis", init<double, list, PyAbstractNode>()).def(init<double, list, list>());
+  class_<PyMatrixNode, bases<PyAbstractNode> >("Matrix", init<list, PyAbstractNode>()).def(init<list, list>());
+  class_<PyColorNode, bases<PyAbstractNode> >("Color", init<list, PyAbstractNode>()).def(init<list, list>());
+  class_<PyCubeNode, bases<PyAbstractNode> >("Cube", init<list, optional<bool> >()).def(init<double, optional<bool> >());
+  class_<PySphereNode, bases<PyAbstractNode> >("Sphere", init<double>());
+  class_<PyCylinderNode, bases<PyAbstractNode> >("Cylinder", init<double, double, double, optional<bool> >()).def(init<double, double, optional< bool> >());
+  class_<PyPolyhedronNode, bases<PyAbstractNode> >("Polyhedron", init<list, list, optional<unsigned int> >());
+  class_<PySquareNode, bases<PyAbstractNode> >("Square", init<list, optional<bool> >()).def(init<double, optional<bool> >());
+  class_<PyCircleNode, bases<PyAbstractNode> >("Circle", init<double>());
+  class_<PyPolygonNode, bases<PyAbstractNode> >("Polygon", init<list, list, optional<unsigned int> >());
+  class_<PyRenderNode, bases<PyAbstractNode> >("Render", init<PyAbstractNode, optional<unsigned int> >()).def(init<list, optional<unsigned int> >());
+  class_<PyDxfLinearExtrudeNode, bases<PyAbstractNode> >("DxfLinearExtrude", 
+    init<std::string, std::string,
+      double, double, double, double, double,
+      optional< unsigned int, int, bool > >());
+  class_<PyLinearExtrudeNode, bases<PyAbstractNode> >("LinearExtrude", 
+    init<PyAbstractNode,
+      double, double,
+      optional< unsigned int, int, bool > >()).def(
+    init<list, 
+      double, double,
+      optional< unsigned int, int, bool > >());
+  class_<PyDxfRotateExtrudeNode, bases<PyAbstractNode> >("DxfRotateExtrude", 
+    init<std::string, std::string,
+      double, double, double, optional< unsigned int > >());
+  class_<PyRotateExtrudeNode, bases<PyAbstractNode> >("RotateExtrude", 
+    init<PyAbstractNode, optional< unsigned int> >()).def(
+    init<list, optional< unsigned int > >());
+}
 
 PythonScript::PythonScript() {
+  PyImport_AppendInittab(const_cast<char*>(PyContext::nsopenscad.c_str()), &initopenscad );
   Py_Initialize();
-  ctx.init();
-  ctx.main_namespace["AbstractNode"] = class_<PyAbstractNode>("AbstractNode").def("highlight", &PyAbstractNode::highlight, PyAbstractNode_overloads());
-  ctx.main_namespace["Union"] = class_<PyUnionNode, bases<PyAbstractNode> >("Union", init<list>());
-  ctx.main_namespace["Difference"] = class_<PyDifferenceNode, bases<PyAbstractNode> >("Difference", init<list>());
-  ctx.main_namespace["Intersection"] = class_<PyIntersectionNode, bases<PyAbstractNode> >("Intersection", init<list>());
-  ctx.main_namespace["Scale"] = class_<PyScaleNode, bases<PyAbstractNode> >("Scale", init<list, PyAbstractNode>()).def(init<list, list>());
-  ctx.main_namespace["Translate"] = class_<PyTranslateNode, bases<PyAbstractNode> >("Translate", init<list, PyAbstractNode>()).def(init<list, list>());
-  ctx.main_namespace["Rotate"] = class_<PyRotateNode, bases<PyAbstractNode> >("Rotate", init<list, PyAbstractNode>()).def(init<list, list>());
-  ctx.main_namespace["Mirror"] = class_<PyMirrorNode, bases<PyAbstractNode> >("Mirror", init<list, PyAbstractNode>()).def(init<list, list>());
-  ctx.main_namespace["RotateAxis"] = class_<PyRotateAxisNode, bases<PyAbstractNode> >("RotateAxis", init<double, list, PyAbstractNode>()).def(init<double, list, list>());
-  ctx.main_namespace["Matrix"] = class_<PyMatrixNode, bases<PyAbstractNode> >("Matrix", init<list, PyAbstractNode>()).def(init<list, list>());
-  ctx.main_namespace["Color"] = class_<PyColorNode, bases<PyAbstractNode> >("Color", init<list, PyAbstractNode>()).def(init<list, list>());
-  ctx.main_namespace["Cube"] = class_<PyCubeNode, bases<PyAbstractNode> >("Cube", init<list, optional<bool> >()).def(init<double, optional<bool> >());
-  ctx.main_namespace["Sphere"] = class_<PySphereNode, bases<PyAbstractNode> >("Sphere", init<double>());
-  ctx.main_namespace["Cylinder"] = class_<PyCylinderNode, bases<PyAbstractNode> >("Cylinder", init<double, double, double, optional<bool> >()).def(init<double, double, optional< bool> >());
-  ctx.main_namespace["Polyhedron"] = class_<PyPolyhedronNode, bases<PyAbstractNode> >("Polyhedron", init<list, list, optional<unsigned int> >());
-  ctx.main_namespace["Square"] = class_<PySquareNode, bases<PyAbstractNode> >("Square", init<list, optional<bool> >()).def(init<double, optional<bool> >());
-  ctx.main_namespace["Circle"] = class_<PyCircleNode, bases<PyAbstractNode> >("Circle", init<double>());
-  ctx.main_namespace["Polygon"] = class_<PyPolygonNode, bases<PyAbstractNode> >("Polygon", init<list, list, optional<unsigned int> >());
-  ctx.main_namespace["Render"] = class_<PyRenderNode, bases<PyAbstractNode> >("Render", init<PyAbstractNode, optional<unsigned int> >()).def(init<list, optional<unsigned int> >());
-  ctx.main_namespace["DxfLinearExtrude"] = class_<PyDxfLinearExtrudeNode, bases<PyAbstractNode> >("DxfLinearExtrude", 
-					    init<std::string, std::string,
-					      double, double, double, double, double,
-					      optional< unsigned int, int, bool > >());
-  ctx.main_namespace["LinearExtrude"] = class_<PyLinearExtrudeNode, bases<PyAbstractNode> >("LinearExtrude", 
-					    init<PyAbstractNode,
-					      double, double,
-					      optional< unsigned int, int, bool > >()).def(
-					    init<list, 
-					      double, double,
-					      optional< unsigned int, int, bool > >());
-  ctx.main_namespace["DxfRotateExtrude"] = class_<PyDxfRotateExtrudeNode, bases<PyAbstractNode> >("DxfRotateExtrude", 
-					    init<std::string, std::string,
-					      double, double, double, optional< unsigned int > >());
-  ctx.main_namespace["RotateExtrude"] = class_<PyRotateExtrudeNode, bases<PyAbstractNode> >("RotateExtrude", 
-					    init<PyAbstractNode, optional< unsigned int> >()).def(
-					    init<list, optional< unsigned int > >());
+  object openscad_module( (handle<>(PyImport_ImportModule(PyContext::nsopenscad.c_str()))) );
+  ctx.init(openscad_module);
   //SurfaceNode
   //ImportSTLNode
   //ImportDXFNode
@@ -353,7 +372,7 @@ PythonScript::PythonScript() {
   //CgaladvGlideNode
   //CgaladvSubdivNode
   //dxf_dim
-  //dxf_
+  //dxf_cross
 }
 
 PythonScript::~PythonScript() {}
@@ -362,7 +381,7 @@ AbstractNode::Pointer PythonScript::evaluate(const std::string &code, const std:
   ctx.setPath(path);
   try {
     exec(code.c_str(), ctx.main_namespace);
-    PyAbstractNode &resNode = extract<PyAbstractNode&>(ctx.main_namespace["result"]);
+    PyAbstractNode &resNode = extract<PyAbstractNode&>(ctx.getResult());
     return resNode.getNode();
   } catch(error_already_set) {
 //    PyErr_Print();

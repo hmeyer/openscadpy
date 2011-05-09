@@ -1,3 +1,4 @@
+from openscad import *
 
 def example003():
 	return Difference([
@@ -14,5 +15,5 @@ def example003():
 		])
 	])
 
-result = example003()
+openscad.result = example003()
 

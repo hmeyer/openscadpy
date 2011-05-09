@@ -1,3 +1,5 @@
+from openscad import *
+
 def example006():
 	def edgeprofile():
 		return Render(Difference([
@@ -40,4 +42,4 @@ def example006():
 			])
 		)
 
-result = example006()
+openscad.result = example006()

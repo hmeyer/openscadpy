@@ -1,3 +1,6 @@
+from openscad import *
+
+
 def example002():
 	return Intersection([
 		Difference([
@@ -16,5 +19,5 @@ def example002():
 			Cylinder(20, 5, 50, True))
 	])
 
-result = example002();
+openscad.result = example002();
 

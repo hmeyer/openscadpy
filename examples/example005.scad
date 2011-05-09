@@ -1,4 +1,6 @@
-import math
+from openscad import *
+from math import sin,cos,pi
+
 def example005():
 	return Translate([0, 0, -120],
 		[Difference([
@@ -7,8 +9,8 @@ def example005():
 			Translate([100, 0, 35], Cube(50, True))
 		])]
 		+ map(lambda i:
-			Translate([math.sin(math.pi*i/3)*80, 
-				math.cos(math.pi*i/3)*80, 0 ],
+			Translate([sin(pi*i/3)*80, 
+				cos(pi*i/3)*80, 0 ],
 				Cylinder(10,200)), range(0,6))
 		+ [Translate([0, 0, 200],
 			Cylinder(120,0,80.0)
@@ -16,4 +18,4 @@ def example005():
 	)
 
 
-result = example005()
+openscad.result = example005()

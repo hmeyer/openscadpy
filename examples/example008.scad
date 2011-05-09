@@ -1,9 +1,11 @@
+from openscad import *
+
 def ext(layer):
 	return DxfLinearExtrude( "example008.dxf",
 			layer, 50,0,0,0,1,3)
 
 
-result = Difference([
+openscad.result = Difference([
 	Intersection([
 		Translate([ -25, -25, -25], ext("G")),
 

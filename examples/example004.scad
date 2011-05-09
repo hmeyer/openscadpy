@@ -1,3 +1,4 @@
+from openscad import *
 
 def example004():
 	return Difference([
@@ -5,5 +6,5 @@ def example004():
 		Sphere(20)
 	])
 
-result = example004()
+openscad.result = example004()
 

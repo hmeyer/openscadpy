@@ -1,3 +1,5 @@
+from openscad import *
+
 def clip():
 	return Difference(
 		[DxfRotateExtrude(
@@ -41,8 +43,8 @@ def cutview():
 		Difference(combo),r
 	])
 
-result = Translate([0, 0, -10],
+openscad.result = Translate([0, 0, -10],
 	clip())
 
-#result = cutview()
+#openscad.result = cutview()
 
