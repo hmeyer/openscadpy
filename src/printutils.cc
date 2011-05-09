@@ -20,7 +20,7 @@ void print_messages_pop()
 {
 	QString msg = print_messages_stack.last();
 	print_messages_stack.removeLast();
-	if (print_messages_stack.size() > 0 && !msg.isNull()) {
+	if (print_messages_stack.size() > 0 && !msg.isEmpty()) {
 		if (!print_messages_stack.last().isEmpty())
 			print_messages_stack.last() += "\n";
 		print_messages_stack.last() += msg;
@@ -29,7 +29,7 @@ void print_messages_pop()
 
 void PRINT(const QString &msg)
 {
-	if (msg.isNull())
+	if (msg.isEmpty())
 		return;
 	if (print_messages_stack.size() > 0) {
 		if (!print_messages_stack.last().isEmpty())
@@ -41,7 +41,7 @@ void PRINT(const QString &msg)
 
 void PRINT_NOCACHE(const QString &msg)
 {
-	if (msg.isNull())
+	if (msg.isEmpty())
 		return;
 	if (!outputhandler) {
 		fprintf(stderr, "%s\n", msg.toUtf8().data());

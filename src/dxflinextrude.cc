@@ -49,9 +49,9 @@ DxfLinearExtrudeNode::DxfLinearExtrudeNode(const AbstractNode::NodeList &childre
   origin_x(origin_x), origin_y(origin_y), scale(scale), filename(filename), layername(layer), acc(acc), 
   center(center), has_twist(twist!=0.0) {
   if (has_twist && slices<2) {
-	  slices = (int)std::max(2.0, std::abs(get_fragments_from_r(height,
+	  this->slices = (int)std::max(2.0, std::abs(get_fragments_from_r(height,
 			  acc) * twist / 360));
-  }    
+  }
 }
 
 

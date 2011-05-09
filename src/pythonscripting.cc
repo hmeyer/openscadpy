@@ -6,6 +6,7 @@
 #include "render.h"
 #include "dxflinextrude.h"
 #include "dxfrotextrude.h"
+#include "dxfdim.h"
 #include <boost/python.hpp>
 #include <boost/make_shared.hpp>
 
@@ -75,10 +76,14 @@ public:
   AbstractNode::Pointer getNode() const { return node; }
   void highlight(bool set=true) {
     node->props.highlight = set;
+  }  
+  void background(bool set=true) {
+    node->props.background = set;
   }
 };
 
-BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(PyAbstractNode_overloads, highlight, 0, 1)
+BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(PyAbstractNode_hi_overloads, highlight, 0, 1)
+BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(PyAbstractNode_bg_overloads, background, 0, 1)
 
 AbstractNode::NodeList list2NodeList(const list &l) {
   AbstractNode::NodeList nl;
@@ -319,8 +324,27 @@ public:
   }
 };
 
+double pyDxfDim(const std::string &filename, const std::string &layername=std::string(), const std::string &name=std::string(), double xorigin=0.0, double yorigin=0.0, double scale=1.0) {
+  return dxf_dim(QString::fromStdString(filename), QString::fromStdString(layername), QString::fromStdString(name), xorigin, yorigin, scale);
+}
+
+BOOST_PYTHON_FUNCTION_OVERLOADS(pyDxfDim_overloads, pyDxfDim, 1, 6)
+
+list pyDxfCross(const std::string &filename, const std::string &layername=std::string(), double xorigin=0.0, double yorigin=0.0, double scale=1.0) {
+  list res;
+  Float2 cross = dxf_cross(QString::fromStdString(filename), QString::fromStdString(layername), xorigin, yorigin, scale);
+  res.append<double>(cross[0]);
+  res.append<double>(cross[1]);
+  return res;
+}
+
+BOOST_PYTHON_FUNCTION_OVERLOADS(pyDxfCross_overloads, pyDxfCross, 1, 5)
+
+
 BOOST_PYTHON_MODULE(openscad) {
-  class_<PyAbstractNode>("AbstractNode").def("highlight", &PyAbstractNode::highlight, PyAbstractNode_overloads());
+  class_<PyAbstractNode>("AbstractNode")
+    .def("highlight", &PyAbstractNode::highlight, PyAbstractNode_hi_overloads())
+    .def("background", &PyAbstractNode::background, PyAbstractNode_bg_overloads());
   class_<PyUnionNode, bases<PyAbstractNode> >("Union", init<list>());
   class_<PyDifferenceNode, bases<PyAbstractNode> >("Difference", init<list>());
   class_<PyIntersectionNode, bases<PyAbstractNode> >("Intersection", init<list>());
@@ -356,6 +380,8 @@ BOOST_PYTHON_MODULE(openscad) {
   class_<PyRotateExtrudeNode, bases<PyAbstractNode> >("RotateExtrude", 
     init<PyAbstractNode, optional< unsigned int> >()).def(
     init<list, optional< unsigned int > >());
+  def("DxfDim", pyDxfDim, pyDxfDim_overloads());
+  def("DxfCross", pyDxfCross, pyDxfCross_overloads());
 }
 
 PythonScript::PythonScript() {
@@ -371,8 +397,6 @@ PythonScript::PythonScript() {
   //CgaladvMinkowskiNode
   //CgaladvGlideNode
   //CgaladvSubdivNode
-  //dxf_dim
-  //dxf_cross
 }
 
 PythonScript::~PythonScript() {}

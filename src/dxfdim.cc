@@ -74,12 +74,11 @@ double dxf_dim(const QString &filename, const QString &layername, const QString 
 
 	if (dxf_dim_cache.contains(key))
 		return dxf_dim_cache[key];
-	
 	DxfData dxf(Accuracy(36,0,0), filename, layername, xorigin, yorigin, scale);
 
 	for (int i = 0; i < dxf.dims.count(); i++)
 	{
-		if (!name.isNull() && dxf.dims[i].name != name)
+		if (!name.isEmpty() && dxf.dims[i].name != name)
 			continue;
 
 		DxfData::Dim *d = &dxf.dims[i];
