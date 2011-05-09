@@ -1,28 +1,30 @@
+from openscad import *
 
-bodywidth = dxf_dim(file = "example009.dxf", name = "bodywidth");
-fanwidth = dxf_dim(file = "example009.dxf", name = "fanwidth");
-platewidth = dxf_dim(file = "example009.dxf", name = "platewidth");
-fan_side_center = dxf_cross(file = "example009.dxf",
-		layer = "fan_side_center");
-fanrot = dxf_dim(file = "example009.dxf", name = "fanrot");
+dxf = "example009.dxf"
+bodywidth = DxfDim(dxf,"","bodywidth")
+fanwidth = DxfDim(dxf,"","fanwidth")
+platewidth = DxfDim(dxf,"","platewidth")
+fan_side_center = DxfCross(dxf,"fan_side_center")
+fanrot = DxfDim(dxf,"","fanrot")
 
-% dxf_linear_extrude(file = "example009.dxf", layer = "body",
-	height = bodywidth, center = true, convexity = 10);
+frame = Union( [
+	DxfLinearExtrude(dxf, "body",
+		bodywidth,0,0,0,1,10,-1,True)]
+	+map(lambda z: 
+		Translate([0, 0, z],
+			DxfLinearExtrude(dxf, "plate",
+				platewidth,0,0,0,1,10,-1,True)),
+		[+(bodywidth/2 + platewidth/2),
+			-(bodywidth/2 + platewidth/2)]
+	))
 
-% for (z = [+(bodywidth/2 + platewidth/2),
-		-(bodywidth/2 + platewidth/2)])
-{
-	translate([0, 0, z])
-	dxf_linear_extrude(file = "example009.dxf", layer = "plate",
-		height = platewidth, center = true, convexity = 10);
-}
+frame.background()
 
-intersection()
-{
-	dxf_linear_extrude(file = "example009.dxf", layer = "fan_top",
-		height = fanwidth, center = true, convexity = 10,
-		twist = -fanrot);
-	dxf_rotate_extrude(file = "example009.dxf", layer = "fan_side",
-		origin = fan_side_center, convexity = 10);
-}
+fan = Intersection([
+		DxfLinearExtrude(dxf, "fan_top",
+			fanwidth,-fanrot,0,0,1,10,-1,True),
+		DxfRotateExtrude(dxf, "fan_side",
+			fan_side_center[0], fan_side_center[1],1,10)
+		])
 
+openscad.result = Union( [frame,fan] )
