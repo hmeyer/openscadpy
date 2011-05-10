@@ -84,7 +84,7 @@ CONFIG += cgal
 CONFIG += opencsg
 CONFIG += progresswidget
 CONFIG += boost
-#CONFIG += python
+CONFIG += python
 
 #Uncomment the following line to enable QCodeEdit
 #CONFIG += qcodeedit
