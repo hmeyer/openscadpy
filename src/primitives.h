@@ -80,9 +80,9 @@ public:
 
 class PolyhedronNode : public PrimitiveNode {
 	Vec3D points;
-	VecTriangles triangles;
+	VecPaths triangles;
 public:
-	PolyhedronNode(const Vec3D &points, const VecTriangles &triangles, int convexity, const Props p=Props())
+	PolyhedronNode(const Vec3D &points, const VecPaths &triangles, int convexity, const Props p=Props())
 	  :PrimitiveNode(convexity,p), points(points), triangles(triangles) {}
 	virtual PolySet *render_polyset(render_mode_e mode) const;
 	virtual QString dump(QString indent) const;

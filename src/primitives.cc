@@ -165,9 +165,9 @@ AbstractNode::Pointer PrimitiveModule::evaluate(const Context *ctx, const Module
 		Value vpoints = c.lookup_variable("points");
 		value2points3d(vpoints,points);
 
-		VecTriangles triangles;
+		VecPaths triangles;
 		Value vtriangles = c.lookup_variable("triangles");
-		value2triangles(vtriangles,triangles);
+		value2paths(vtriangles,triangles);
 		
 		return make_shared<PolyhedronNode>(points,triangles,convexity,inst);
 	}
@@ -418,7 +418,7 @@ PolySet *CylinderNode::render_polyset(render_mode_e) const {
 PolySet *PolyhedronNode::render_polyset(render_mode_e) const {
   PolySet *p = new PolySet();
   p->convexity = convexity;
-  BOOST_FOREACH(const UInt3 &t, triangles) {
+  BOOST_FOREACH(const VecPoints &t, triangles) {
     p->append_poly();
     BOOST_FOREACH(unsigned int pt, t) {
       if (pt < points.size()) {

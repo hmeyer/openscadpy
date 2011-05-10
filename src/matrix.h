@@ -18,13 +18,11 @@ typedef boost::array< Float4, 4> MatFloat4x4;
 typedef boost::array< unsigned int, 3> UInt3;
 typedef std::vector<unsigned int> VecPoints;
 typedef std::vector<VecPoints> VecPaths;
-typedef std::vector<UInt3> VecTriangles;
 typedef std::vector<Float2> Vec2D;
 typedef std::vector<Float3> Vec3D;
 
 void value2points2d(const Value &v, Vec2D &points);
 void value2paths(const Value &v, VecPaths &paths);
 void value2points3d(const Value &v, Vec3D &points);
-void value2triangles(const Value &v, VecTriangles &triangles);
 
 #endif

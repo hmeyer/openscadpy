@@ -7,6 +7,8 @@
 #include "dxflinextrude.h"
 #include "dxfrotextrude.h"
 #include "dxfdim.h"
+#include "surface.h"
+#include "import.h"
 #include <boost/python.hpp>
 #include <boost/make_shared.hpp>
 
@@ -131,6 +133,14 @@ public:
   PyRotateAxisNode(double ang, const list &va, const list &a) {
     node = make_shared<TransformRotateAxisNode>(list2StdArray<Float3>(va), ang, list2NodeList(a));
   }
+  PyRotateAxisNode(double ang, const PyAbstractNode &n) {
+    Float3 v = {{0,0,1}};
+    node = make_shared<TransformRotateAxisNode>(v, ang, AbstractNode::NodeList(1, n.getNode()));
+  }
+  PyRotateAxisNode(double ang, const list &a) {
+    Float3 v = {{0,0,1}};
+    node = make_shared<TransformRotateAxisNode>(v, ang, list2NodeList(a));
+  }
 };
 class PyMatrixNode: public PyAbstractNode {
 public:
@@ -214,7 +224,7 @@ public:
   PyPolyhedronNode(const list &points, const list &triangles, unsigned int convexity=5) {
     node = make_shared<PolyhedronNode>(
       list2ArrayVec<Vec3D>(points), 
-      list2ArrayVec<VecTriangles>(triangles), convexity);
+      list2VecVec<VecPaths>(triangles), convexity);
   }
 };
 
@@ -259,7 +269,7 @@ public:
 class PyDxfLinearExtrudeNode: public PyAbstractNode {
 public:
   PyDxfLinearExtrudeNode(const std::string &filename, const std::string &layer,
-	double height, double twist, double origin_x, double origin_y, double scale, 
+	double height, double twist=.0, double origin_x=.0, double origin_y=.0, double scale=1.0, 
 	unsigned int convexity=5, int slices = -1, bool center = false) {
       node.reset(new DxfLinearExtrudeNode(
 	AbstractNode::NodeList(), QString::fromStdString(filename), QString::fromStdString(layer),
@@ -272,7 +282,7 @@ public:
 class PyLinearExtrudeNode: public PyAbstractNode {
 public:
   PyLinearExtrudeNode(const PyAbstractNode &n,
-	double height, double twist,
+	double height, double twist=.0,
 	unsigned int convexity=5, int slices = -1, bool center = false) {
       node.reset(new DxfLinearExtrudeNode(
 	AbstractNode::NodeList(1, n.getNode()), QString(), QString(),
@@ -281,7 +291,7 @@ public:
       ));
   }
   PyLinearExtrudeNode(const list &a,
-	double height, double twist,
+	double height, double twist=.0,
 	unsigned int convexity=5, int slices = -1, bool center = false) {
       node.reset(new DxfLinearExtrudeNode(
 	list2NodeList(a), QString(), QString(),
@@ -295,7 +305,7 @@ public:
 class PyDxfRotateExtrudeNode: public PyAbstractNode {
 public:
   PyDxfRotateExtrudeNode(const std::string &filename, const std::string &layer,
-	double origin_x, double origin_y, double scale, 
+	double origin_x=.0, double origin_y=.0, double scale=1.0, 
 	unsigned int convexity=5) {
       node = make_shared<DxfRotateExtrudeNode>(
 	AbstractNode::NodeList(), QString::fromStdString(filename), QString::fromStdString(layer),
@@ -321,6 +331,29 @@ public:
 	0, 0, 0,
 	convexity, ctx.getAcc()
       );
+  }
+};
+
+class PySurfaceNode: public PyAbstractNode {
+public:
+  PySurfaceNode(const std::string &filename, unsigned int convexity=5, bool center=false) {
+      node = make_shared<SurfaceNode>(QString::fromStdString(filename), convexity, center);
+  }
+};
+
+class PyImportSTLNode: public PyAbstractNode {
+public:
+  PyImportSTLNode(const std::string &filename, unsigned int convexity=5) {
+      node = make_shared<ImportSTLNode>(QString::fromStdString(filename), convexity);
+  }
+};
+
+class PyImportDXFNode: public PyAbstractNode {
+public:
+  PyImportDXFNode(const std::string &filename, const std::string &layer,
+	double origin_x=0.0, double origin_y=0.0, double scale=1.0, unsigned int convexity=5) {
+      node = make_shared<ImportDXFNode>(QString::fromStdString(filename),
+	QString::fromStdString(layer), origin_x, origin_y, scale, convexity, ctx.getAcc());
   }
 };
 
@@ -352,7 +385,8 @@ BOOST_PYTHON_MODULE(openscad) {
   class_<PyTranslateNode, bases<PyAbstractNode> >("Translate", init<list, PyAbstractNode>()).def(init<list, list>());
   class_<PyRotateNode, bases<PyAbstractNode> >("Rotate", init<list, PyAbstractNode>()).def(init<list, list>());
   class_<PyMirrorNode, bases<PyAbstractNode> >("Mirror", init<list, PyAbstractNode>()).def(init<list, list>());
-  class_<PyRotateAxisNode, bases<PyAbstractNode> >("RotateAxis", init<double, list, PyAbstractNode>()).def(init<double, list, list>());
+  class_<PyRotateAxisNode, bases<PyAbstractNode> >("RotateAxis", init<double, list, PyAbstractNode>()).def(init<double, list, list>())
+    .def(init<double, PyAbstractNode>()).def(init<double, list>());
   class_<PyMatrixNode, bases<PyAbstractNode> >("Matrix", init<list, PyAbstractNode>()).def(init<list, list>());
   class_<PyColorNode, bases<PyAbstractNode> >("Color", init<list, PyAbstractNode>()).def(init<list, list>());
   class_<PyCubeNode, bases<PyAbstractNode> >("Cube", init<list, optional<bool> >()).def(init<double, optional<bool> >());
@@ -365,21 +399,26 @@ BOOST_PYTHON_MODULE(openscad) {
   class_<PyRenderNode, bases<PyAbstractNode> >("Render", init<PyAbstractNode, optional<unsigned int> >()).def(init<list, optional<unsigned int> >());
   class_<PyDxfLinearExtrudeNode, bases<PyAbstractNode> >("DxfLinearExtrude", 
     init<std::string, std::string,
-      double, double, double, double, double,
-      optional< unsigned int, int, bool > >());
+      double, optional< double, double, double, double,
+      unsigned int, int, bool > >());
   class_<PyLinearExtrudeNode, bases<PyAbstractNode> >("LinearExtrude", 
     init<PyAbstractNode,
-      double, double,
-      optional< unsigned int, int, bool > >()).def(
+      double, optional< double,
+      unsigned int, int, bool > >()).def(
     init<list, 
-      double, double,
-      optional< unsigned int, int, bool > >());
+      double, optional< double,
+      unsigned int, int, bool > >());
   class_<PyDxfRotateExtrudeNode, bases<PyAbstractNode> >("DxfRotateExtrude", 
     init<std::string, std::string,
-      double, double, double, optional< unsigned int > >());
+      optional< double, double, double, unsigned int > >());
   class_<PyRotateExtrudeNode, bases<PyAbstractNode> >("RotateExtrude", 
     init<PyAbstractNode, optional< unsigned int> >()).def(
     init<list, optional< unsigned int > >());
+  class_<PySurfaceNode, bases<PyAbstractNode> >("Surface", init<std::string, optional<unsigned int, bool> >());
+  class_<PyImportSTLNode, bases<PyAbstractNode> >("ImportSTL", init<std::string, optional<unsigned int> >());
+  class_<PyImportDXFNode, bases<PyAbstractNode> >("ImportDXF", 
+    init<std::string, std::string, optional< double, double, double,unsigned int> >());						  
+   
   def("DxfDim", pyDxfDim, pyDxfDim_overloads());
   def("DxfCross", pyDxfCross, pyDxfCross_overloads());
 }
