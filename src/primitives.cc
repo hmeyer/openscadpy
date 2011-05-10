@@ -34,6 +34,8 @@
 #include <assert.h>
 #include <boost/make_shared.hpp>
 #include <boost/foreach.hpp>
+#include "tostring.h"
+
 using boost::make_shared;
 
 enum primitive_type_e {
@@ -556,7 +558,7 @@ QString PolyhedronNode::dump(QString indent) const
 {
   if (dump_cache.isEmpty()) {
     QString text;
-    text.sprintf("polyhedron(points = %d, triangles = %d, convexity = %d);\n", (int)points.size(), (int)triangles.size(), convexity);
+    text.sprintf("polyhedron(points = %s, triangles = %s, convexity = %d);\n", toString(points).c_str(), toString(triangles).c_str(), convexity);
     ((AbstractNode*)this)->dump_cache = indent + QString("n%1: ").arg(idx) + text;
   }
   return dump_cache;
@@ -589,7 +591,7 @@ QString PolygonNode::dump(QString indent) const
 {
   if (dump_cache.isEmpty()) {
     QString text;
-    text.sprintf("polygon(points = %d, paths = %d, convexity = %d);\n", (int)points.size(), (int)paths.size(), convexity);
+    text.sprintf("polygon(points = %s, paths = %s, convexity = %d);\n", toString(points).c_str(), toString(paths).c_str(), convexity);
     ((AbstractNode*)this)->dump_cache = indent + QString("n%1: ").arg(idx) + text;
   }
   return dump_cache;

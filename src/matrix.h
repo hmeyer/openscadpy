@@ -3,6 +3,7 @@
 
 #include <boost/array.hpp>
 #include <boost/shared_ptr.hpp>
+#include <boost/foreach.hpp>
 #include <vector>
 #include "value.h"
 
@@ -24,5 +25,30 @@ typedef std::vector<Float3> Vec3D;
 void value2points2d(const Value &v, Vec2D &points);
 void value2paths(const Value &v, VecPaths &paths);
 void value2points3d(const Value &v, Vec3D &points);
+
+template<typename T>
+std::ostream& operator<<(std::ostream &out, const std::vector<T> &rhs){
+  out << "[";
+  typename std::vector<T>::const_iterator it = rhs.begin();
+  if (it != rhs.end()) out << *it++;
+  while(it != rhs.end()) {
+    out << ", " << *it++;
+  }
+  out << "]";
+  return out;
+}
+
+template<typename T, long unsigned int N>
+std::ostream& operator<<(std::ostream &out, const boost::array<T,N> &rhs){
+  out << "[";
+  typename boost::array<T,N>::const_iterator it = rhs.begin();
+  if (it != rhs.end()) out << *it++;
+  while(it != rhs.end()) {
+    out << ", " << *it++;
+  }
+  out << "]";
+  return out;
+}
+
 
 #endif

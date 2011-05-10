@@ -84,7 +84,7 @@ CONFIG += cgal
 CONFIG += opencsg
 CONFIG += progresswidget
 CONFIG += boost
-CONFIG += python
+#CONFIG += python
 
 #Uncomment the following line to enable QCodeEdit
 #CONFIG += qcodeedit
@@ -157,6 +157,7 @@ HEADERS += src/CGAL_renderer.h \
            src/render.h \
            src/render-opencsg.h \
            src/surface.h \
+           src/tostring.h \
            src/mathc99.h
 
 SOURCES += src/openscad.cc \
