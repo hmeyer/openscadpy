@@ -60,12 +60,15 @@ const std::string PyContext::nsopenscad("openscad");
 PyContext ctx;
 
 template<class StdArray>
-StdArray list2StdArray(const list &l) {
+StdArray list2StdArray(const list &l, double defval=0.0) {
   StdArray p;
-  for(int i=0;i<len(l);++i) {
+  int i;
+  for(i=0;i<len(l);++i) {
     extract<double> x(l[i]);
     if (x.check()) p[i] = x();
+    else p[i] = defval;
   }
+  for(;i<p.static_size;++i) p[i] = defval;
   return p;
 }
 
@@ -109,18 +112,18 @@ typedef PyCSGNode< CSG_TYPE_UNION > PyUnionNode;
 typedef PyCSGNode< CSG_TYPE_DIFFERENCE > PyDifferenceNode;
 typedef PyCSGNode< CSG_TYPE_INTERSECTION > PyIntersectionNode;
 
-template<class NodeClass>
+template<class NodeClass, int defval=0>
 class PyTransformNode: public PyAbstractNode {
 public:
   PyTransformNode(const list &va, const PyAbstractNode &n) {
-    node = make_shared<NodeClass>(list2StdArray<Float3>(va), AbstractNode::NodeList(1, n.getNode()));
+    node = make_shared<NodeClass>(list2StdArray<Float3>(va, defval), AbstractNode::NodeList(1, n.getNode()));
   }
   PyTransformNode(const list &va, const list &n) {
-    node = make_shared<NodeClass>(list2StdArray<Float3>(va), list2NodeList(n));
+    node = make_shared<NodeClass>(list2StdArray<Float3>(va, defval), list2NodeList(n));
   }
 };
 
-typedef PyTransformNode<TransformScaleNode> PyScaleNode;
+typedef PyTransformNode<TransformScaleNode,1> PyScaleNode;
 typedef PyTransformNode<TransformTranslateNode> PyTranslateNode;
 typedef PyTransformNode<TransformRotateNode> PyRotateNode;
 typedef PyTransformNode<TransformMirrorNode> PyMirrorNode;
@@ -353,7 +356,7 @@ public:
   PyImportDXFNode(const std::string &filename, const std::string &layer,
 	double origin_x=0.0, double origin_y=0.0, double scale=1.0, unsigned int convexity=5) {
       node = make_shared<ImportDXFNode>(QString::fromStdString(filename),
-	QString::fromStdString(layer), origin_x, origin_y, scale, convexity, ctx.getAcc());
+	QString::fromStdString(layer), origin_x, origin_y, convexity, scale, ctx.getAcc());
   }
 };
 
