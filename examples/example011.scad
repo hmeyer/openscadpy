@@ -1,16 +1,18 @@
-polyhedron(
-	points = [
+from openscad import *
+
+openscad.result = Polyhedron(
+	[#points
 		[10, 0, 0],
 		[0, 10, 0],
 		[-10, 0, 0],
 		[0, -10, 0],
 		[0, 0, 10]
 	],
-	triangles = [
+	[#triangles
 		[0, 1, 2, 3],
 		[4, 1, 0],
 		[4, 2, 1],
 		[4, 3, 2],
 		[4, 0, 3]
 	]
-);
+)

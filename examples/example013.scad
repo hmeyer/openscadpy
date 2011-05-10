@@ -1,12 +1,7 @@
+from openscad import *
 
-intersection()
-{
-	dxf_linear_extrude(file = "example013.dxf",
-			height = 100, center = true, convexity= 3);
-	rotate([0, 90, 0])
-	dxf_linear_extrude(file = "example013.dxf",
-			height = 100, center = true, convexity= 3);
-	rotate([90, 0, 0])
-	dxf_linear_extrude(file = "example013.dxf",
-			height = 100, center = true, convexity= 3);
-}
+t = DxfLinearExtrude( "example013.dxf",
+			"", 100,0,0,0,1,3,-1,True)
+
+openscad.result =Intersection([
+	t, Rotate([0, 90, 0], t),	Rotate([90, 0, 0], t )])
