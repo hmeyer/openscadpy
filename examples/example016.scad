@@ -1,30 +1,33 @@
+from openscad import *
 
-// example016.stl is derived from Mblock.stl
-// (c) 2009 Will Langford licensed under
-// the Creative Commons - GNU GPL license.
-// http://www.thingiverse.com/thing:753
-//
-// Jonas Pfeil converted the file to binary
-// STL and duplicated its content.
 
-module blk1() {
-	cube([ 65, 28, 28 ], center = true);
-}
+# example016.stl is derived from Mblock.stl
+# (c) 2009 Will Langford licensed under
+# the Creative Commons - GNU GPL license.
+# http://www.thingiverse.com/thing:753
+#
+# Jonas Pfeil converted the file to binary
+# STL and duplicated its content.
 
-module blk2() {
-	difference() {
-		translate([ 0, 0, 7.5 ])
-			cube([ 60, 28, 14 ], center = true);
-		cube([ 8, 32, 32 ], center = true);
-	}
-}
 
-module chop() {
-	translate([ -14, 0, 0 ])
-		import_stl(file = "example016.stl", convexity = 12);
-}
+def blk1():
+	return Cube([ 65, 28, 28 ], True)
 
-difference() {
+
+def blk2():
+	return Difference([
+		Translate([ 0, 0, 7.5 ],
+			Cube([ 60, 28, 14 ], True)),
+		Cube([ 8, 32, 32 ], True)
+	])
+
+
+def chop():
+	return Translate([ -14, 0, 0 ],
+			ImportSTL("example016.stl", 12))
+
+'''
+dfference() {
 	blk1();
 	for (alpha = [0, 90, 180, 270]) {
 		rotate(alpha, [ 1, 0, 0]) render(convexity = 12)
@@ -34,4 +37,14 @@ difference() {
 			}
 	}
 }
+'''
+
+openscad.result = Difference(
+	[blk1()]
+	+map(lambda alpha: RotateAxis(alpha, [1], Render(
+		Difference([
+			blk2(),
+			chop()
+		]), 12)),  [0, 90, 180, 270])
+)
 
