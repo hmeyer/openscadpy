@@ -48,10 +48,6 @@ DxfLinearExtrudeNode::DxfLinearExtrudeNode(const AbstractNode::NodeList &childre
   :AbstractPolyNode(p,children), Accuracy(acc), convexity(convexity), slices(slices), height(height), twist(twist), 
   origin_x(origin_x), origin_y(origin_y), scale(scale), filename(filename), layername(layer), 
   center(center), has_twist(twist!=0.0) {
-  if (has_twist && slices<2) {
-	  this->slices = (int)std::max(2.0, std::abs(get_fragments_from_r(height,
-			  acc) * twist / 360));
-  }
 }
 
 
@@ -207,6 +203,10 @@ static void add_slice(PolySet *ps, DxfData::Path *pt, double rot1, double rot2, 
 
 PolySet *DxfLinearExtrudeNode::render_polyset(render_mode_e) const
 {
+  double slices = this->slices;
+  if (has_twist && slices<2) {
+	  slices = (int)std::max(2.0, std::abs(get_fragments_from_r(height, *this) * twist / 360));
+  }  
 	QString key = mk_cache_id();
 	if (PolySet::ps_cache.contains(key)) {
 		PRINT(PolySet::ps_cache[key]->msg);

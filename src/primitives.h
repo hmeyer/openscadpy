@@ -57,6 +57,7 @@ public:
 class SphereNode : public PrimitiveNode, public Accuracy {
 	double r;
 public:
+	typedef shared_ptr<SphereNode> Pointer;
 	SphereNode(double r, const Accuracy &acc=Accuracy(), const Props p=Props())
 	  :PrimitiveNode(1,p), Accuracy(acc), r(r) {}
 	virtual PolySet *render_polyset(render_mode_e mode) const;
@@ -100,6 +101,7 @@ public:
 class CircleNode : public PrimitiveNode, public Accuracy {
 	double r;
 public:
+	typedef shared_ptr<CircleNode> Pointer;
 	CircleNode(double r, const Accuracy &acc=Accuracy(), const Props p=Props())
 	  :PrimitiveNode(1,p), Accuracy(acc), r(r) {}
 	virtual PolySet *render_polyset(render_mode_e mode) const;

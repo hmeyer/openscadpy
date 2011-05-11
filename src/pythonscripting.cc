@@ -196,7 +196,9 @@ public:
 class PySphereNode: public PyAbstractNode, public PyNodeAccuracy {
 public:
   PySphereNode(double r) {
-    node = make_shared<SphereNode>(r, ctx.getAcc());
+    SphereNode::Pointer p = make_shared<SphereNode>(r, ctx.getAcc());
+    initAcc(p);
+    node = p;
   }
 };
 
@@ -268,7 +270,9 @@ public:
 class PyCircleNode: public PyAbstractNode, public PyNodeAccuracy {
 public:
   PyCircleNode(double r) {
-    node = make_shared<CircleNode>(r, ctx.getAcc());
+    CircleNode::Pointer p = make_shared<CircleNode>(r, ctx.getAcc());
+    initAcc(p);
+    node = p;
   }
 };
 
@@ -296,11 +300,13 @@ public:
   PyDxfLinearExtrudeNode(const std::string &filename, const std::string &layer,
 	double height, double twist=.0, double origin_x=.0, double origin_y=.0, double scale=1.0, 
 	unsigned int convexity=5, int slices = -1, bool center = false) {
-      node.reset(new DxfLinearExtrudeNode(
+      DxfLinearExtrudeNode::Pointer p(new DxfLinearExtrudeNode(
 	AbstractNode::NodeList(), QString::fromStdString(filename), QString::fromStdString(layer),
 	height, twist, origin_x, origin_y, scale,
 	convexity, slices, center, ctx.getAcc()
       ));
+      initAcc(p);
+      node = p;
   }
 };
 
@@ -309,20 +315,24 @@ public:
   PyLinearExtrudeNode(const PyAbstractNode &n,
 	double height, double twist=.0,
 	unsigned int convexity=5, int slices = -1, bool center = false) {
-      node.reset(new DxfLinearExtrudeNode(
+      DxfLinearExtrudeNode::Pointer p(new DxfLinearExtrudeNode(
 	AbstractNode::NodeList(1, n.getNode()), QString(), QString(),
 	height, twist, 0, 0, 0,
 	convexity, slices, center, ctx.getAcc()
       ));
+      initAcc(p);
+      node = p;
   }
   PyLinearExtrudeNode(const list &a,
 	double height, double twist=.0,
 	unsigned int convexity=5, int slices = -1, bool center = false) {
-      node.reset(new DxfLinearExtrudeNode(
+      DxfLinearExtrudeNode::Pointer p(new DxfLinearExtrudeNode(
 	list2NodeList(a), QString(), QString(),
 	height, twist, 0, 0, 0,
 	convexity, slices, center, ctx.getAcc()
       ));
+      initAcc(p);
+      node = p;
   }
 };
 
@@ -332,30 +342,36 @@ public:
   PyDxfRotateExtrudeNode(const std::string &filename, const std::string &layer,
 	double origin_x=.0, double origin_y=.0, double scale=1.0, 
 	unsigned int convexity=5) {
-      node = make_shared<DxfRotateExtrudeNode>(
+      DxfRotateExtrudeNode::Pointer p = make_shared<DxfRotateExtrudeNode>(
 	AbstractNode::NodeList(), QString::fromStdString(filename), QString::fromStdString(layer),
 	origin_x, origin_y, scale,
 	convexity, ctx.getAcc()
       );
+      initAcc(p);
+      node = p;
   }
 };
 class PyRotateExtrudeNode: public PyAbstractNode, public PyNodeAccuracy {
 public:
   PyRotateExtrudeNode(const PyAbstractNode &n,
 	unsigned int convexity=5) {
-      node = make_shared<DxfRotateExtrudeNode>(
+      DxfRotateExtrudeNode::Pointer p = make_shared<DxfRotateExtrudeNode>(
 	AbstractNode::NodeList(1, n.getNode()), QString(), QString(),
 	0, 0, 0,
 	convexity, ctx.getAcc()
       );
+      initAcc(p);
+      node = p;
   }
   PyRotateExtrudeNode(const list &a,
 	unsigned int convexity=5) {
-      node = make_shared<DxfRotateExtrudeNode>(
+      DxfRotateExtrudeNode::Pointer p = make_shared<DxfRotateExtrudeNode>(
 	list2NodeList(a), QString(), QString(),
 	0, 0, 0,
 	convexity, ctx.getAcc()
       );
+      initAcc(p);
+      node = p;
   }
 };
 
@@ -377,8 +393,10 @@ class PyImportDXFNode: public PyAbstractNode, public PyNodeAccuracy {
 public:
   PyImportDXFNode(const std::string &filename, const std::string &layer,
 	double origin_x=0.0, double origin_y=0.0, double scale=1.0, unsigned int convexity=5) {
-      node = make_shared<ImportDXFNode>(QString::fromStdString(filename),
+      ImportDXFNode::Pointer p = make_shared<ImportDXFNode>(QString::fromStdString(filename),
 	QString::fromStdString(layer), origin_x, origin_y, convexity, scale, ctx.getAcc());
+      initAcc(p);
+      node = p;
   }
 };
 
@@ -457,9 +475,6 @@ PythonScript::PythonScript() {
   Py_Initialize();
   object openscad_module( (handle<>(PyImport_ImportModule(PyContext::nsopenscad.c_str()))) );
   ctx.init(openscad_module);
-  //SurfaceNode
-  //ImportSTLNode
-  //ImportDXFNode
   //ImportOFFNode
   //ProjectionNode
   //CgaladvMinkowskiNode
