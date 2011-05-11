@@ -1,76 +1,56 @@
+from openscad import *
+from math import sin,cos,acos,pi
+from collections import deque
 
-module screw(type = 2, r1 = 15, r2 = 20, n = 7, h = 100, t = 8)
-{
-	linear_extrude(height = h, twist = 360*t/n, convexity = t)
-	difference() {
-		circle(r2);
-		for (i = [0:n-1]) {
-				if (type == 1) rotate(i*360/n) polygon([
-						[ 2*r2, 0 ],
-						[ r2, 0 ],
-						[ r1*cos(180/n), r1*sin(180/n) ],
-						[ r2*cos(360/n), r2*sin(360/n) ],
-						[ 2*r2*cos(360/n), 2*r2*sin(360/n) ],
-				]);
-				if (type == 2) rotate(i*360/n) polygon([
-						[ 2*r2, 0 ],
-						[ r2, 0 ],
-						[ r1*cos(90/n), r1*sin(90/n) ],
-						[ r1*cos(180/n), r1*sin(180/n) ],
-						[ r2*cos(270/n), r2*sin(270/n) ],
-						[ 2*r2*cos(270/n), 2*r2*sin(270/n) ],
-				]);
-		}
-	}
-}
+def screw(type = 2, r1 = 15, r2 = 20, n = 7, h = 100, t = 8):
+	p = [ [ [ 2*r2, 0 ],
+		[ r2, 0 ],
+		[ r1*cos(pi/n), r1*sin(pi/n) ],
+		[ r2*cos(pi*2/n), r2*sin(pi*2/n) ],
+		[ 2*r2*cos(pi*2/n), 2*r2*sin(pi*2/n) ]],
+		[[ 2*r2, 0 ],
+		[ r2, 0 ],
+		[ r1*cos(pi*0.5/n), r1*sin(pi*0.5/n) ],
+		[ r1*cos(pi/n), r1*sin(pi/n) ],
+		[ r2*cos(pi*1.5/n), r2*sin(pi*1.5/n) ],
+		[ 2*r2*cos(pi*1.5/n), 2*r2*sin(pi*1.5/n) ]]
+		]
 
-module nut(type = 2, r1 = 16, r2 = 21, r3 = 30, s = 6, n = 7, h = 100/5, t = 8/5)
-{
-	difference() {
-		cylinder($fn = s, r = r3, h = h);
-		translate([ 0, 0, -h/2 ]) screw(type, r1, r2, n, h*2, t*2);
-	}
-}
+	return LinearExtrude(Difference( [Circle(r2)] +
+		[ RotateAxis(i*360/n, Polygon(p[type-1])) for i in range(0,n)]),
+		h, 360*t/n,t,-1)
 
-module spring(r1 = 100, r2 = 10, h = 100, hr = 12)
-{
-	stepsize = 1/16;
-	module segment(i1, i2) {
-		alpha1 = i1 * 360*r2/hr;
-		alpha2 = i2 * 360*r2/hr;
-		len1 = sin(acos(i1*2-1))*r2;
-		len2 = sin(acos(i2*2-1))*r2;
-		if (len1 < 0.01)
-			polygon([
-				[ cos(alpha1)*r1, sin(alpha1)*r1 ],
-				[ cos(alpha2)*(r1-len2), sin(alpha2)*(r1-len2) ],
-				[ cos(alpha2)*(r1+len2), sin(alpha2)*(r1+len2) ]
-			]);
-		if (len2 < 0.01)
-			polygon([
-				[ cos(alpha1)*(r1+len1), sin(alpha1)*(r1+len1) ],
-				[ cos(alpha1)*(r1-len1), sin(alpha1)*(r1-len1) ],
-				[ cos(alpha2)*r1, sin(alpha2)*r1 ],
-			]);
-		if (len1 >= 0.01 && len2 >= 0.01)
-			polygon([
-				[ cos(alpha1)*(r1+len1), sin(alpha1)*(r1+len1) ],
-				[ cos(alpha1)*(r1-len1), sin(alpha1)*(r1-len1) ],
-				[ cos(alpha2)*(r1-len2), sin(alpha2)*(r1-len2) ],
-				[ cos(alpha2)*(r1+len2), sin(alpha2)*(r1+len2) ]
-			]);
-	}
-	linear_extrude(height = 100, twist = 180*h/hr,
-			$fn = (hr/r2)/stepsize, convexity = 5) {
-		for (i = [ stepsize : stepsize : 1+stepsize/2 ])
-			segment(i-stepsize, min(i, 1));
-	}
-}
 
-translate([ -30, 0, 0 ])
-screw();
+def nut(type = 2, r1 = 16, r2 = 21, r3 = 30, s = 6, n = 7, h = 100/5, t = 8/5):
+	cyl = Cylinder(r3,h)
+	cyl.fn = s
+	return Difference([
+		cyl,
+		Translate([ 0, 0, -h/2 ], screw(type, r1, r2, n, h*2, t*2))
+	])
 
-translate([ 30, 0, 0 ])
-nut();
+def spring(r1 = 100, r2 = 10, h = 100, hr = 12):
+	steps = 32
+	points = deque([])
+	for i in range(0,steps):
+		wirealpha = pi* (i+0.5)/steps
+		wirer = sin(wirealpha)*r2
+		wireh = (cos(wirealpha)+1)/2
+		springalpha = 2*pi*wireh*r2/hr
+		points.appendleft(
+			[cos(springalpha)*(r1+wirer), sin(springalpha)*(r1+wirer)])
+		points.append(
+			[cos(springalpha)*(r1-wirer), sin(springalpha)*(r1-wirer)])
+	points = list(points)
+	return LinearExtrude(Polygon(points),h, 180.0*h/hr, 5)
+		
+openscad.result = Union([
 
-spring();
+	Translate([ -30, 0, 0 ],
+		screw()),
+
+	Translate([ 30, 0, 0 ],
+		nut()),
+	
+	spring()
+	])
