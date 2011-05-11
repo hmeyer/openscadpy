@@ -298,7 +298,7 @@ PolySet *CubeNode::render_polyset(render_mode_e) const {
 PolySet *SphereNode::render_polyset(render_mode_e) const {
   PolySet *p = new PolySet();
   if (r > 0) {
-    int fragments = get_fragments_from_r(r, acc);
+    int fragments = get_fragments_from_r(r, *this);
     int rings = fragments/2;
 // Uncomment the following three lines to enable experimental sphere tesselation
 //		if (rings % 2 == 0) rings++; // To ensure that the middle ring is at phi == 0 degrees
@@ -361,7 +361,7 @@ sphere_next_r2:
 PolySet *CylinderNode::render_polyset(render_mode_e) const {
   PolySet *p = new PolySet();
   if (h > 0 && r1 >=0 && r2 >= 0 && (r1 > 0 || r2 > 0)) {
-    int fragments = get_fragments_from_r(std::max(r1, r2), acc);
+    int fragments = get_fragments_from_r(std::max(r1, r2), *this);
 
     double z1, z2;
     if (center) {
@@ -458,7 +458,7 @@ PolySet *SquareNode::render_polyset(render_mode_e) const {
 
 PolySet *CircleNode::render_polyset(render_mode_e) const {
   PolySet *p = new PolySet();
-  int fragments = get_fragments_from_r(r, acc);
+  int fragments = get_fragments_from_r(r, *this);
 
   p->is2d = true;
   p->append_poly();
@@ -537,7 +537,7 @@ QString SphereNode::dump(QString indent) const
 {
   if (dump_cache.isEmpty()) {
     QString text;
-    text.sprintf("sphere($fn = %g, $fa = %g, $fs = %g, r = %g);\n", acc.fn, acc.fa, acc.fs, r);
+    text.sprintf("sphere($fn = %g, $fa = %g, $fs = %g, r = %g);\n", fn, fa, fs, r);
     ((AbstractNode*)this)->dump_cache = indent + QString("n%1: ").arg(idx) + text;
   }
   return dump_cache;
@@ -548,7 +548,7 @@ QString CylinderNode::dump(QString indent) const
 {
   if (dump_cache.isEmpty()) {
     QString text;
-    text.sprintf("cylinder($fn = %g, $fa = %g, $fs = %g, h = %g, r1 = %g, r2 = %g, center = %s);\n", acc.fn, acc.fa, acc.fs, h, r1, r2, center ? "true" : "false");
+    text.sprintf("cylinder($fn = %g, $fa = %g, $fs = %g, h = %g, r1 = %g, r2 = %g, center = %s);\n", fn, fa, fs, h, r1, r2, center ? "true" : "false");
     ((AbstractNode*)this)->dump_cache = indent + QString("n%1: ").arg(idx) + text;
   }
   return dump_cache;
@@ -580,7 +580,7 @@ QString CircleNode::dump(QString indent) const
 {
   if (dump_cache.isEmpty()) {
     QString text;
-    text.sprintf("circle($fn = %g, $fa = %g, $fs = %g, r = %g);\n", acc.fn, acc.fa, acc.fs, r);
+    text.sprintf("circle($fn = %g, $fa = %g, $fs = %g, r = %g);\n", fn, fa, fs, r);
     ((AbstractNode*)this)->dump_cache = indent + QString("n%1: ").arg(idx) + text;
   }
   return dump_cache;

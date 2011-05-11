@@ -18,7 +18,7 @@ frame = Union( [
 			-(bodywidth/2 + platewidth/2)]
 	))
 
-frame.background()
+frame.background = True
 
 fan = Intersection([
 		DxfLinearExtrude(dxf, "fan_top",

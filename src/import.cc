@@ -197,7 +197,7 @@ PolySet *ImportSTLNode::render_polyset(render_mode_e) const {
 PolySet *ImportDXFNode::render_polyset(render_mode_e) const {
   PolySet *p = new PolySet();
   p->convexity = convexity;
-  DxfData dd(acc, filename, layername, origin_x, origin_y, scale);
+  DxfData dd(*this, filename, layername, origin_x, origin_y, scale);
   p->is2d = true;
   dxf_tesselate(p, &dd, 0, true, false, 0);
   dxf_border_to_ps(p, &dd);
@@ -248,7 +248,7 @@ QString ImportDXFNode::dump(QString indent) const {
 		    "$fn = %g, $fa = %g, $fs = %g);\n",
 		    filename.toAscii().data(), (int)st.st_mtime, (int)st.st_size,
 		    layername.toAscii().data(), origin_x, origin_y, scale, convexity,
-		    acc.fn, acc.fa, acc.fs);
+		    fn, fa, fs);
     ((AbstractNode*)this)->dump_cache = indent + QString("n%1: ").arg(idx) + text;
   }
   return dump_cache;

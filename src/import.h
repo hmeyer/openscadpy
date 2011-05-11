@@ -49,13 +49,12 @@ public:
   virtual QString dump(QString indent) const;
 };
 
-class ImportDXFNode : public ImportNode {
+class ImportDXFNode : public ImportNode, public Accuracy {
   QString layername;
-  Accuracy acc;
   double origin_x, origin_y, scale;
 public:	
   ImportDXFNode(const QString &filename,const QString &layername, double origin_x, double origin_y, int convexity=5, double scale=1.0, const Accuracy &acc=Accuracy(), const Props p=Props())
-    :ImportNode(filename, convexity, p), layername(layername), acc(acc), origin_x(origin_x), origin_y(origin_y), scale(scale) {}
+    :ImportNode(filename, convexity, p), Accuracy(acc), layername(layername), origin_x(origin_x), origin_y(origin_y), scale(scale) {}
   virtual PolySet *render_polyset(render_mode_e mode) const;
   virtual QString dump(QString indent) const;
 };

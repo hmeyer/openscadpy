@@ -38,7 +38,7 @@ def cutview():
 			)
 		]
 	r = Render(Intersection(combo))
-	r.highlight()
+	r.highlight = True
 	return Difference([
 		Difference(combo),r
 	])

@@ -45,8 +45,8 @@
 DxfLinearExtrudeNode::DxfLinearExtrudeNode(const AbstractNode::NodeList &children, const QString &filename, const QString &layer,
 			      double height, double twist, double origin_x, double origin_y, double scale, 
 			     int convexity, int slices, bool center, const Accuracy &acc, const Props p)
-  :AbstractPolyNode(p,children), convexity(convexity), slices(slices), height(height), twist(twist), 
-  origin_x(origin_x), origin_y(origin_y), scale(scale), filename(filename), layername(layer), acc(acc), 
+  :AbstractPolyNode(p,children), Accuracy(acc), convexity(convexity), slices(slices), height(height), twist(twist), 
+  origin_x(origin_x), origin_y(origin_y), scale(scale), filename(filename), layername(layer), 
   center(center), has_twist(twist!=0.0) {
   if (has_twist && slices<2) {
 	  this->slices = (int)std::max(2.0, std::abs(get_fragments_from_r(height,
@@ -234,7 +234,7 @@ PolySet *DxfLinearExtrudeNode::render_polyset(render_mode_e) const
 	  dxf = new DxfData();
 #endif // ENABLE_CGAL
 	} else {
-	  dxf = new DxfData(acc, filename, layername, origin_x, origin_y, scale);
+	  dxf = new DxfData(*this, filename, layername, origin_x, origin_y, scale);
 	}
 	PolySet *ps = new PolySet();
 	ps->convexity = convexity;
@@ -320,7 +320,7 @@ QString DxfLinearExtrudeNode::dump(QString indent) const
 			text += t2;
 		}
 		QString t3;
-		t3.sprintf(", $fn = %g, $fa = %g, $fs = %g) {\n", acc.fn, acc.fa, acc.fs);
+		t3.sprintf(", $fn = %g, $fa = %g, $fs = %g) {\n", fn, fa, fs);
 		text += t3;
 		foreach (AbstractNode::Pointer v, children)
 			text += v->dump(indent + QString("\t"));

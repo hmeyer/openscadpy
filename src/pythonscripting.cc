@@ -79,16 +79,34 @@ protected:
   AbstractNode::Pointer node;
 public:
   AbstractNode::Pointer getNode() const { return node; }
-  void highlight(bool set=true) {
+  void setHighlight(bool set=true) {
     node->props.highlight = set;
   }  
-  void background(bool set=true) {
+  bool getHighlight(void) const {
+    return node->props.highlight;
+  }  
+  void setBackground(bool set=true) {
     node->props.background = set;
+  }
+  bool getBackground(void) const {
+    return node->props.background;
   }
 };
 
-BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(PyAbstractNode_hi_overloads, highlight, 0, 1)
-BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(PyAbstractNode_bg_overloads, background, 0, 1)
+class PyNodeAccuracy {
+public:
+  typedef boost::shared_ptr<Accuracy> AccPtr;
+protected:
+  boost::shared_ptr<Accuracy> accp;
+public:
+  void initAcc(AccPtr p) { accp = p; }
+  virtual void setfn(double fn) {accp->fn = fn;}
+  virtual double getfn(void) const {return accp->fn;}
+  virtual void setfs(double fs) {accp->fs = fs;}
+  virtual double getfs(void) const {return accp->fs;}
+  virtual void setfa(double fa) {accp->fa = fa;}
+  virtual double getfa(void) const {return accp->fa;}
+};
 
 AbstractNode::NodeList list2NodeList(const list &l) {
   AbstractNode::NodeList nl;
@@ -157,10 +175,10 @@ public:
 class PyColorNode: public PyAbstractNode {
 public:
   PyColorNode(const list &ca, const PyAbstractNode &n) {
-    node = make_shared<TransformColorNode	>(list2StdArray<Float4>(ca), AbstractNode::NodeList(1, n.getNode()));
+    node = make_shared<TransformColorNode>(list2StdArray<Float4>(ca,1), AbstractNode::NodeList(1, n.getNode()));
   }
   PyColorNode(const list &ca, const list &a) {
-    node = make_shared<TransformColorNode>(list2StdArray<Float4>(ca), list2NodeList(a));
+    node = make_shared<TransformColorNode>(list2StdArray<Float4>(ca,1), list2NodeList(a));
   }
 };
 
@@ -175,20 +193,24 @@ public:
   }  
 };
 
-class PySphereNode: public PyAbstractNode {
+class PySphereNode: public PyAbstractNode, public PyNodeAccuracy {
 public:
   PySphereNode(double r) {
     node = make_shared<SphereNode>(r, ctx.getAcc());
   }
 };
 
-class PyCylinderNode: public PyAbstractNode {
+class PyCylinderNode: public PyAbstractNode, public PyNodeAccuracy {
 public:
   PyCylinderNode(double r1, double r2, double h, bool center=false) {
-    node = make_shared<CylinderNode>(r1, r2, h, center, ctx.getAcc());
+    CylinderNode::Pointer p = make_shared<CylinderNode>(r1, r2, h, center, ctx.getAcc());
+    node = p;
+    initAcc(p);
   }
   PyCylinderNode(double r, double h, bool center=false) {
-    node = make_shared<CylinderNode>(r, r, h, center, ctx.getAcc());
+    CylinderNode::Pointer p = make_shared<CylinderNode>(r, r, h, center, ctx.getAcc());
+    node = p;
+    initAcc(p);
   }
 };
 
@@ -243,7 +265,7 @@ public:
   }
 };
 
-class PyCircleNode: public PyAbstractNode {
+class PyCircleNode: public PyAbstractNode, public PyNodeAccuracy {
 public:
   PyCircleNode(double r) {
     node = make_shared<CircleNode>(r, ctx.getAcc());
@@ -252,7 +274,7 @@ public:
 
 class PyPolygonNode: public PyAbstractNode {
 public:
-  PyPolygonNode(const list &points, const list &paths, unsigned int convexity=5) {
+  PyPolygonNode(const list &points, const list &paths=list(), unsigned int convexity=5) {
     node = make_shared<PolygonNode>(
       list2ArrayVec<Vec2D>(points), 
       list2VecVec<VecPaths>(paths), convexity);
@@ -269,7 +291,7 @@ public:
   }
 };
 
-class PyDxfLinearExtrudeNode: public PyAbstractNode {
+class PyDxfLinearExtrudeNode: public PyAbstractNode, public PyNodeAccuracy {
 public:
   PyDxfLinearExtrudeNode(const std::string &filename, const std::string &layer,
 	double height, double twist=.0, double origin_x=.0, double origin_y=.0, double scale=1.0, 
@@ -282,7 +304,7 @@ public:
   }
 };
 
-class PyLinearExtrudeNode: public PyAbstractNode {
+class PyLinearExtrudeNode: public PyAbstractNode, public PyNodeAccuracy {
 public:
   PyLinearExtrudeNode(const PyAbstractNode &n,
 	double height, double twist=.0,
@@ -305,7 +327,7 @@ public:
 };
 
 
-class PyDxfRotateExtrudeNode: public PyAbstractNode {
+class PyDxfRotateExtrudeNode: public PyAbstractNode, public PyNodeAccuracy {
 public:
   PyDxfRotateExtrudeNode(const std::string &filename, const std::string &layer,
 	double origin_x=.0, double origin_y=.0, double scale=1.0, 
@@ -317,7 +339,7 @@ public:
       );
   }
 };
-class PyRotateExtrudeNode: public PyAbstractNode {
+class PyRotateExtrudeNode: public PyAbstractNode, public PyNodeAccuracy {
 public:
   PyRotateExtrudeNode(const PyAbstractNode &n,
 	unsigned int convexity=5) {
@@ -351,7 +373,7 @@ public:
   }
 };
 
-class PyImportDXFNode: public PyAbstractNode {
+class PyImportDXFNode: public PyAbstractNode, public PyNodeAccuracy {
 public:
   PyImportDXFNode(const std::string &filename, const std::string &layer,
 	double origin_x=0.0, double origin_y=0.0, double scale=1.0, unsigned int convexity=5) {
@@ -379,8 +401,12 @@ BOOST_PYTHON_FUNCTION_OVERLOADS(pyDxfCross_overloads, pyDxfCross, 1, 5)
 
 BOOST_PYTHON_MODULE(openscad) {
   class_<PyAbstractNode>("AbstractNode")
-    .def("highlight", &PyAbstractNode::highlight, PyAbstractNode_hi_overloads())
-    .def("background", &PyAbstractNode::background, PyAbstractNode_bg_overloads());
+    .add_property("highlight", &PyAbstractNode::getHighlight, &PyAbstractNode::setHighlight)
+    .add_property("background", &PyAbstractNode::getBackground, &PyAbstractNode::setBackground);    
+  class_<PyNodeAccuracy>("NodeAccuracy")
+    .add_property("fn", &PyNodeAccuracy::getfn, &PyNodeAccuracy::setfn)
+    .add_property("fs", &PyNodeAccuracy::getfs, &PyNodeAccuracy::setfs)
+    .add_property("fa", &PyNodeAccuracy::getfa, &PyNodeAccuracy::setfa);
   class_<PyUnionNode, bases<PyAbstractNode> >("Union", init<list>());
   class_<PyDifferenceNode, bases<PyAbstractNode> >("Difference", init<list>());
   class_<PyIntersectionNode, bases<PyAbstractNode> >("Intersection", init<list>());
@@ -393,33 +419,33 @@ BOOST_PYTHON_MODULE(openscad) {
   class_<PyMatrixNode, bases<PyAbstractNode> >("Matrix", init<list, PyAbstractNode>()).def(init<list, list>());
   class_<PyColorNode, bases<PyAbstractNode> >("Color", init<list, PyAbstractNode>()).def(init<list, list>());
   class_<PyCubeNode, bases<PyAbstractNode> >("Cube", init<list, optional<bool> >()).def(init<double, optional<bool> >());
-  class_<PySphereNode, bases<PyAbstractNode> >("Sphere", init<double>());
-  class_<PyCylinderNode, bases<PyAbstractNode> >("Cylinder", init<double, double, double, optional<bool> >()).def(init<double, double, optional< bool> >());
+  class_<PySphereNode, bases<PyAbstractNode, PyNodeAccuracy> >("Sphere", init<double>());
+  class_<PyCylinderNode, bases<PyAbstractNode, PyNodeAccuracy> >("Cylinder", init<double, double, double, optional<bool> >()).def(init<double, double, optional< bool> >());
   class_<PyPolyhedronNode, bases<PyAbstractNode> >("Polyhedron", init<list, list, optional<unsigned int> >());
   class_<PySquareNode, bases<PyAbstractNode> >("Square", init<list, optional<bool> >()).def(init<double, optional<bool> >());
-  class_<PyCircleNode, bases<PyAbstractNode> >("Circle", init<double>());
-  class_<PyPolygonNode, bases<PyAbstractNode> >("Polygon", init<list, list, optional<unsigned int> >());
+  class_<PyCircleNode, bases<PyAbstractNode, PyNodeAccuracy> >("Circle", init<double>());
+  class_<PyPolygonNode, bases<PyAbstractNode> >("Polygon", init<list, optional<list, unsigned int> >());
   class_<PyRenderNode, bases<PyAbstractNode> >("Render", init<PyAbstractNode, optional<unsigned int> >()).def(init<list, optional<unsigned int> >());
-  class_<PyDxfLinearExtrudeNode, bases<PyAbstractNode> >("DxfLinearExtrude", 
+  class_<PyDxfLinearExtrudeNode, bases<PyAbstractNode, PyNodeAccuracy> >("DxfLinearExtrude", 
     init<std::string, std::string,
       double, optional< double, double, double, double,
       unsigned int, int, bool > >());
-  class_<PyLinearExtrudeNode, bases<PyAbstractNode> >("LinearExtrude", 
+  class_<PyLinearExtrudeNode, bases<PyAbstractNode, PyNodeAccuracy> >("LinearExtrude", 
     init<PyAbstractNode,
       double, optional< double,
       unsigned int, int, bool > >()).def(
     init<list, 
       double, optional< double,
       unsigned int, int, bool > >());
-  class_<PyDxfRotateExtrudeNode, bases<PyAbstractNode> >("DxfRotateExtrude", 
+  class_<PyDxfRotateExtrudeNode, bases<PyAbstractNode, PyNodeAccuracy> >("DxfRotateExtrude", 
     init<std::string, std::string,
       optional< double, double, double, unsigned int > >());
-  class_<PyRotateExtrudeNode, bases<PyAbstractNode> >("RotateExtrude", 
+  class_<PyRotateExtrudeNode, bases<PyAbstractNode, PyNodeAccuracy> >("RotateExtrude", 
     init<PyAbstractNode, optional< unsigned int> >()).def(
     init<list, optional< unsigned int > >());
   class_<PySurfaceNode, bases<PyAbstractNode> >("Surface", init<std::string, optional<unsigned int, bool> >());
   class_<PyImportSTLNode, bases<PyAbstractNode> >("ImportSTL", init<std::string, optional<unsigned int> >());
-  class_<PyImportDXFNode, bases<PyAbstractNode> >("ImportDXF", 
+  class_<PyImportDXFNode, bases<PyAbstractNode, PyNodeAccuracy> >("ImportDXF", 
     init<std::string, std::string, optional< double, double, double,unsigned int> >());						  
    
   def("DxfDim", pyDxfDim, pyDxfDim_overloads());

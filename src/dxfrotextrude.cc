@@ -127,7 +127,7 @@ PolySet *DxfRotateExtrudeNode::render_polyset(render_mode_e) const
 		dxf = new DxfData();
 #endif // ENABLE_CGAL
 	} else {
-		dxf = new DxfData(acc, filename, layername, origin_x, origin_y, scale);
+		dxf = new DxfData(*this, filename, layername, origin_x, origin_y, scale);
 	}
 
 	PolySet *ps = new PolySet();
@@ -140,7 +140,7 @@ PolySet *DxfRotateExtrudeNode::render_polyset(render_mode_e) const
 			max_x = fmax(max_x, dxf->paths[i].points[j]->x);
 		}
 
-		int fragments = get_fragments_from_r(max_x, acc);
+		int fragments = get_fragments_from_r(max_x, *this);
 
         double ***points;
         points = new double**[fragments];
@@ -218,7 +218,7 @@ QString DxfRotateExtrudeNode::dump(QString indent) const
 				"$fn = %g, $fa = %g, $fs = %g) {\n",
 				filename.toAscii().data(), (int)fileInfo.lastModified().toTime_t(),
 				(int)fileInfo.size(),layername.toAscii().data(), origin_x, origin_y, 
-				scale, convexity, acc.fn, acc.fa, acc.fs);
+				scale, convexity, fn, fa, fs);
 		foreach (AbstractNode::Pointer v, children)
 			text += v->dump(indent + QString("\t"));
 		text += indent + "}\n";

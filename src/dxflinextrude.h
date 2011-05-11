@@ -30,7 +30,7 @@
 #include "node.h"
 #include "accuracy.h"
 
-class DxfLinearExtrudeNode : public AbstractPolyNode
+class DxfLinearExtrudeNode : public AbstractPolyNode, public Accuracy
 {
 public:
 	typedef shared_ptr<DxfLinearExtrudeNode> Pointer;
@@ -38,7 +38,6 @@ public:
 	double height, twist;
 	double origin_x, origin_y, scale;
 	QString filename, layername;
-	Accuracy acc;
 	bool center, has_twist;
 	DxfLinearExtrudeNode(const AbstractNode::NodeList &children, const QString &filename, const QString &layer,
 			     double height, double twist, double origin_x, double origin_y, double scale, 

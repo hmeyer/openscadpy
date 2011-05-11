@@ -54,26 +54,25 @@ public:
 	virtual QString dump(QString indent) const;
 };
 
-class SphereNode : public PrimitiveNode {
+class SphereNode : public PrimitiveNode, public Accuracy {
 	double r;
-	Accuracy acc;
 public:
 	SphereNode(double r, const Accuracy &acc=Accuracy(), const Props p=Props())
-	  :PrimitiveNode(1,p), r(r), acc(acc) {}
+	  :PrimitiveNode(1,p), Accuracy(acc), r(r) {}
 	virtual PolySet *render_polyset(render_mode_e mode) const;
 	virtual QString dump(QString indent) const;
 };
 
-class CylinderNode : public PrimitiveNode {
+class CylinderNode : public PrimitiveNode, public Accuracy {
 	bool center;
 	double r1,r2;
 	double h;
-	Accuracy acc;
 public:
+	typedef shared_ptr<CylinderNode> Pointer;
 	CylinderNode(double r1, double r2, double h, bool center=false, const Accuracy &acc=Accuracy(), const Props p=Props())
-	  :PrimitiveNode(1,p), center(center), r1(r1), r2(r2), h(h), acc(acc) {}
+	  :PrimitiveNode(1,p), Accuracy(acc), center(center), r1(r1), r2(r2), h(h) {}
 	CylinderNode(double r, double h, bool center=false, const Accuracy &acc=Accuracy(), const Props p=Props())
-	  :PrimitiveNode(1,p), center(center), r1(r), r2(r), h(h), acc(acc) {}
+	  :PrimitiveNode(1,p), Accuracy(acc), center(center), r1(r), r2(r), h(h) {}
 	virtual PolySet *render_polyset(render_mode_e mode) const;
 	virtual QString dump(QString indent) const;
 };
@@ -98,12 +97,11 @@ public:
 	virtual QString dump(QString indent) const;
 };
 
-class CircleNode : public PrimitiveNode {
+class CircleNode : public PrimitiveNode, public Accuracy {
 	double r;
-	Accuracy acc;
 public:
 	CircleNode(double r, const Accuracy &acc=Accuracy(), const Props p=Props())
-	  :PrimitiveNode(1,p), r(r), acc(acc) {}
+	  :PrimitiveNode(1,p), Accuracy(acc), r(r) {}
 	virtual PolySet *render_polyset(render_mode_e mode) const;
 	virtual QString dump(QString indent) const;
 };

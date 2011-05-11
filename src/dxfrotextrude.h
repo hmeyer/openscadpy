@@ -30,19 +30,18 @@
 #include "node.h"
 #include "accuracy.h"
 
-class DxfRotateExtrudeNode : public AbstractPolyNode
+class DxfRotateExtrudeNode : public AbstractPolyNode, public Accuracy
 {
 public:
 	typedef shared_ptr<DxfRotateExtrudeNode> Pointer;
 	int convexity;
 	double origin_x, origin_y, scale;
 	QString filename, layername;
-	Accuracy acc;
 	DxfRotateExtrudeNode(const AbstractNode::NodeList &children, const QString &filename, const QString &layer,
 	  double origin_x, double origin_y, double scale, 
 	  int convexity, const Accuracy &acc=Accuracy(), const Props p=Props())
-	    :AbstractPolyNode(p,children), convexity(convexity),
-	    origin_x(origin_x), origin_y(origin_y), scale(scale), filename(filename), layername(layer), acc(acc) {}
+	    :AbstractPolyNode(p,children), Accuracy(acc), convexity(convexity),
+	    origin_x(origin_x), origin_y(origin_y), scale(scale), filename(filename), layername(layer) {}
 	virtual PolySet *render_polyset(render_mode_e mode) const;
 	virtual QString dump(QString indent) const;
 };
