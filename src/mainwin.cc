@@ -601,7 +601,7 @@ void MainWindow::compile(bool procevents)
 	last_compiled_doc = editor->toPlainText();
 #ifdef ENABLE_PYTHON
 	PythonScript pyvm;
-	absolute_root_node = pyvm.evaluate((last_compiled_doc + "\n" + commandline_commands).toStdString(), this->fileName.isEmpty() ? "" : QFileInfo(this->fileName).absolutePath().toStdString());
+	root_node = absolute_root_node = pyvm.evaluate((last_compiled_doc + "\n" + commandline_commands).toStdString(), this->fileName.isEmpty() ? "" : QFileInfo(this->fileName).absolutePath().toStdString());
 	if (!absolute_root_node) {
 	  PRINT(pyvm.error().c_str());
 	}
@@ -1088,8 +1088,12 @@ void MainWindow::actionRenderCGAL()
 	console->clear();
 
 	compile(true);
+	if (
+#ifndef ENABLE_PYTHON
+	  !root_module || 
+#endif
+	  !root_node)
 
-	if (!root_module || !root_node)
 		return;
 
 	if (this->root_N) {
