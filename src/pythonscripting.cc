@@ -9,6 +9,7 @@
 #include "dxfdim.h"
 #include "surface.h"
 #include "import.h"
+#include "projection.h"
 #include <boost/python.hpp>
 #include <boost/make_shared.hpp>
 
@@ -400,6 +401,17 @@ public:
   }
 };
 
+class PyProjectionNode: public PyAbstractNode {
+public:
+  PyProjectionNode(const PyAbstractNode &n, bool cut_mode=false, unsigned int convexity=5) {
+    node = make_shared<ProjectionNode>(AbstractNode::NodeList(1, n.getNode()), cut_mode, convexity);
+  }
+  PyProjectionNode(const list &a, bool cut_mode=false, unsigned int convexity=5) {
+    node = make_shared<ProjectionNode>(list2NodeList(a), cut_mode, convexity);
+  }
+};
+
+
 double pyDxfDim(const std::string &filename, const std::string &layername=std::string(), const std::string &name=std::string(), double xorigin=0.0, double yorigin=0.0, double scale=1.0) {
   return dxf_dim(QString::fromStdString(filename), QString::fromStdString(layername), QString::fromStdString(name), xorigin, yorigin, scale);
 }
@@ -465,6 +477,7 @@ BOOST_PYTHON_MODULE(openscad) {
   class_<PyImportSTLNode, bases<PyAbstractNode> >("ImportSTL", init<std::string, optional<unsigned int> >());
   class_<PyImportDXFNode, bases<PyAbstractNode, PyNodeAccuracy> >("ImportDXF", 
     init<std::string, std::string, optional< double, double, double,unsigned int> >());						  
+  class_<PyProjectionNode, bases<PyAbstractNode> >("Projection", init<PyAbstractNode, optional<bool, unsigned int> >()).def(init<list, optional<bool, unsigned int> >());
    
   def("DxfDim", pyDxfDim, pyDxfDim_overloads());
   def("DxfCross", pyDxfCross, pyDxfCross_overloads());
