@@ -40,6 +40,9 @@
 #include "cgal.h"
 #include <CGAL/assertions_behaviour.h>
 #endif
+#ifdef ENABLE_PYTHON
+#include "pythonscripting.h"
+#endif
 
 #include <QApplication>
 #include <QFile>
@@ -272,13 +275,17 @@ int main(int argc, char **argv)
 		root_ctx.set_variable("$vpr", zero3);
 
 
+#ifndef ENABLE_PYTHON
 		AbstractModule *root_module;
 		ModuleInstantiation root_inst;
+#endif		
 		AbstractNode::Pointer root_node;
 
 		QFileInfo fileInfo(filename);
 		handle_dep(filename);
 		FILE *fp = fopen(filename, "rt");
+
+		AbstractNode::resetIndexCounter();
 		if (!fp) {
 			fprintf(stderr, "Can't open input file `%s'!\n", filename);
 			exit(1);
@@ -291,13 +298,22 @@ int main(int argc, char **argv)
 				text += buffer;
 			}
 			fclose(fp);
+			QDir::setCurrent(fileInfo.absolutePath());
+#ifdef ENABLE_PYTHON
+				PythonScript pyvm;
+				root_node = pyvm.evaluate((text+commandline_commands).toStdString(), fileInfo.absolutePath().toStdString());
+				if (!root_node) {
+				  fprintf(stderr, "Python error:%s", pyvm.error().c_str());
+				}
+#else			  
 			root_module = parse((text+commandline_commands).toAscii().data(), fileInfo.absolutePath().toLocal8Bit(), false);
+#endif
+
 		}
 
-		QDir::setCurrent(fileInfo.absolutePath());
-
-		AbstractNode::resetIndexCounter();
+#ifndef ENABLE_PYTHON
 		root_node = root_module->evaluate(&root_ctx, &root_inst);
+#endif
 
 		CGAL_Nef_polyhedron *root_N;
 		root_N = new CGAL_Nef_polyhedron(root_node->render_cgal_nef_polyhedron());
