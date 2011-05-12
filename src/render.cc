@@ -25,13 +25,10 @@
  */
 
 #include "render.h"
-#include "module.h"
 #include "polyset.h"
-#include "context.h"
 #include "dxfdata.h"
 #include "dxftess.h"
 #include "csgterm.h"
-#include "builtin.h"
 #include "printutils.h"
 #include "progress.h"
 
@@ -41,39 +38,6 @@
 #include <QTime>
 #include <boost/make_shared.hpp>
 
-class RenderModule : public AbstractModule
-{
-public:
-	RenderModule() { }
-	virtual AbstractNode::Pointer evaluate(const Context *ctx, const ModuleInstantiation *inst) const;
-};
-
-AbstractNode::Pointer RenderModule::evaluate(const Context *ctx, const ModuleInstantiation *inst) const
-{
-  AbstractNode::NodeList children;
-  foreach (ModuleInstantiation *v, inst->children) {
-	  AbstractNode::Pointer n(v->evaluate(inst->ctx));
-	  if (n) children.append(n);
-  }
-
-  QVector<QString> argnames = QVector<QString>() << "convexity";
-  QVector<Expression*> argexpr;
-
-  Context c(ctx);
-  c.args(argnames, argexpr, inst->argnames, inst->argvalues);
-
-  Value v = c.lookup_variable("convexity");
-  int convexity = 1;
-  if (v.type == Value::NUMBER)
-	  convexity = (int)v.num;
-
-  return boost::make_shared<RenderNode>(children, convexity, inst);
-}
-
-void register_builtin_render()
-{
-	builtin_modules["render"] = new RenderModule();
-}
 
 #ifdef ENABLE_CGAL
 

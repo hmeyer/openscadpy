@@ -25,9 +25,6 @@
  */
 
 #include "cgaladv.h"
-#include "module.h"
-#include "context.h"
-#include "builtin.h"
 #include "printutils.h"
 #include "cgal.h"
 #include <boost/make_shared.hpp>
@@ -46,66 +43,6 @@ enum cgaladv_type_e {
 	SUBDIV,
 	HULL
 };
-
-class CgaladvModule : public AbstractModule
-{
-public:
-	cgaladv_type_e type;
-	CgaladvModule(cgaladv_type_e type) : type(type) { }
-	virtual AbstractNode::Pointer evaluate(const Context *ctx, const ModuleInstantiation *inst) const;
-};
-
-AbstractNode::Pointer CgaladvModule::evaluate(const Context *ctx, const ModuleInstantiation *inst) const
-{
-  AbstractNode::NodeList children;
-  foreach (ModuleInstantiation *v, inst->children) {
-	  AbstractNode::Pointer n(v->evaluate(inst->ctx));
-	  if (n) children.append(n);
-  }
-  QVector<QString> argnames;
-  QVector<Expression*> argexpr;
-
-  if (type == MINKOWSKI)
-	  argnames = QVector<QString>() << "convexity";
-
-  if (type == GLIDE)
-	  argnames = QVector<QString>() << "path" << "convexity";
-
-  if (type == SUBDIV)
-	  argnames = QVector<QString>() << "type" << "level" << "convexity";
-
-  Context c(ctx);
-  c.args(argnames, argexpr, inst->argnames, inst->argvalues);
-
-  Value vconvexity, path, vsubdiv_type, vlevel;
-
-  if (type == MINKOWSKI) {
-	  vconvexity = c.lookup_variable("convexity", true);
-    return make_shared<CgaladvMinkowskiNode>(children, (int)vconvexity.num, inst);
-  }
-
-  if (type == GLIDE) {
-	  vconvexity = c.lookup_variable("convexity", true);
-	  path = c.lookup_variable("path", false);
-    return make_shared<CgaladvGlideNode>(children, path, (int)vconvexity.num, inst);
-  }
-
-  if (type == SUBDIV) {
-    vconvexity = c.lookup_variable("convexity", true);
-    vsubdiv_type = c.lookup_variable("type", false);
-    vlevel = c.lookup_variable("level", true);
-    return make_shared<CgaladvSubdivNode>(children, vsubdiv_type.text, std::min(1,(int)vlevel.num), (int)vconvexity.num, inst);
-  }
-  return make_shared<CgaladvHullNode>(children, (int)vconvexity.num, inst);
-}
-
-void register_builtin_cgaladv()
-{
-	builtin_modules["minkowski"] = new CgaladvModule(MINKOWSKI);
-	builtin_modules["glide"] = new CgaladvModule(GLIDE);
-	builtin_modules["subdiv"] = new CgaladvModule(SUBDIV);
-	builtin_modules["hull"] = new CgaladvModule(HULL);
-}
 
 #ifdef ENABLE_CGAL
 
@@ -252,7 +189,7 @@ QString CgaladvGlideNode::dump(QString indent) const
   if (dump_cache.isEmpty()) {
       QString text;
       text.sprintf(", convexity = %d) {\n", this->convexity);
-      text = QString("glide(path = ") + this->path.dump() + text;
+      text = QString("glide(path = undef") + text;
       text += static_cast<const CgaladvNode*>(this)->dump(indent + QString("\t"));
       text += indent + "}\n";
       ((AbstractNode*)this)->dump_cache = indent + QString("n%1: ").arg(idx) + text;

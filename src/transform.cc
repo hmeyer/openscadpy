@@ -25,24 +25,14 @@
  */
 
 #include "transform.h"
-#include "module.h"
-#include "context.h"
 #include "dxfdata.h"
 #include "csgterm.h"
 #include "polyset.h"
 #include "dxftess.h"
-#include "builtin.h"
 #include "printutils.h"
 #include <boost/make_shared.hpp>
 using boost::make_shared;
 
-class TransformModule : public AbstractModule
-{
-public:
-	transform_type_e type;
-	TransformModule(transform_type_e type) : type(type) { }
-	virtual AbstractNode::Pointer evaluate(const Context *ctx, const ModuleInstantiation *inst) const;
-};
 
 TransformNode::TransformNode(const NodeList &children, const Props p) 
   :AbstractNode(p,children) {
@@ -152,107 +142,6 @@ TransformColorNode::TransformColorNode(const Float4 &color, const NodeList &chil
   :TransformNode(children,p) {
   for (int i = 0; i < color.static_size; i++)
     m[16+i] = color[i];
-}
-
-AbstractNode::Pointer TransformModule::evaluate(const Context *ctx, const ModuleInstantiation *inst) const
-{
-  AbstractNode::NodeList children;
-  foreach (ModuleInstantiation *v, inst->children) {
-	  AbstractNode::Pointer n(v->evaluate(inst->ctx));
-	  if (n) children.append(n);
-  }
-  QVector<QString> argnames;
-  QVector<Expression*> argexpr;
-
-  if (type == SCALE) {
-	  argnames = QVector<QString>() << "v";
-  }
-  if (type == ROTATE) {
-	  argnames = QVector<QString>() << "a" << "v";
-  }
-  if (type == MIRROR) {
-	  argnames = QVector<QString>() << "v";
-  }
-  if (type == TRANSLATE) {
-	  argnames = QVector<QString>() << "v";
-  }
-  if (type == MULTMATRIX) {
-	  argnames = QVector<QString>() << "m";
-  }
-  if (type == COLOR) {
-	  argnames = QVector<QString>() << "c";
-  }
-
-  Context c(ctx);
-  c.args(argnames, argexpr, inst->argnames, inst->argvalues);
-
-  if (type == SCALE)
-  {
-    Value v = c.lookup_variable("v");
-    Float3 scale;
-    v.getnum(scale[0]);
-    v.getnum(scale[1]);
-    v.getnum(scale[2]);
-    v.getv3(scale[0],scale[1],scale[2]);
-    return make_shared<TransformScaleNode>(scale, children, inst);
-  }
-  if (type == ROTATE)
-  {
-    Value val_a = c.lookup_variable("a");
-    if (val_a.type == Value::VECTOR)
-    {
-      Float3 rotation;
-      for (int i = 0; i < 3 && i < val_a.vec.size(); i++)
-	      val_a.vec[i]->getnum(rotation[i]);
-      return make_shared<TransformRotateNode>(rotation,children,inst);
-    }
-    else
-    {
-      Value val_v = c.lookup_variable("v");
-      Float3 v={{0,0,1}};
-      FloatType angle = 0;
-      val_a.getnum(angle);
-      val_v.getv3(v[0], v[1], v[2]);
-      return make_shared<TransformRotateAxisNode>(v,angle,children,inst);
-    }
-  }
-  if (type == MIRROR)
-  {
-    Value val_v = c.lookup_variable("v");
-    Float3 v={{1,0,0}};
-    val_v.getv3(v[0], v[1], v[2]);
-    return make_shared<TransformMirrorNode>(v,children,inst);
-  }
-  if (type == TRANSLATE)
-  {
-    Value val_v = c.lookup_variable("v");
-    Float3 v;
-    val_v.getv3(v[0], v[1], v[2]);
-    return make_shared<TransformTranslateNode>(v,children,inst);
-  }
-  if (type == MULTMATRIX)
-  {
-	  Value v = c.lookup_variable("m");
-	  Float16 mat;
-	  if (v.type == Value::VECTOR) {
-		  for (int i = 0; i < 16; i++) {
-			  int x = i / 4, y = i % 4;
-			  if (y < v.vec.size() && v.vec[y]->type == Value::VECTOR && x < v.vec[y]->vec.size())
-				  v.vec[y]->vec[x]->getnum(mat[i]);
-		  }
-	  }
-	  return make_shared<TransformMatrixNode>(mat,children,inst);
-  }
-//  if (type == COLOR)
-  {
-	  Value v = c.lookup_variable("c");
-	  Float4 color;
-	  if (v.type == Value::VECTOR) {
-		  for (int i = 0; i < 4; i++)
-			  color[i] = i < v.vec.size() ? v.vec[i]->num : 1.0;
-	  }
-	  return make_shared<TransformColorNode>(color,children,inst);
-  }
 }
 
 #ifdef ENABLE_CGAL
@@ -384,14 +273,3 @@ QString TransformNode::dump(QString indent) const
 	}
 	return dump_cache;
 }
-
-void register_builtin_transform()
-{
-	builtin_modules["scale"] = new TransformModule(SCALE);
-	builtin_modules["rotate"] = new TransformModule(ROTATE);
-	builtin_modules["mirror"] = new TransformModule(MIRROR);
-	builtin_modules["translate"] = new TransformModule(TRANSLATE);
-	builtin_modules["multmatrix"] = new TransformModule(MULTMATRIX);
-	builtin_modules["color"] = new TransformModule(COLOR);
-}
-

@@ -14,16 +14,6 @@ win32 {
   isEmpty(VERSION) VERSION = $$system(date "+%Y.%m.%d")
 }
 
-#configure lex / yacc
-win32 {
-  include(flex.pri)
-  include(bison.pri)
-  FLEXSOURCES = src/lexer.l
-  BISONSOURCES = src/parser.y
-} else {
-  LEXSOURCES += src/lexer.l
-  YACCSOURCES += src/parser.y
-}
 
 #configure additional directories
 win32 {
@@ -124,27 +114,21 @@ HEADERS += src/CGAL_renderer.h \
            src/GLView.h \
            src/MainWindow.h \
            src/Preferences.h \
-           src/builtin.h \
            src/cgal.h \
-           src/context.h \
            src/csgterm.h \
            src/csgops.h \
            src/dxfdata.h \
            src/dxfdim.h \
            src/dxftess.h \
            src/export.h \
-           src/expression.h \
-           src/function.h \
            src/grid.h \
            src/highlighter.h \
            src/matrix.h \
-           src/module.h \
            src/node.h \
            src/openscad.h \
            src/polyset.h \
            src/printutils.h \
            src/transform.h \
-           src/value.h \
            src/primitives.h \
            src/progress.h \
            src/editor.h \
@@ -164,13 +148,8 @@ SOURCES += src/openscad.cc \
            src/mainwin.cc \
            src/glview.cc \
            src/export.cc \
-           src/value.cc \
-           src/expr.cc \
-           src/func.cc \
 	   src/matrix.cc \
-           src/module.cc \
            src/node.cc \
-           src/context.cc \
            src/csgterm.cc \
            src/polyset.cc \
            src/csgops.cc \
@@ -182,7 +161,6 @@ SOURCES += src/openscad.cc \
            src/cgaladv_minkowski3.cc \
            src/cgaladv_minkowski2.cc \
            src/surface.cc \
-           src/control.cc \
            src/render.cc \
            src/import.cc \
            src/dxfdata.cc \

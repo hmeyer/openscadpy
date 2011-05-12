@@ -26,10 +26,7 @@
 
 
 #include "dxfrotextrude.h"
-#include "module.h"
-#include "context.h"
 #include "printutils.h"
-#include "builtin.h"
 #include "polyset.h"
 #include "dxfdata.h"
 #include "progress.h"
@@ -41,63 +38,6 @@
 #include <QDateTime>
 #include <QFileInfo>
 #include <boost/make_shared.hpp>
-
-class DxfRotateExtrudeModule : public AbstractModule
-{
-public:
-	DxfRotateExtrudeModule() { }
-	virtual AbstractNode::Pointer evaluate(const Context *ctx, const ModuleInstantiation *inst) const;
-};
-
-AbstractNode::Pointer DxfRotateExtrudeModule::evaluate(const Context *ctx, const ModuleInstantiation *inst) const
-{
-  AbstractNode::NodeList children;
-  foreach (ModuleInstantiation *v, inst->children) {
-	  AbstractNode::Pointer n(v->evaluate(inst->ctx));
-	  if (n) children.append(n);
-  }
-  QVector<QString> argnames = QVector<QString>() << "file" << "layer" << "origin" << "scale";
-  QVector<Expression*> argexpr;
-
-  Context c(ctx);
-  c.args(argnames, argexpr, inst->argnames, inst->argvalues);
-
-  Accuracy acc;
-  acc.fn = c.lookup_variable("$fn").num;
-  acc.fs = c.lookup_variable("$fs").num;
-  acc.fa = c.lookup_variable("$fa").num;
-
-  Value vfile = c.lookup_variable("file");
-  Value vlayer = c.lookup_variable("layer", true);
-  Value vconvexity = c.lookup_variable("convexity", true);
-  Value vorigin = c.lookup_variable("origin", true);
-  Value vscale = c.lookup_variable("scale", true);  
-
-  int convexity = (int)vconvexity.num;
-
-  if (convexity <= 0)
-	  convexity = 1;
-  
-  QString file;
-  if(!vfile.text.isNull())
-    file = c.get_absolute_path(vfile.text);
-  else
-    file = vfile.text;
-  double ox=0,oy=0;
-  vorigin.getv2(ox, oy);
-  
-  double scale = vscale.num;
-  if (scale <= 0.0)
-    scale = 1.0;
-
-  return boost::make_shared<DxfRotateExtrudeNode>(children, file, vlayer.text, ox, oy, scale, convexity, acc, inst);	
-}
-
-void register_builtin_dxf_rotate_extrude()
-{
-	builtin_modules["dxf_rotate_extrude"] = new DxfRotateExtrudeModule();
-	builtin_modules["rotate_extrude"] = new DxfRotateExtrudeModule();
-}
 
 PolySet *DxfRotateExtrudeNode::render_polyset(render_mode_e) const
 {

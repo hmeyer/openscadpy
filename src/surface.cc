@@ -25,10 +25,7 @@
  */
 
 #include "surface.h"
-#include "module.h"
-#include "context.h"
 #include "polyset.h"
-#include "builtin.h"
 #include "dxftess.h"
 #include "printutils.h"
 #include "openscad.h" // handle_dep()
@@ -36,41 +33,6 @@
 using boost::make_shared;
 
 #include <QFile>
-
-class SurfaceModule : public AbstractModule
-{
-public:
-	SurfaceModule() { }
-	virtual AbstractNode::Pointer evaluate(const Context *ctx, const ModuleInstantiation *inst) const;
-};
-
-
-AbstractNode::Pointer SurfaceModule::evaluate(const Context *ctx, const ModuleInstantiation *inst) const
-{
-	QVector<QString> argnames = QVector<QString>() << "file" << "center" << "convexity";
-	QVector<Expression*> argexpr;
-	Context c(ctx);
-	c.args(argnames, argexpr, inst->argnames, inst->argvalues);
-	QString filename = c.get_absolute_path(c.lookup_variable("file").text);
-
-	Value vcenter = c.lookup_variable("center", true);
-	bool center = false;
-	if (vcenter.type == Value::BOOL) {
-		center = vcenter.b;
-	}
-
-	Value vconvexity = c.lookup_variable("convexity", true);
-	int convexity = 1;
-	if (vconvexity.type == Value::NUMBER) {
-		convexity = (int)vconvexity.num;
-	}
-	return make_shared<SurfaceNode>(filename, convexity, center, inst);
-}
-
-void register_builtin_surface()
-{
-	builtin_modules["surface"] = new SurfaceModule();
-}
 
 PolySet *SurfaceNode::render_polyset(render_mode_e) const
 {

@@ -25,12 +25,8 @@
  */
 
 #include "dxfdim.h"
-#include "value.h"
-#include "function.h"
 #include "dxfdata.h"
-#include "builtin.h"
 #include "printutils.h"
-#include "context.h"
 
 #include <cmath>
 #include <QHash>
@@ -41,30 +37,6 @@ using namespace std;
 
 QHash<QString,double> dxf_dim_cache;
 QHash<QString,Float2> dxf_cross_cache;
-
-Value builtin_dxf_dim(const Context *ctx, const QVector<QString> &argnames, const QVector<Value> &args)
-{
-	QString filename;
-	QString layername;
-	QString name;
-	double xorigin = 0;
-	double yorigin = 0;
-	double scale = 1;
-
-	for (int i = 0; i < argnames.count() && i < args.count(); i++) {
-		if (argnames[i] == "file")
-			filename = ctx->get_absolute_path(args[i].text);
-		if (argnames[i] == "layer")
-			layername = args[i].text;
-		if (argnames[i] == "origin")
-			args[i].getv2(xorigin, yorigin);
-		if (argnames[i] == "scale")
-			args[i].getnum(scale);
-		if (argnames[i] == "name")
-			name = args[i].text;
-	}
-	return dxf_dim(filename, layername, name, xorigin, yorigin, scale);
-}
 
 double dxf_dim(const QString &filename, const QString &layername, const QString &name, double xorigin, double yorigin, double scale) {
 	QFileInfo fileInfo(filename);
@@ -127,31 +99,6 @@ double dxf_dim(const QString &filename, const QString &layername, const QString 
 	return -1;
 }
 
-Value builtin_dxf_cross(const Context *ctx, const QVector<QString> &argnames, const QVector<Value> &args)
-{
-	QString filename;
-	QString layername;
-	double xorigin = 0;
-	double yorigin = 0;
-	double scale = 1;
-
-	for (int i = 0; i < argnames.count() && i < args.count(); i++) {
-		if (argnames[i] == "file")
-			filename = ctx->get_absolute_path(args[i].text);
-		if (argnames[i] == "layer")
-			layername = args[i].text;
-		if (argnames[i] == "origin")
-			args[i].getv2(xorigin, yorigin);
-		if (argnames[i] == "scale")
-			args[i].getnum(scale);
-	}
-	Float2 ret = dxf_cross(filename, layername, xorigin, yorigin, scale);
-	Value vret;
-	vret.type = Value::VECTOR;
-	vret.vec.append(new Value(ret[0]));
-	vret.vec.append(new Value(ret[1]));
-	return vret;
-}
 	
 Float2 dxf_cross(const QString &filename, const QString &layername, double xorigin, double yorigin, double scale) {
 	QFileInfo fileInfo(filename);
@@ -194,11 +141,5 @@ Float2 dxf_cross(const QString &filename, const QString &layername, double xorig
 	PRINTA("WARNING: Can't find cross in `%1', layer `%2'!", filename, layername);
 	Float2 inv={{-1,-1}};
 	return inv;
-}
-
-void initialize_builtin_dxf_dim()
-{
-	builtin_functions["dxf_dim"] = new BuiltinFunction(&builtin_dxf_dim);
-	builtin_functions["dxf_cross"] = new BuiltinFunction(&builtin_dxf_cross);
 }
 

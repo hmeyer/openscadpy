@@ -43,7 +43,7 @@ void Highlighter::highlightBlock(const QString &text)
 		n = 0;
 	int k = n + text.size() + 1;
 	setCurrentBlockState(k);
-	if (parser_error_pos >= n && parser_error_pos < k) {
+/*	if (parser_error_pos >= n && parser_error_pos < k) {
 		QTextCharFormat style;
 		style.setBackground(Qt::red);
 		setFormat(0, text.size(), style);
@@ -53,5 +53,6 @@ void Highlighter::highlightBlock(const QString &text)
 		setFormat(parser_error_pos - n, 1, style);
 #endif
 	}
+*/	
 }
 

@@ -39,11 +39,8 @@
 
 #include "accuracy.h"
 
-extern class AbstractModule *parse(const char *text, const char *path, int debug);
-
 #include <QString>
 extern QString commandline_commands;
-extern int parser_error_pos;
 
 extern void handle_dep(QString filename);
 

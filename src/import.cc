@@ -26,8 +26,6 @@
 
 #include "import.h"
 #include "polyset.h"
-#include "context.h"
-#include "builtin.h"
 #include "dxfdata.h"
 #include "dxftess.h"
 #include "printutils.h"
@@ -44,78 +42,6 @@ enum import_type_e {
        TYPE_DXF
 };
 
-class ImportModule : public AbstractModule
-{
-public:
-	import_type_e type;
-	ImportModule(import_type_e type) : type(type) { }
-	virtual AbstractNode::Pointer evaluate(const Context *ctx, const ModuleInstantiation *inst) const;
-};
-
-
-
-AbstractNode::Pointer ImportModule::evaluate(const Context *ctx, const ModuleInstantiation *inst) const
-{
-	QVector<QString> argnames;
-	if (type == TYPE_DXF) {
-		argnames = QVector<QString>() << "file" << "layer" << "convexity" << "origin" << "scale";
-	} else {
-		argnames = QVector<QString>() << "file" << "convexity";
-	}
-	QVector<Expression*> argexpr;
-
-	// Map old argnames to new argnames for compatibility
-	QVector<QString> inst_argnames = inst->argnames;
-	for (int i=0; i<inst_argnames.size(); i++) {
-		if (inst_argnames[i] == "filename")
-			inst_argnames[i] = "file";
-		if (inst_argnames[i] == "layername")
-			inst_argnames[i] = "layer";
-	}
-
-	Context c(ctx);
-	c.args(argnames, argexpr, inst_argnames, inst->argvalues);
-	
-	Accuracy acc;
-
-	acc.fn = c.lookup_variable("$fn").num;
-	acc.fs = c.lookup_variable("$fs").num;
-	acc.fa = c.lookup_variable("$fa").num;
-
-	QString filename = c.get_absolute_path(c.lookup_variable("file").text);
-	QString layername = c.lookup_variable("layer", true).text;
-	int convexity = c.lookup_variable("convexity", true).num;
-
-	if (convexity <= 0)
-		convexity = 1;
-
-	Value origin = c.lookup_variable("origin", true);
-	double origin_x = 0, origin_y = 0;
-	origin.getv2(origin_x, origin_y);
-
-	double scale = c.lookup_variable("scale", true).num;
-	if (scale <= 0)
-		scale = 1;
-	
-	ImportNode::Pointer p;
-	switch(type) {
-	  case TYPE_STL: 
-	    p = boost::make_shared<ImportSTLNode>(filename, convexity, inst);break;
-	  case TYPE_DXF: 
-	    p = boost::make_shared<ImportDXFNode>(filename, layername, origin_x, origin_y, convexity, scale, acc, inst);break;
-	  default: /*case TYPE_OFF:*/ 
-	    p = boost::make_shared<ImportOFFNode>(filename, convexity, inst);break;
-	}
-	std::cerr << p->dump("").toStdString() << std::endl;
-	return p;
-}
-
-void register_builtin_import()
-{
-	builtin_modules["import_stl"] = new ImportModule(TYPE_STL);
-	builtin_modules["import_off"] = new ImportModule(TYPE_OFF);
-	builtin_modules["import_dxf"] = new ImportModule(TYPE_DXF);
-}
 
 PolySet *ImportSTLNode::render_polyset(render_mode_e) const {
   PolySet *p = new PolySet();

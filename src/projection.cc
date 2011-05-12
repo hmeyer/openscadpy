@@ -25,10 +25,7 @@
  */
 
 #include "projection.h"
-#include "module.h"
-#include "context.h"
 #include "printutils.h"
-#include "builtin.h"
 #include "dxfdata.h"
 #include "dxftess.h"
 #include "polyset.h"
@@ -46,43 +43,6 @@
 #include <QTime>
 #include <QProgressDialog>
 #include <boost/make_shared.hpp>
-
-class ProjectionModule : public AbstractModule
-{
-public:
-	ProjectionModule() { }
-	virtual AbstractNode::Pointer evaluate(const Context *ctx, const ModuleInstantiation *inst) const;
-};
-
-AbstractNode::Pointer ProjectionModule::evaluate(const Context *ctx, const ModuleInstantiation *inst) const {
-  AbstractNode::NodeList children;
-  foreach (ModuleInstantiation *v, inst->children) {
-	  AbstractNode::Pointer n(v->evaluate(inst->ctx));
-	  if (n) children.append(n);
-  }
-
-  QVector<QString> argnames = QVector<QString>() << "cut";
-  QVector<Expression*> argexpr;
-
-  Context c(ctx);
-  c.args(argnames, argexpr, inst->argnames, inst->argvalues);
-
-  Value vconvexity = c.lookup_variable("convexity", true);
-  Value vcut = c.lookup_variable("cut", true);
-
-  int convexity = (int)vconvexity.num;
-  bool cut = true;
-
-  if (vcut.type == Value::BOOL)
-	  cut = vcut.b;
-
-  return boost::make_shared<ProjectionNode>(children, cut, convexity, inst);
-}
-
-void register_builtin_projection()
-{
-	builtin_modules["projection"] = new ProjectionModule();
-}
 
 #ifdef ENABLE_CGAL
 

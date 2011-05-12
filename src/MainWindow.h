@@ -4,8 +4,6 @@
 #include <QMainWindow>
 #include "ui_MainWindow.h"
 #include "openscad.h"
-#include "context.h"
-#include "module.h"
 #include "polyset.h"
 #include <QPointer>
 #include <boost/shared_ptr.hpp>
@@ -31,9 +29,6 @@ public:
 	QTimer *autoReloadTimer;
 	QString autoReloadInfo;
 
-	Context root_ctx;
-	AbstractModule *root_module;      // Result of parsing
-	ModuleInstantiation root_inst;    // Top level instance
 	AbstractNodePtr absolute_root_node; // Result of tree evaluation
 	AbstractNodePtr root_node;          // Root if the root modifier (!) is used
 

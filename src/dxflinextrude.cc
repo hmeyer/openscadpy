@@ -25,10 +25,7 @@
  */
 
 #include "dxflinextrude.h"
-#include "module.h"
-#include "context.h"
 #include "printutils.h"
-#include "builtin.h"
 #include "dxfdata.h"
 #include "dxftess.h"
 #include "polyset.h"
@@ -50,84 +47,6 @@ DxfLinearExtrudeNode::DxfLinearExtrudeNode(const AbstractNode::NodeList &childre
   center(center), has_twist(twist!=0.0) {
 }
 
-
-class DxfLinearExtrudeModule : public AbstractModule
-{
-public:
-	DxfLinearExtrudeModule() { }
-	virtual AbstractNode::Pointer evaluate(const Context *ctx, const ModuleInstantiation *inst) const;
-};
-
-AbstractNode::Pointer DxfLinearExtrudeModule::evaluate(const Context *ctx, const ModuleInstantiation *inst) const {
-  AbstractNode::NodeList children;
-  foreach (ModuleInstantiation *v, inst->children) {
-	  AbstractNode::Pointer n(v->evaluate(inst->ctx));
-	  if (n) children.append(n);
-  }
-  QVector<QString> argnames = QVector<QString>() << "file" << "layer" << "height" << "origin" << "scale" << "center" << "twist" << "slices";
-  QVector<Expression*> argexpr;
-
-  Context c(ctx);
-  c.args(argnames, argexpr, inst->argnames, inst->argvalues);
-
-  Accuracy acc;
-  acc.fn = c.lookup_variable("$fn").num;
-  acc.fs = c.lookup_variable("$fs").num;
-  acc.fa = c.lookup_variable("$fa").num;
-
-  Value vfile = c.lookup_variable("file");
-  Value vlayer = c.lookup_variable("layer", true);
-  Value vheight = c.lookup_variable("height", true);
-  Value vconvexity = c.lookup_variable("convexity", true);
-  Value vorigin = c.lookup_variable("origin", true);
-  Value vscale = c.lookup_variable("scale", true);  
-  Value vcenter = c.lookup_variable("center", true);
-  Value vtwist = c.lookup_variable("twist", true);
-  Value vslices = c.lookup_variable("slices", true);
-
-  double height = vheight.num;
-  int convexity = (int)vconvexity.num;
-  bool center = false;
-  double twist = 0.0;
-  int slices = -1;
-
-  if (vcenter.type == Value::BOOL)
-	  center = vcenter.b;
-
-  if (height <= 0)
-	  height = 100;
-
-  if (convexity <= 0)
-	  convexity = 1;
-
-  if (vtwist.type == Value::NUMBER) {
-	  twist = vtwist.num;
-	  if (vslices.type == Value::NUMBER) {
-		  slices = (int)vslices.num;
-	  }
-  }
-  
-  QString file;
-  if(!vfile.text.isNull())
-    file = c.get_absolute_path(vfile.text);
-  else
-    file = vfile.text;
-  double ox=0,oy=0;
-  vorigin.getv2(ox, oy);
-  
-  double scale = vscale.num;
-  if (scale <= 0.0)
-    scale = 1.0;
-
-  return DxfLinearExtrudeNode::Pointer(new DxfLinearExtrudeNode(children, file, vlayer.text, height, twist, ox, oy, scale, convexity, slices, center, acc, inst));
-}
-
-
-void register_builtin_dxf_linear_extrude()
-{
-	builtin_modules["dxf_linear_extrude"] = new DxfLinearExtrudeModule();
-	builtin_modules["linear_extrude"] = new DxfLinearExtrudeModule();
-}
 
 static void add_slice(PolySet *ps, DxfData::Path *pt, double rot1, double rot2, double h1, double h2)
 {

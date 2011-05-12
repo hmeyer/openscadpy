@@ -2,7 +2,6 @@
 #define DXFDIM_H_
 
 #include <QHash>
-#include "value.h"
 #include "matrix.h"
 
 extern QHash<QString,Float2> dxf_cross_cache;

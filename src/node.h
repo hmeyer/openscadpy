@@ -31,7 +31,6 @@ public:
 	  inline Props():root(false),highlight(false),background(false) {}
 	  inline Props(bool root, bool highlight, bool background)
 	    :root(root),highlight(highlight),background(background) {}
-	  Props(const class ModuleInstantiation *mi);
 	};
 	typedef shared_ptr<AbstractNode> Pointer;
 	typedef QVector<Pointer> NodeList;

@@ -25,9 +25,7 @@
  */
 
 
-#include "module.h"
 #include "csgops.h"
-#include "builtin.h"
 #include "printutils.h"
 #ifdef ENABLE_CGAL
 #  include <CGAL/assertions_behaviour.h>
@@ -37,26 +35,6 @@
 #include <boost/make_shared.hpp>
 using boost::make_shared;
 
-
-class CsgModule : public AbstractModule
-{
-public:
-	csg_type_e type;
-	CsgModule(csg_type_e type) : type(type) { }
-	virtual AbstractNode::Pointer evaluate(const Context *ctx, const ModuleInstantiation *inst) const;
-};
-
-AbstractNode::Pointer CsgModule::evaluate(const Context*, const ModuleInstantiation *inst) const
-{
-	AbstractNode::NodeList children;
-	foreach (ModuleInstantiation *v, inst->children) {
-		AbstractNode::Pointer n = v->evaluate(inst->ctx);
-		if (n) children.append(n);
-	}
-	AbstractNode::Props p(inst);
-	CsgNode::Pointer node(make_shared<CsgNode>(type, children, p));
-	return node;
-}
 
 #ifdef ENABLE_CGAL
 
@@ -157,12 +135,5 @@ QString CsgNode::dump(QString indent) const
 		((AbstractNode*)this)->dump_cache = text + indent + "}\n";
 	}
 	return dump_cache;
-}
-
-void register_builtin_csgops()
-{
-	builtin_modules["union"] = new CsgModule(CSG_TYPE_UNION);
-	builtin_modules["difference"] = new CsgModule(CSG_TYPE_DIFFERENCE);
-	builtin_modules["intersection"] = new CsgModule(CSG_TYPE_INTERSECTION);
 }
 

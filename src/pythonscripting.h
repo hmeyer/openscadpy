@@ -10,7 +10,7 @@ class AbstractNode;
 
 class PythonScript {
 public:
-  PythonScript();
+  PythonScript(double time=0.0);
   ~PythonScript();
   boost::shared_ptr<AbstractNode> evaluate(const std::string &code, const std::string &path);
   std::string error(void);

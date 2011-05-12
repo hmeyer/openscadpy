@@ -36,12 +36,9 @@
 #include "dxfdata.h"
 #include "dxfdim.h"
 #include "export.h"
-#include "builtin.h"
 #include "dxftess.h"
 #include "progress.h"
-#ifdef ENABLE_PYTHON
 #include "pythonscripting.h"
-#endif
 #ifdef ENABLE_OPENCSG
 #include "render-opencsg.h"
 #endif
@@ -127,22 +124,6 @@ MainWindow::MainWindow(const QString &filename)
 {
 	setupUi(this);
 
-	root_ctx.functions_p = &builtin_functions;
-	root_ctx.modules_p = &builtin_modules;
-	root_ctx.set_variable("$fn", Value(0.0));
-	root_ctx.set_variable("$fs", Value(1.0));
-	root_ctx.set_variable("$fa", Value(12.0));
-	root_ctx.set_variable("$t", Value(0.0));
-
-	Value zero3;
-	zero3.type = Value::VECTOR;
-	zero3.vec.append(new Value(0.0));
-	zero3.vec.append(new Value(0.0));
-	zero3.vec.append(new Value(0.0));
-	root_ctx.set_variable("$vpt", zero3);
-	root_ctx.set_variable("$vpr", zero3);
-
-	root_module = NULL;
 	root_raw_term = NULL;
 	root_norm_term = NULL;
 	root_chain = NULL;
@@ -360,8 +341,6 @@ MainWindow::MainWindow(const QString &filename)
 
 MainWindow::~MainWindow()
 {
-	if (root_module)
-		delete root_module;
 #ifdef ENABLE_CGAL
 	if (this->root_N)
 		delete this->root_N;
@@ -440,7 +419,6 @@ MainWindow::setFileName(const QString &filename)
 {
 	if (filename.isEmpty()) {
 		this->fileName.clear();
-		this->root_ctx.document_path = currentdir;
 		setWindowTitle("OpenSCAD - New Document[*]");
 	}
 	else {
@@ -462,8 +440,6 @@ MainWindow::setFileName(const QString &filename)
 		} else {
 			this->fileName = fileinfo.fileName();
 		}
-		
-		this->root_ctx.document_path = fileinfo.dir().absolutePath();
 		QDir::setCurrent(fileinfo.dir().absolutePath());
 	}
 
@@ -541,10 +517,6 @@ void MainWindow::compile(bool procevents)
 
 
 	// Remove previous CSG tree
-	if (root_module) {
-		delete root_module;
-		root_module = NULL;
-	}
 	absolute_root_node.reset();
 	if (root_raw_term) {
 		root_raw_term->unlink();
@@ -580,66 +552,13 @@ void MainWindow::compile(bool procevents)
 	root_node.reset();
 	enableOpenCSG = false;
 
-	// Initialize special variables
-	root_ctx.set_variable("$t", Value(e_tval->text().toDouble()));
-
-	Value vpt;
-	vpt.type = Value::VECTOR;
-	vpt.vec.append(new Value(-screen->object_trans_x));
-	vpt.vec.append(new Value(-screen->object_trans_y));
-	vpt.vec.append(new Value(-screen->object_trans_z));
-	root_ctx.set_variable("$vpt", vpt);
-
-	Value vpr;
-	vpr.type = Value::VECTOR;
-	vpr.vec.append(new Value(fmodf(360 - screen->object_rot_x + 90, 360)));
-	vpr.vec.append(new Value(fmodf(360 - screen->object_rot_y, 360)));
-	vpr.vec.append(new Value(fmodf(360 - screen->object_rot_z, 360)));
-	root_ctx.set_variable("$vpr", vpr);
-
 	// Parse
 	last_compiled_doc = editor->toPlainText();
-#ifdef ENABLE_PYTHON
-	PythonScript pyvm;
+	PythonScript pyvm(e_tval->text().toDouble());
 	root_node = absolute_root_node = pyvm.evaluate((last_compiled_doc + "\n" + commandline_commands).toStdString(), this->fileName.isEmpty() ? "" : QFileInfo(this->fileName).absolutePath().toStdString());
 	if (!absolute_root_node) {
 	  PRINT(pyvm.error().c_str());
 	}
-#else	
-	root_module = parse((last_compiled_doc + "\n" + commandline_commands).toAscii().data(), this->fileName.isEmpty() ? "" : QFileInfo(this->fileName).absolutePath().toLocal8Bit(), false);
-
-	// Error highlighting
-	if (highlighter) {
-		delete highlighter;
-		highlighter = NULL;
-	}
-	if (parser_error_pos >= 0) {
-		highlighter = new Highlighter(editor->document());
-	}
-
-	if (!root_module) {
-		if (!animate_panel->isVisible()) {
-#ifdef _QCODE_EDIT_
-			QDocumentCursor cursor = editor->cursor();
-			cursor.setPosition(parser_error_pos);
-#else
-			QTextCursor cursor = editor->textCursor();
-			cursor.setPosition(parser_error_pos);
-			editor->setTextCursor(cursor);
-#endif
-		}
-		goto fail;
-	}
-
-	// Evaluate CSG tree
-	PRINT("Compiling design (CSG Tree generation)...");
-	if (procevents)
-		QApplication::processEvents();
-
-	AbstractNode::resetIndexCounter();
-	root_inst = ModuleInstantiation();
-	absolute_root_node = root_module->evaluate(&root_ctx, &root_inst);
-#endif	
 
 	if (!absolute_root_node)
 		goto fail;
@@ -656,8 +575,8 @@ void MainWindow::compile(bool procevents)
 			QApplication::processEvents();
 	} else {
 fail:
-		if (parser_error_pos < 0) {
-			PRINT("ERROR: Compilation failed! (no top level object found)");
+/*		if (parser_error_pos < 0) {
+		  PRINT("ERROR: Compilation failed! (no top level object found)");
 		} else {
 			int line = 1;
 			QByteArray pb = last_compiled_doc.toAscii();
@@ -672,7 +591,7 @@ fail:
 			}
 			PRINTF("ERROR: Compilation failed! (parser error in line %d)", line);
 		}
-		if (procevents)
+*/		if (procevents)
 			QApplication::processEvents();
 	}
 }
@@ -1088,13 +1007,7 @@ void MainWindow::actionRenderCGAL()
 	console->clear();
 
 	compile(true);
-	if (
-#ifndef ENABLE_PYTHON
-	  !root_module || 
-#endif
-	  !root_node)
-
-		return;
+	if (!root_node) return;
 
 	if (this->root_N) {
 		delete this->root_N;
@@ -1209,11 +1122,7 @@ void MainWindow::actionDisplayAST()
 	e->setTabStopWidth(30);
 	e->setWindowTitle("AST Dump");
 	e->setReadOnly(true);
-	if (root_module) {
-		e->setPlainText(root_module->dump("", ""));
-	} else {
-		e->setPlainText("No AST to dump. Please try compiling first...");
-	}
+	e->setPlainText("No AST to dump, as this is Python now.");
 	e->show();
 	e->resize(600, 400);
 	clearCurrentOutput();

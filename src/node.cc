@@ -26,17 +26,12 @@
 
 #include "printutils.h"
 #include "node.h"
-#include "module.h"
 #include "csgterm.h"
 #include "progress.h"
 #include "polyset.h"
 #include <QRegExp>
 
 int AbstractNode::idx_counter;
-
-AbstractNode::Props::Props(const ModuleInstantiation *mi)
-  :root(mi->tag_root), highlight(mi->tag_highlight), background(mi->tag_background) {}
-
 
 AbstractNode::AbstractNode(const Props &p):props(p)
 {

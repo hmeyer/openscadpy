@@ -27,7 +27,7 @@ class PyContext {
   static const std::string nsresult;
   static const std::string nsopenscad;
   PyContext() {};
-    void init(object &openscad_module){
+    void init(object &openscad_module, double time=0.0){
       path.clear();
       main_module = object((handle<>(borrowed(PyImport_AddModule("__main__")))));
       main_namespace = main_module.attr("__dict__");
@@ -36,7 +36,8 @@ class PyContext {
       if (openscad_namespace.contains(nsresult)) openscad_namespace[nsresult].del();
       openscad_namespace["fn"] = acc.fn;
       openscad_namespace["fs"] = acc.fs;
-      openscad_namespace["fa"] = acc.fa;      
+      openscad_namespace["fa"] = acc.fa;     
+      openscad_namespace["t"] = time;     
     }
     object getResult() {
       if (openscad_namespace.contains(nsresult))
@@ -483,11 +484,11 @@ BOOST_PYTHON_MODULE(openscad) {
   def("DxfCross", pyDxfCross, pyDxfCross_overloads());
 }
 
-PythonScript::PythonScript() {
+PythonScript::PythonScript(double time) {
   PyImport_AppendInittab(const_cast<char*>(PyContext::nsopenscad.c_str()), &initopenscad );
   Py_Initialize();
   object openscad_module( (handle<>(PyImport_ImportModule(PyContext::nsopenscad.c_str()))) );
-  ctx.init(openscad_module);
+  ctx.init(openscad_module, time);
   //ImportOFFNode
   //ProjectionNode
   //CgaladvMinkowskiNode

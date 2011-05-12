@@ -27,11 +27,7 @@
 #include "openscad.h"
 #include "MainWindow.h"
 #include "node.h"
-#include "module.h"
-#include "context.h"
-#include "value.h"
 #include "export.h"
-#include "builtin.h"
 
 #include <string>
 #include <vector>
@@ -40,9 +36,7 @@
 #include "cgal.h"
 #include <CGAL/assertions_behaviour.h>
 #endif
-#ifdef ENABLE_PYTHON
 #include "pythonscripting.h"
-#endif
 
 #include <QApplication>
 #include <QFile>
@@ -109,8 +103,6 @@ int main(int argc, char **argv)
 	// (which we don't catch). This gives us stack traces without rerunning in gdb.
 	CGAL::set_error_behaviour(CGAL::ABORT);
 #endif
-	initialize_builtin_functions();
-	initialize_builtin_modules();
 
 #ifdef Q_WS_X11
 	// see <http://qt.nokia.com/doc/4.5/qapplication.html#QApplication-2>:
@@ -258,27 +250,6 @@ int main(int argc, char **argv)
 			help(argv[0]);
 
 #ifdef ENABLE_CGAL
-		Context root_ctx;
-		root_ctx.functions_p = &builtin_functions;
-		root_ctx.modules_p = &builtin_modules;
-		root_ctx.set_variable("$fn", Value(0.0));
-		root_ctx.set_variable("$fs", Value(1.0));
-		root_ctx.set_variable("$fa", Value(12.0));
-		root_ctx.set_variable("$t", Value(0.0));
-
-		Value zero3;
-		zero3.type = Value::VECTOR;
-		zero3.vec.append(new Value(0.0));
-		zero3.vec.append(new Value(0.0));
-		zero3.vec.append(new Value(0.0));
-		root_ctx.set_variable("$vpt", zero3);
-		root_ctx.set_variable("$vpr", zero3);
-
-
-#ifndef ENABLE_PYTHON
-		AbstractModule *root_module;
-		ModuleInstantiation root_inst;
-#endif		
 		AbstractNode::Pointer root_node;
 
 		QFileInfo fileInfo(filename);
@@ -299,22 +270,12 @@ int main(int argc, char **argv)
 			}
 			fclose(fp);
 			QDir::setCurrent(fileInfo.absolutePath());
-#ifdef ENABLE_PYTHON
-				PythonScript pyvm;
-				root_node = pyvm.evaluate((text+commandline_commands).toStdString(), fileInfo.absolutePath().toStdString());
-				if (!root_node) {
-				  fprintf(stderr, "Python error:%s", pyvm.error().c_str());
-				}
-#else			  
-			root_module = parse((text+commandline_commands).toAscii().data(), fileInfo.absolutePath().toLocal8Bit(), false);
-#endif
-
+			PythonScript pyvm;
+			root_node = pyvm.evaluate((text+commandline_commands).toStdString(), fileInfo.absolutePath().toStdString());
+			if (!root_node) {
+			  fprintf(stderr, "Python error:%s", pyvm.error().c_str());
+			}
 		}
-
-#ifndef ENABLE_PYTHON
-		root_node = root_module->evaluate(&root_ctx, &root_inst);
-#endif
-
 		CGAL_Nef_polyhedron *root_N;
 		root_N = new CGAL_Nef_polyhedron(root_node->render_cgal_nef_polyhedron());
 
@@ -386,10 +347,6 @@ int main(int argc, char **argv)
 		fprintf(stderr, "Requested GUI mode but can't open display!\n");
 		exit(1);
 	}
-
-	destroy_builtin_functions();
-	destroy_builtin_modules();
-
 	return rc;
 }
 

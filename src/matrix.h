@@ -5,7 +5,6 @@
 #include <boost/shared_ptr.hpp>
 #include <boost/foreach.hpp>
 #include <vector>
-#include "value.h"
 
 typedef double FloatType;
 typedef boost::array< FloatType, 20 > Float20;
@@ -21,10 +20,6 @@ typedef std::vector<unsigned int> VecPoints;
 typedef std::vector<VecPoints> VecPaths;
 typedef std::vector<Float2> Vec2D;
 typedef std::vector<Float3> Vec3D;
-
-void value2points2d(const Value &v, Vec2D &points);
-void value2paths(const Value &v, VecPaths &paths);
-void value2points3d(const Value &v, Vec3D &points);
 
 template<typename T>
 std::ostream& operator<<(std::ostream &out, const std::vector<T> &rhs){
