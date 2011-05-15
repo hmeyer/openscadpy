@@ -13,6 +13,16 @@
 #include <boost/python.hpp>
 #include <boost/make_shared.hpp>
 
+#include <boost/parameter/keyword.hpp>
+#include <boost/parameter/preprocessor.hpp>
+#include <boost/parameter/python.hpp>
+#include <boost/python.hpp>
+#include <boost/mpl/vector.hpp>
+
+BOOST_PARAMETER_KEYWORD(tag, dim)
+BOOST_PARAMETER_KEYWORD(tag, length)
+BOOST_PARAMETER_KEYWORD(tag, center)
+
 using namespace boost::python;
 using boost::make_shared;
 
@@ -184,15 +194,28 @@ public:
   }
 };
 
-class PyCubeNode: public PyAbstractNode {
+class PyCubeNodeBase: public PyAbstractNode {
 public:
-  PyCubeNode(const list &dim, bool center=false) {
-    node = make_shared<CubeNode>(list2StdArray<Float3>(dim), center);  
-  }
-  PyCubeNode(double l, bool center=false) {
-    Float3 dim = {{ l,l,l }};
-    node = make_shared<CubeNode>(dim, center);  
-  }  
+    template <class ArgumentPack>
+    PyCubeNodeBase(ArgumentPack const& args) {
+	list empty_list = list();
+	const list &ldim = args[dim|empty_list];
+	if (len(ldim) > 0)
+	  node = make_shared<CubeNode>(list2StdArray<Float3>(ldim), args[center|false]);
+	else {
+	  double l = args[length|.0];
+	  Float3 dim3 = {{ l,l,l }};
+	  node = make_shared<CubeNode>(dim3, args[center|false]);
+	}
+    }
+};
+  
+class PyCubeNode: public PyCubeNodeBase {
+public:
+  BOOST_PARAMETER_CONSTRUCTOR(PyCubeNode, (PyCubeNodeBase), tag,
+      (optional (dim, (*)))
+      (optional (center, (bool)))
+  )
 };
 
 class PySphereNode: public PyAbstractNode, public PyNodeAccuracy {
@@ -431,6 +454,8 @@ BOOST_PYTHON_FUNCTION_OVERLOADS(pyDxfCross_overloads, pyDxfCross, 1, 5)
 
 
 BOOST_PYTHON_MODULE(openscad) {
+  namespace py = boost::parameter::python;
+  namespace mpl = boost::mpl;
   class_<PyAbstractNode>("AbstractNode")
     .add_property("highlight", &PyAbstractNode::getHighlight, &PyAbstractNode::setHighlight)
     .add_property("background", &PyAbstractNode::getBackground, &PyAbstractNode::setBackground);    
@@ -449,7 +474,10 @@ BOOST_PYTHON_MODULE(openscad) {
     .def(init<double, PyAbstractNode>()).def(init<double, list>());
   class_<PyMatrixNode, bases<PyAbstractNode> >("Matrix", init<list, PyAbstractNode>()).def(init<list, list>());
   class_<PyColorNode, bases<PyAbstractNode> >("Color", init<list, PyAbstractNode>()).def(init<list, list>());
-  class_<PyCubeNode, bases<PyAbstractNode> >("Cube", init<list, optional<bool> >()).def(init<double, optional<bool> >());
+  class_<PyCubeNodeBase, bases<PyAbstractNode> >("_CubeBase", no_init);
+  class_<PyCubeNode, bases<PyCubeNodeBase> >("cube", no_init)
+    .def(py::init< mpl::vector< tag::length(double), tag::center*(bool)> >())
+    .def(py::init< mpl::vector< tag::dim(list), tag::center*(bool)> >());
   class_<PySphereNode, bases<PyAbstractNode, PyNodeAccuracy> >("Sphere", init<double>());
   class_<PyCylinderNode, bases<PyAbstractNode, PyNodeAccuracy> >("Cylinder", init<double, double, double, optional<bool> >()).def(init<double, double, optional< bool> >());
   class_<PyPolyhedronNode, bases<PyAbstractNode> >("Polyhedron", init<list, list, optional<unsigned int> >());
