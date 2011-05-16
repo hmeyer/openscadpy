@@ -209,11 +209,11 @@ public:
 	}
     }
 };
-  
 class PyCubeNode: public PyCubeNodeBase {
 public:
   BOOST_PARAMETER_CONSTRUCTOR(PyCubeNode, (PyCubeNodeBase), tag,
-      (optional (dim, (*)))
+      (optional (dim, (list)))
+      (optional (length, (double)))
       (optional (center, (bool)))
   )
 };
