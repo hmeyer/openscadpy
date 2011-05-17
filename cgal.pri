@@ -17,6 +17,6 @@ cgal {
     LIBS += $$CGAL_DIR/auxiliary/gmp/lib/libmpfr-4.lib -lCGAL-vc90-mt-gd
   } else {
     LIBS += -lgmp -lmpfr -lCGAL
+    QMAKE_CXXFLAGS += -frounding-math
   }
-  QMAKE_CXXFLAGS += -frounding-math
 }
