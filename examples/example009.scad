@@ -7,24 +7,24 @@ platewidth = DxfDim(dxf,"","platewidth")
 fan_side_center = DxfCross(dxf,"fan_side_center")
 fanrot = DxfDim(dxf,"","fanrot")
 
-frame = Union( [
-	DxfLinearExtrude(dxf, "body",
-		bodywidth,0,0,0,1,10,-1,True)]
+frame = union( [
+	dxf_linear_extrude(dxf, "body",
+		bodywidth, convexity=10, center=True)]
 	+map(lambda z: 
-		Translate([0, 0, z],
-			DxfLinearExtrude(dxf, "plate",
-				platewidth,0,0,0,1,10,-1,True)),
+		translate([0, 0, z],
+			dxf_linear_extrude(dxf, "plate",
+				platewidth, convexity = 10, center=True)),
 		[+(bodywidth/2 + platewidth/2),
 			-(bodywidth/2 + platewidth/2)]
 	))
 
 frame.background = True
 
-fan = Intersection([
-		DxfLinearExtrude(dxf, "fan_top",
-			fanwidth,-fanrot,0,0,1,10,-1,True),
-		DxfRotateExtrude(dxf, "fan_side",
-			fan_side_center[0], fan_side_center[1],1,10)
+fan = intersection([
+		dxf_linear_extrude(dxf, "fan_top",
+			fanwidth,-fanrot,convexity = 10, center=True),
+		dxf_rotate_extrude(dxf, "fan_side",
+			origin=fan_side_center, convexity=10)
 		])
 
-openscad.result = Union( [frame,fan] )
+openscad.result = union( [frame,fan] )

@@ -34,14 +34,14 @@ def shape_tripod():
 	y4 = y3 + thickness
 	y5 = y3 + total_height - 3*thickness
 	y6 = y5 + thickness
-	roundedCorner = Intersection([
-		Circle(thickness),
-		Translate([ -thickness*2, 0 ],
-			Square(thickness*2))
+	roundedCorner = intersection([
+		circle(thickness),
+		translate([ -thickness*2, 0 ],
+			square(thickness*2))
 	])
-	return Union([
-		Difference([
-			Polygon([
+	return union([
+		difference([
+			polygon([
 				[ x1, y2 ], [ x2, y2 ],
 				[ x2, y1 ], [ x3, y1 ], [ x3, y2 ],
 				[ x4, y2 ], [ x4, y1 ], [ x5, y1 ],
@@ -52,30 +52,30 @@ def shape_tripod():
 				[ x9, y4 ], [ x10, y3 ],
 				[ x2, y3 ]
 			]),
-			Translate([ x10, y4 ], Circle(thickness)),
-			Translate([ x5 + thickness, y4 ], Circle(thickness))
+			translate([ x10, y4 ], circle(thickness)),
+			translate([ x5 + thickness, y4 ], circle(thickness))
 		]),
-		Translate([ x5, y1 ],
-			Square([ boltlen - thickness, thickness*2 ])),
+		translate([ x5, y1 ],
+			square([ boltlen - thickness, thickness*2 ])),
 	
-		Translate([ x5 + boltlen - thickness, y2 ],
-			Circle(thickness)),
+		translate([ x5 + boltlen - thickness, y2 ],
+			circle(thickness)),
 
-		Translate([ x2, y2 ],roundedCorner),
+		translate([ x2, y2 ],roundedCorner),
 	
-		Translate([ x8, y5 ],roundedCorner)
+		translate([ x8, y5 ],roundedCorner)
 	])
 
 
 def shape_X_disc(r1, holetrans, holelen, r2):
-	return Difference(
-		[Circle(r1)]
-		+map(lambda alpha: RotateAxis(alpha, 
-			Translate([ 0, holetrans ],
-				Square([ thickness, holelen ], True)
+	return difference(
+		[circle(r1)]
+		+map(lambda alpha: rotate(alpha, child=
+			translate([ 0, holetrans ],
+				square([ thickness, holelen ], True)
 			)
 		), [ 0, 120, 240 ])
-		+ [Circle(r2)])
+		+ [circle(r2)])
 
 def shape_inner_disc():
 	return shape_X_disc(
@@ -92,15 +92,14 @@ def shape_outer_disc():
 		midhole + boltlen + inner1_to_inner2)
 		
 
-
 def parts():
 	tripod_x_off = locklen1 - locklen2 + inner1_to_inner2;
 	tripod_y_off = max([midhole + boltlen + inner1_to_inner2 + 4*thickness + locklen1, total_height]);
 
-	return Union([
+	return union([
 		shape_inner_disc(),
 		shape_outer_disc()]
-		+ map(lambda s: Scale(s, Translate([ tripod_x_off, -tripod_y_off ], shape_tripod())), [ [1,1], [-1,1], [1,-1] ])
+		+ map(lambda s: scale(s, translate([ tripod_x_off, -tripod_y_off ], shape_tripod())), [ [1,1], [-1,1], [1,-1] ])
 	)
 
 
@@ -111,44 +110,44 @@ def exploded():
 def bottle():
 	r = boltlen + midhole
 	h = total_height - thickness*2
-	return RotateExtrude([
-		Square([ r, h ]),
+	return rotate_extrude(children=[
+		square([ r, h ]),
 
-		Translate([ 0, h ],
-			Intersection([
-				Square([ r, r ]),
-				Scale([ 1, 0.7 ], Circle(r))
+		translate([ 0, h ],
+			intersection([
+				square([ r, r ]),
+				scale([ 1, 0.7 ], circle(r))
 			])
 		),
 
-		Translate([ 0, h+r ],
-			Intersection([
-				Translate([ 0, -r/2 ], Square([ r/2, r ])),
-				Circle(r/2)
+		translate([ 0, h+r ],
+			intersection([
+				translate([ 0, -r/2 ], square([ r/2, r ])),
+				circle(r/2)
 			])
 		)
-	],2)
+	], convexity=2)
 
 def construct(extraspace=0): #1.5*thickness
 	assembly = [
-		Translate([ 0, 0, total_height - thickness + 2*extraspace],
-			LinearExtrude(shape_inner_disc(), thickness)),
-		LinearExtrude(shape_outer_disc(), thickness),
-		Color([ 0.7, 0.7, 1 ],
-			map(lambda alpha: RotateAxis(alpha, 
-				Translate([ 0, thickness*2 + locklen1 + inner1_to_inner2 + boltlen + midhole, extraspace ],
-					Rotate([ 90, 0, -90 ],
-						LinearExtrude(shape_tripod(), thickness, 0, 10, -1, True)
+		translate([ 0, 0, total_height - thickness + 2*extraspace],
+			linear_extrude(child=shape_inner_disc(), h=thickness)),
+		linear_extrude(child=shape_outer_disc(), h=thickness),
+		color([ 0.7, 0.7, 1 ],
+			map(lambda alpha: rotate(alpha, child=
+				translate([ 0, thickness*2 + locklen1 + inner1_to_inner2 + boltlen + midhole, extraspace ],
+					rotate([ 90, 0, -90 ],
+						linear_extrude(child=shape_tripod(), h=thickness, convexity=10, center=True)
 					)
 				)
 			),[ 0, 120, 240 ])
 		)
 	]
 	if  extraspace == 0:
-		b = Translate([ 0, 0, thickness*2], bottle())
+		b = translate([ 0, 0, thickness*2], bottle())
 		b.background = True
 		assembly.append(b)
-	return Union(assembly)
+	return union(assembly)
 
 def assembled():
 	return construct()
@@ -161,4 +160,3 @@ if mode == "exploded":
 
 if mode == "assembled":
 	openscad.result = assembled()
-

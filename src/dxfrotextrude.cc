@@ -67,7 +67,7 @@ PolySet *DxfRotateExtrudeNode::render_polyset(render_mode_e) const
 		dxf = new DxfData();
 #endif // ENABLE_CGAL
 	} else {
-		dxf = new DxfData(*this, filename, layername, origin_x, origin_y, scale);
+		dxf = new DxfData(*this, filename, layername, origin[0], origin[1], scale);
 	}
 
 	PolySet *ps = new PolySet();
@@ -157,7 +157,7 @@ QString DxfRotateExtrudeNode::dump(QString indent) const
 				"origin = [ %g %g ], scale = %g, convexity = %d, "
 				"$fn = %g, $fa = %g, $fs = %g) {\n",
 				filename.toAscii().data(), (int)fileInfo.lastModified().toTime_t(),
-				(int)fileInfo.size(),layername.toAscii().data(), origin_x, origin_y, 
+				(int)fileInfo.size(),layername.toAscii().data(), origin[0], origin[1], 
 				scale, convexity, fn, fa, fs);
 		foreach (AbstractNode::Pointer v, children)
 			text += v->dump(indent + QString("\t"));

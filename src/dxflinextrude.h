@@ -36,11 +36,12 @@ public:
 	typedef shared_ptr<DxfLinearExtrudeNode> Pointer;
 	int convexity, slices;
 	double height, twist;
-	double origin_x, origin_y, scale;
+	Float2 origin; 
+	double scale;
 	QString filename, layername;
 	bool center, has_twist;
 	DxfLinearExtrudeNode(const AbstractNode::NodeList &children, const QString &filename, const QString &layer,
-			     double height, double twist, double origin_x, double origin_y, double scale, 
+			     double height, double twist, Float2 origin, double scale, 
 			     int convexity, int slices=-1, bool center=false, const Accuracy &acc=Accuracy(), const Props p=Props());
 	virtual PolySet *render_polyset(render_mode_e mode) const;
 	virtual QString dump(QString indent) const;

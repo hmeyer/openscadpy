@@ -1,25 +1,25 @@
 from openscad import *
 
 def clip():
-	return Difference(
-		[DxfRotateExtrude(
-				"example007.dxf",
-				"dorn",
-				0,0,1,3)]
-		+ map(lambda r: RotateAxis(r, [0,0,1], cutout()), [0, 90])
+	return difference(
+		[dxf_rotate_extrude(
+				file="example007.dxf",
+				layer="dorn",
+				convexity=3)]
+		+ map(lambda r: rotate(r, [0,0,1], child=cutout()), [0, 90])
 		)
 
 def cutout():
-	ext = map(lambda layer: Translate([0, 0, -50], 
-					DxfLinearExtrude(
-						"example007.dxf",
-						layer,
-						100,0,0,0,1,
-						2)), ["cutout1", "cutout2"])
-	return Intersection([
-		RotateAxis(90, [1, 0, 0], ext[0]),
-		RotateAxis(90, [0, 0, 1], 
-			RotateAxis(90, [1, 0, 0], ext[1])
+	ext = map(lambda lay: translate([0, 0, -50], 
+					dxf_linear_extrude(
+						file="example007.dxf",
+						layer=lay,
+						h=100,
+						convexity=2)), ["cutout1", "cutout2"])
+	return intersection([
+		rotate(90, [1, 0, 0], child=ext[0]),
+		rotate(90, [0, 0, 1], 
+			rotate(90, [1, 0, 0], child=ext[1])
 		)
 	])
 
@@ -27,23 +27,23 @@ def cutout():
 
 def cutview():
 	combo = [
-			Translate([0, 0, -10],
+			translate([0, 0, -10],
 				clip()),
-			RotateAxis(20, [0, 0, 1],
-				RotateAxis(-20, [0, 1, 0],
-					Translate([18, 0, 0],
-						Cube(30, True)
+			rotate(20, [0, 0, 1], child=
+				rotate(-20, [0, 1, 0], child=
+					translate([18, 0, 0],
+						cube(30, True)
 					)
 				)
 			)
 		]
-	r = Render(Intersection(combo))
+	r = render(intersection(combo))
 	r.highlight = True
-	return Difference([
-		Difference(combo),r
+	return difference([
+		difference(combo),r
 	])
 
-openscad.result = Translate([0, 0, -10],
+openscad.result = translate([0, 0, -10],
 	clip())
 
 #openscad.result = cutview()

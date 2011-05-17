@@ -38,15 +38,15 @@ using namespace std;
 QHash<QString,double> dxf_dim_cache;
 QHash<QString,Float2> dxf_cross_cache;
 
-double dxf_dim(const QString &filename, const QString &layername, const QString &name, double xorigin, double yorigin, double scale) {
+double dxf_dim(const QString &filename, const QString &layername, const QString &name, Float2 origin, double scale) {
 	QFileInfo fileInfo(filename);
 
-	QString key = filename + "|" + layername + "|" + name + "|" + QString::number(xorigin) + "|" + QString::number(yorigin) +
+	QString key = filename + "|" + layername + "|" + name + "|" + QString::number(origin[0]) + "|" + QString::number(origin[1]) +
 			"|" + QString::number(scale) + "|" + QString::number(fileInfo.lastModified().toTime_t()) + "|" + QString::number(fileInfo.size());
 
 	if (dxf_dim_cache.contains(key))
 		return dxf_dim_cache[key];
-	DxfData dxf(Accuracy(36,0,0), filename, layername, xorigin, yorigin, scale);
+	DxfData dxf(Accuracy(36,0,0), filename, layername, origin[0], origin[1], scale);
 
 	for (int i = 0; i < dxf.dims.count(); i++)
 	{
@@ -100,16 +100,16 @@ double dxf_dim(const QString &filename, const QString &layername, const QString 
 }
 
 	
-Float2 dxf_cross(const QString &filename, const QString &layername, double xorigin, double yorigin, double scale) {
+Float2 dxf_cross(const QString &filename, const QString &layername, Float2 origin, double scale) {
 	QFileInfo fileInfo(filename);
 
-	QString key = filename + "|" + layername + "|" + QString::number(xorigin) + "|" + QString::number(yorigin) +
+	QString key = filename + "|" + layername + "|" + QString::number(origin[0]) + "|" + QString::number(origin[1]) +
 			"|" + QString::number(scale) + "|" + QString::number(fileInfo.lastModified().toTime_t()) + "|" + QString::number(fileInfo.size());
 
 	if (dxf_cross_cache.contains(key))
 		return dxf_cross_cache[key];
 
-	DxfData dxf(Accuracy(36, 0, 0), filename, layername, xorigin, yorigin, scale);
+	DxfData dxf(Accuracy(36, 0, 0), filename, layername, origin[0], origin[1], scale);
 
 	double coords[4][2];
 

@@ -1,8 +1,8 @@
 from openscad import *
 
-openscad.result = Intersection(
+openscad.result = intersection(
 	map(lambda i:
-		Rotate(i, Cube([100,20,20], True)),
+		rotate(i, cube([100,20,20], True)),
 		[
 			[0, 0, 0],
 			[10, 20, 300],

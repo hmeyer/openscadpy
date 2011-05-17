@@ -1,9 +1,9 @@
 from openscad import *
 
 def example004():
-	return Difference([
-		Cube(30, True),
-		Sphere(20)
+	return difference([
+		cube(30, True),
+		sphere(20)
 	])
 
 openscad.result = example004()

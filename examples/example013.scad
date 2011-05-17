@@ -1,7 +1,6 @@
 from openscad import *
 
-t = DxfLinearExtrude( "example013.dxf",
-			"", 100,0,0,0,1,3,-1,True)
-
-openscad.result =Intersection([
-	t, Rotate([0, 90, 0], t),	Rotate([90, 0, 0], t )])
+t = dxf_linear_extrude(file="example013.dxf",
+			h=100,convexity=3,center=True)
+openscad.result =intersection([
+	t, rotate([0, 90, 0], child=t),	rotate([90, 0, 0], child=t )])

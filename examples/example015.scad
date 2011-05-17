@@ -1,27 +1,27 @@
 from openscad import *
 
 def shape():
-	return Union([
-		Difference([
-			Translate([ -35, -35 ], Intersection([
-				Union([
-					Difference([
-						Square(100, True),
-						Square(50, True)
+	return union([
+		difference([
+			translate([ -35, -35 ], intersection([
+				union([
+					difference([
+						square(100, True),
+						square(50, True)
 					]),
-					Translate([ 50, 50 ],
-						Square(15, True) )
+					translate([ 50, 50 ],
+						square(15, True) )
 				]),
-				RotateAxis(45,
-					Translate([ 0, -15 ],
-						Square([ 100, 30 ])
+				rotate(45, child=
+					translate([ 0, -15 ],
+						square([ 100, 30 ])
 					)
 				)
 			])),
-			RotateAxis(-45, Scale([ 0.7, 1.3 ], Circle(5)))
+			rotate(-45, child=scale([ 0.7, 1.3 ], circle(5)))
 		]),
- 		ImportDXF( "example009.dxf",
-			"body",0,0,2.0,10)	
+ 		import_dxf( "example009.dxf",
+			"body",scale=2.0, convexity=10)	
 	])
 
 

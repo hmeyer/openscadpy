@@ -40,10 +40,10 @@
 #include <boost/make_shared.hpp>
 #include <boost/concept_check.hpp>
 DxfLinearExtrudeNode::DxfLinearExtrudeNode(const AbstractNode::NodeList &children, const QString &filename, const QString &layer,
-			      double height, double twist, double origin_x, double origin_y, double scale, 
+			      double height, double twist, Float2 origin, double scale, 
 			     int convexity, int slices, bool center, const Accuracy &acc, const Props p)
   :AbstractPolyNode(p,children), Accuracy(acc), convexity(convexity), slices(slices), height(height), twist(twist), 
-  origin_x(origin_x), origin_y(origin_y), scale(scale), filename(filename), layername(layer), 
+  origin(origin), scale(scale), filename(filename), layername(layer), 
   center(center), has_twist(twist!=0.0) {
 }
 
@@ -153,7 +153,7 @@ PolySet *DxfLinearExtrudeNode::render_polyset(render_mode_e) const
 	  dxf = new DxfData();
 #endif // ENABLE_CGAL
 	} else {
-	  dxf = new DxfData(*this, filename, layername, origin_x, origin_y, scale);
+	  dxf = new DxfData(*this, filename, layername, origin[0], origin[1], scale);
 	}
 	PolySet *ps = new PolySet();
 	ps->convexity = convexity;
@@ -179,10 +179,10 @@ PolySet *DxfLinearExtrudeNode::render_polyset(render_mode_e) const
 			first_open_path = false;
 		}
 		PRINTF("   %9.5f %10.5f ... %10.5f %10.5f",
-				dxf->paths[i].points.first()->x / scale + origin_x,
-				dxf->paths[i].points.first()->y / scale + origin_y, 
-				dxf->paths[i].points.last()->x / scale + origin_x,
-				dxf->paths[i].points.last()->y / scale + origin_y);
+				dxf->paths[i].points.first()->x / scale + origin[0],
+				dxf->paths[i].points.first()->y / scale + origin[1], 
+				dxf->paths[i].points.last()->x / scale + origin[0],
+				dxf->paths[i].points.last()->y / scale + origin[1]);
 	}
 
 
@@ -231,8 +231,8 @@ QString DxfLinearExtrudeNode::dump(QString indent) const
 		text.sprintf("linear_extrude(file = \"%s\", cache = \"%x.%x\", layer = \"%s\", "
 				"height = %g, origin = [ %g %g ], scale = %g, center = %s, convexity = %d",
 				filename.toAscii().data(), (int)fileInfo.lastModified().toTime_t(), 
-				(int)fileInfo.size(), layername.toAscii().data(), height, origin_x, 
-				origin_y, scale, center ? "true" : "false", convexity);
+				(int)fileInfo.size(), layername.toAscii().data(), height, origin[0], 
+				origin[1], scale, center ? "true" : "false", convexity);
 		if (has_twist) {
 			QString t2;
 			t2.sprintf(", twist = %g, slices = %d", twist, slices);

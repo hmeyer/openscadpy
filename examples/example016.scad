@@ -11,38 +11,25 @@ from openscad import *
 
 
 def blk1():
-	return Cube([ 65, 28, 28 ], True)
+	return cube([ 65, 28, 28 ], True)
 
 
 def blk2():
-	return Difference([
-		Translate([ 0, 0, 7.5 ],
-			Cube([ 60, 28, 14 ], True)),
-		Cube([ 8, 32, 32 ], True)
+	return difference([
+		translate([ 0, 0, 7.5 ],
+			cube([ 60, 28, 14 ], True)),
+		cube([ 8, 32, 32 ], True)
 	])
 
 
 def chop():
-	return Translate([ -14, 0, 0 ],
-			ImportSTL("example016.stl", 12))
+	return translate([ -14, 0, 0 ],
+			import_stl("example016.stl", 12))
 
-'''
-dfference() {
-	blk1();
-	for (alpha = [0, 90, 180, 270]) {
-		rotate(alpha, [ 1, 0, 0]) render(convexity = 12)
-			difference() {
-				blk2();
-				chop();
-			}
-	}
-}
-'''
-
-openscad.result = Difference(
+openscad.result = difference(
 	[blk1()]
-	+map(lambda alpha: RotateAxis(alpha, [1], Render(
-		Difference([
+	+map(lambda alpha: rotate(alpha, [1], render(
+		difference([
 			blk2(),
 			chop()
 		]), 12)),  [0, 90, 180, 270])

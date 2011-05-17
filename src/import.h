@@ -50,11 +50,12 @@ public:
 
 class ImportDXFNode : public ImportNode, public Accuracy {
   QString layername;
-  double origin_x, origin_y, scale;
+  Float2 origin;
+  double scale;
 public:	
   typedef shared_ptr<ImportDXFNode> Pointer;
-  ImportDXFNode(const QString &filename,const QString &layername, double origin_x, double origin_y, int convexity=5, double scale=1.0, const Accuracy &acc=Accuracy(), const Props p=Props())
-    :ImportNode(filename, convexity, p), Accuracy(acc), layername(layername), origin_x(origin_x), origin_y(origin_y), scale(scale) {}
+  ImportDXFNode(const QString &filename,const QString &layername, Float2 origin, int convexity=5, double scale=1.0, const Accuracy &acc=Accuracy(), const Props p=Props())
+    :ImportNode(filename, convexity, p), Accuracy(acc), layername(layername), origin(origin), scale(scale) {}
   virtual PolySet *render_polyset(render_mode_e mode) const;
   virtual QString dump(QString indent) const;
 };

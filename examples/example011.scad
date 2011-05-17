@@ -1,6 +1,6 @@
 from openscad import *
 
-openscad.result = Polyhedron(
+openscad.result = polyhedron(
 	[#points
 		[10, 0, 0],
 		[0, 10, 0],

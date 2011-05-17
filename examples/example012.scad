@@ -4,10 +4,10 @@ from openscad import *
 # licensed under the Creative Commons - GNU GPL license.
 # http://www.thingiverse.com/thing:753
 
-openscad.result = Difference([
-	Sphere(20),
+openscad.result = difference([
+	sphere(20),
 	
-	Translate([ -2.92, 0.5, +20 ], Rotate([180, 0, 180],
-			ImportSTL("example012.stl", 5)
+	translate([ -2.92, 0.5, +20 ], rotate([180, 0, 180],
+			import_stl("example012.stl", 5)
 	))])
 
