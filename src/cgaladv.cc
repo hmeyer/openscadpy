@@ -157,13 +157,20 @@ CSGTerm *CgaladvNode::render_csg_term(const Float20 &m, QVector<CSGTerm*> *highl
 
 #endif // ENABLE_CGAL
 
+QString CgaladvNode::dumpChildren(QString indent) const
+{
+      QString text;
+      foreach (AbstractNode::Pointer v, this->children)
+	      text += v->dump(indent + QString("\t"));
+  return text;
+}
+
 QString CgaladvNode::dump(QString indent) const
 {
   if (dump_cache.isEmpty()) {
       QString text;
       text.sprintf("CgaladvNode() {\n");
-      foreach (AbstractNode::Pointer v, this->children)
-	      text += v->dump(indent + QString("\t"));
+      text += dumpChildren(indent);
       text += indent + "}\n";
       ((AbstractNode*)this)->dump_cache = indent + QString("n%1: ").arg(idx) + text;
   }
@@ -171,13 +178,12 @@ QString CgaladvNode::dump(QString indent) const
 }
 
 
-
 QString CgaladvMinkowskiNode::dump(QString indent) const
 {
   if (dump_cache.isEmpty()) {
       QString text;
       text.sprintf("minkowski(convexity = %d) {\n", this->convexity);
-      text += static_cast<const CgaladvNode*>(this)->dump(indent + QString("\t"));
+      text += dumpChildren(indent);
       text += indent + "}\n";
       ((AbstractNode*)this)->dump_cache = indent + QString("n%1: ").arg(idx) + text;
   }
@@ -190,7 +196,7 @@ QString CgaladvGlideNode::dump(QString indent) const
       QString text;
       text.sprintf(", convexity = %d) {\n", this->convexity);
       text = QString("glide(path = undef") + text;
-      text += static_cast<const CgaladvNode*>(this)->dump(indent + QString("\t"));
+      text += dumpChildren(indent);
       text += indent + "}\n";
       ((AbstractNode*)this)->dump_cache = indent + QString("n%1: ").arg(idx) + text;
   }
@@ -202,7 +208,7 @@ QString CgaladvSubdivNode::dump(QString indent) const
   if (dump_cache.isEmpty()) {
       QString text;
       text.sprintf("subdiv(level = %d, convexity = %d) {\n", this->level, this->convexity);
-      text += static_cast<const CgaladvNode*>(this)->dump(indent + QString("\t"));
+      text += dumpChildren(indent);
       text += indent + "}\n";
       ((AbstractNode*)this)->dump_cache = indent + QString("n%1: ").arg(idx) + text;
   }
@@ -214,7 +220,7 @@ QString CgaladvHullNode::dump(QString indent) const
   if (dump_cache.isEmpty()) {
       QString text;
       text.sprintf("hull() {\n");
-      text += static_cast<const CgaladvNode*>(this)->dump(indent + QString("\t"));
+      text += dumpChildren(indent);
       text += indent + "}\n";
       ((AbstractNode*)this)->dump_cache = indent + QString("n%1: ").arg(idx) + text;
   }

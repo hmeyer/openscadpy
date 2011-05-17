@@ -13,6 +13,7 @@
 #include "surface.h"
 #include "import.h"
 #include "projection.h"
+#include "cgaladv.h"
 #include <boost/python.hpp>
 #include <boost/make_shared.hpp>
 
@@ -564,6 +565,14 @@ public:
   )
 };
 
+
+class PyMinkowskiNode: public PyAbstractNode {
+public:
+  PyMinkowskiNode(const list &a, unsigned int convexity=5) {
+    node = make_shared<CgaladvMinkowskiNode>(list2NodeList(a), convexity);
+  }
+};
+
 /*
 BOOST_PARAMETER_FUNCTION((double), pyDxfDim, tag,
     (required (file, *))
@@ -682,6 +691,9 @@ BOOST_PYTHON_MODULE(openscad) {
     .def(py::init< mpl::vector< tag::convexity*(unsigned int), tag::cut_mode*(bool), tag::child(PyAbstractNode) > >())
     .def(py::init< mpl::vector< tag::convexity*(unsigned int), tag::cut_mode*(bool), tag::children(list) > >());
   
+  class_<PyMinkowskiNode, bases<PyAbstractNode> >("minkowski", init<list, optional<unsigned int> >());
+    
+    
 /* doesn't work: error: no matching function for call to ´def(const char [7])´
   def< pyDxfDim_fwd
       , mpl::vector<
