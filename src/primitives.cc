@@ -36,6 +36,8 @@
 
 using boost::make_shared;
 
+const double PrimitiveNode::F_MINIMUM = 0.01;
+
 enum primitive_type_e {
 	CUBE,
 	SPHERE,

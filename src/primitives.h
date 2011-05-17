@@ -37,7 +37,7 @@ class PolySet;
 class PrimitiveNode : public AbstractPolyNode {
 public:
     typedef shared_ptr<PrimitiveNode> Pointer;
-    static const double F_MINIMUM = 0.01;
+    static const double F_MINIMUM;
     int convexity;
     PrimitiveNode(int convex=1, const Props p=Props()) : AbstractPolyNode(p), convexity(convex) { }
     virtual QString dump(QString indent) const;
