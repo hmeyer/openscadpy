@@ -55,7 +55,7 @@ public:
 
 class CgaladvGlideNode : public CgaladvNode {
 public:	
-  CgaladvGlideNode(const AbstractNode::NodeList &children, const void */*path*/, int convexity, const Props p=Props())
+  CgaladvGlideNode(const AbstractNode::NodeList &children, const void * /*path*/, int convexity, const Props p=Props())
     :CgaladvNode(children, convexity, p) {}
 #ifdef ENABLE_CGAL
     virtual CGAL_Nef_polyhedron render_cgal_nef_polyhedron() const;
