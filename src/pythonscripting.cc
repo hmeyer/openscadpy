@@ -140,6 +140,10 @@ VecVec list2VecVec(const list &l) {
   return v;
 }
 
+bool isnan(double x) {
+	return x!=x;
+}
+
 
 class PyAbstractNode {
 protected:
@@ -222,7 +226,7 @@ public:
       else childlist.append(args[child|PyAbstractNode()].getNode());
       
       double a = args[ang|std::numeric_limits<double>::quiet_NaN()];
-      if (std::isnan( a )) {
+      if (isnan( a )) {
 	const list &lvec = args[vec|empty_list];
 	node = make_shared<TransformRotateNode>(list2StdArray<Float3>(lvec), childlist);
       } else {
@@ -305,13 +309,13 @@ public:
       double rad = args[r|std::numeric_limits<double>::quiet_NaN()];
       double rad1 = args[r1|std::numeric_limits<double>::quiet_NaN()];
       double rad2 = args[r2|std::numeric_limits<double>::quiet_NaN()];
-      if (std::isnan( rad )) {
-	if (std::isnan(rad1) && std::isnan(rad2)) {
+      if (isnan( rad )) {
+	if (isnan(rad1) && isnan(rad2)) {
 	  std::cerr << __func__ << " warning no valid radius - using 10" << std::endl;
 	  rad1 = rad2 = 10.0;
 	} else {
-	  if (std::isnan(rad1)) rad1 = rad2;
-	  if (std::isnan(rad2)) rad2 = rad1;
+	  if (isnan(rad1)) rad1 = rad2;
+	  if (isnan(rad2)) rad2 = rad1;
 	}
       } else rad1 = rad2 = rad;
       CylinderNode::Pointer p = make_shared<CylinderNode>(rad1, rad2, height, args[center|false], ctx.getAcc());
