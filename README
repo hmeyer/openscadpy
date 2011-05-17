@@ -2,8 +2,9 @@
 WHAT IS IT?
 ===========
 
-OpenSCAD is a software for creating solid 3D CAD objects. It is free software
-and available for Linux/UNIX, MS Windows and Mac OS X.
+OpenSCADPy is a blend of openscad, a software for creating solid 3D CAD objects.
+OpenSCADPy uses Python instead of OpenSCADs intrinsic language to model objects.
+It is free software and available for Linux/UNIX, MS Windows and Mac OS X.
 
 Unlike most free software for creating 3D models (such as the famous
 application Blender) it does not focus on the artistic aspects of 3D modelling
@@ -64,11 +65,7 @@ development. Other versions may or may not work as well..
 * GCC C++ Compiler (4.2, 4.3.1):
   http://gcc.gnu.org/
 
-* Bison (2.4):
-  http://www.gnu.org/software/bison/
-
-* Flex (2.5.35):
-  http://flex.sourceforge.net/
+* Python (2.7)
 
 
 BUILDING OPENSCAD
