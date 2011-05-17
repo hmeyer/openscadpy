@@ -3,7 +3,7 @@ from openscad import *
 def thing(type):
 	return [sphere(30), 
 		cube(60, True), 
-		cylinder(50, 30, True),
+		cylinder(50, 30, center=True),
 		union([cube(45, True)]+
 			[rotate([0,0,45][i:i+3], cube(50, True)) for i in [0,1,2]]
 		)
