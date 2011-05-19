@@ -47,7 +47,7 @@ development. Other versions may or may not work as well..
 * MPFR (3.0.x):
   http://www.mpfr.org/
 
-* boost (1.35 - 1.44, required by CGAL)
+* boost (at least 1.41.0, required by CGAL and Python binding)
   http://www.boost.org/
 
 * cmake (2.6.x, required by CGAL)
