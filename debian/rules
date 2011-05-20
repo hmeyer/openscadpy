@@ -16,12 +16,12 @@ override_dh_auto_configure:
 
 override_dh_auto_build:
 	dh_auto_build
-	convert icons/icon-alpha.png -resize 688x688 -background transparent -gravity center -extent 688x688 openscad.png
+	convert icons/icon-alpha.png -resize 688x688 -background transparent -gravity center -extent 688x688 openscadpy.png
 
 override_dh_auto_install:
 	dh_auto_install
-	ln -s /usr/share/openscad/examples debian/openscad/usr/share/doc/openscad/examples
+	ln -s /usr/share/openscadpy/examples debian/openscadpy/usr/share/doc/openscadpy/examples
 
 override_dh_clean:
 	dh_clean
-	rm -f openscad.png
+	rm -f openscadpy.png
