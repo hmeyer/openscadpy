@@ -1,6 +1,6 @@
 *~
 *.kdev4
-Makefile*
+/Makefile*
 /lexer_lex.cpp
 /parser_yacc.cpp
 /parser_yacc.h

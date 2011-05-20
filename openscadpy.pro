@@ -49,7 +49,7 @@ macx {
     CONFIG += x86 x86_64
   }
 
-  TARGET = OpenSCAD
+  TARGET = OpenSCADpy
   ICON = icons/OpenSCAD.icns
   QMAKE_INFO_PLIST = Info.plist
   APP_RESOURCES.path = Contents/Resources
