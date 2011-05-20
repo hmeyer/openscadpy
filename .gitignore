@@ -5,4 +5,4 @@ Makefile*
 /parser_yacc.cpp
 /parser_yacc.h
 /objects
-/openscad
+/openscadpy
