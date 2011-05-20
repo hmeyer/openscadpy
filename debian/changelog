@@ -1,0 +1,5 @@
+openscadpy (2010.05-1) natty; urgency=low
+
+  * Initial packaging. Inspired by http://gitorious.org/openscad-debian/openscad
+
+ -- Henning Meyer <hmeyer@shigella>  Fri, 20 May 2011 11:41:31 +0200

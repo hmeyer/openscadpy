@@ -1,0 +1,21 @@
+Source: openscadpy
+Priority: optional
+Maintainer: Henning Meyer <hmeyer@gmx.eu>
+Build-Depends: debhelper (>= 7.0.50~), qt4-qmake (>=4.4), libcgal-dev (>=3.5), libopencsg-dev (>=1.3.0), libeigen2-dev, bison (>= 2.4), flex (>=2.5.35), libqt4-opengl-dev, libglew1.5-dev, imagemagick, libboost-python-dev (>= 1.41)
+Standards-Version: 3.9.1
+Section: universe/graphics
+Homepage: http://github.com/hmeyer/openscadpy
+
+Package: openscadpy
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: python script file based graphical CAD environment
+ OpenSCADpy is a software for creating solid 3D CAD objects. It focuses on CAD
+ aspects rather than artistic ones.
+ .
+ OpenSCADpy is not an interactive modeller. Instead it is something like a
+ 3D-compiler that reads in a PYTHON script file that describes the object and
+ renders the 3D model from this script. This gives the designer full control
+ over the modelling process and enables him to easily change any step in the
+ modelling process or make designes that are defined by configurable
+ parameters.
