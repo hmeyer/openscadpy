@@ -6,16 +6,15 @@ opencsg {
   HEADERS += src/render-opencsg.h
   SOURCES += src/render-opencsg.cc
 
-  isEmpty(DEPLOYDIR) {
-    # Optionally specify location of OpenCSG using the 
-    # OPENCSGDIR env. variable
-    OPENCSG_DIR = $$(OPENCSGDIR)
-    !isEmpty(OPENCSG_DIR) {
-      INCLUDEPATH += $$OPENCSG_DIR/include
-      LIBS += -L$$OPENCSG_DIR/lib
-      message("OpenCSG location: $$OPENCSG_DIR")
-    }
-  }
+  OPENCSG_DIR = opencsg/OpenCSG-1.3.1
+  INCLUDEPATH += $$OPENCSG_DIR/include
+  LIBS += -L$$OPENCSG_DIR/lib
+  PRE_TARGETDEPS += $$OPENCSG_DIR/lib/libopencsg.a
+  LIBS += -Wl,-Bstatic -lopencsg -Wl,-Bdynamic
 
-  LIBS += -lopencsg
+	opencsg.target = "$$OPENCSG_DIR/lib/libopencsg.a"
+	opencsg.commands = cd opencsg;$(MAKE)
+
+  QMAKE_EXTRA_TARGETS += opencsg
+  QMAKE_CLEAN += -r opencsg/OpenCSG-1.3.1 opencsg/OpenCSG-1.3.1.tar.gz
 }
