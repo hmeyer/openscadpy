@@ -1,3 +1,9 @@
+openscadpy (2010.05.01-1ubuntu2) natty; urgency=low
+
+  * new git release and hopefully proper build 
+
+ -- Henning Meyer <hmeyer@gmx.eu>  Sat, 21 May 2011 16:18:45 +0200
+
 openscadpy (2010.05-1ubuntu1) natty; urgency=low
 
   * tried to fix several build errors 
