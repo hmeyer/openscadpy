@@ -1,3 +1,9 @@
+openscadpy (2010.05.01-1ubuntu3) natty; urgency=low
+
+  * needed to download OpenCSG - no net on launchpad
+
+ -- Henning Meyer <hmeyer@gmx.eu>  Sat, 21 May 2011 16:32:37 +0200
+
 openscadpy (2010.05.01-1ubuntu2) natty; urgency=low
 
   * new git release and hopefully proper build 

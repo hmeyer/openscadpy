@@ -1,7 +1,7 @@
 all: OpenCSG-1.3.1/lib/libopencsg.a
 
 clean:
-	rm -rf OpenCSG-1.3.1*
+	rm -rf OpenCSG-1.3.1/
 
 OpenCSG-1.3.1/lib/libopencsg.a: OpenCSG-1.3.1/.modmak
 	cd OpenCSG-1.3.1/src;$(MAKE)
