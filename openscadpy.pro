@@ -185,13 +185,13 @@ macx {
   SOURCES += src/AppleEvents.cc
 }
 
-target.path = /usr/local/bin/
+target.path = /usr/bin/
 INSTALLS += target
 
-examples.path = /usr/local/share/openscadpy/examples/
+examples.path = /usr/share/openscadpy/examples/
 examples.files = examples/*
 INSTALLS += examples
 
-libraries.path = /usr/local/share/openscadpy/libraries/
+libraries.path = /usr/share/openscadpy/libraries/
 libraries.files = libraries/*
 INSTALLS += libraries

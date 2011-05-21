@@ -1,3 +1,9 @@
+openscadpy (2010.05.03-1ubuntu2) natty; urgency=low
+
+  * install to /usr instead of /usr/local 
+
+ -- Henning Meyer <hmeyer@gmx.eu>  Sat, 21 May 2011 21:15:47 +0200
+
 openscadpy (2010.05.03-1ubuntu1) natty; urgency=low
 
   * distclean delete opencsg tgz 
