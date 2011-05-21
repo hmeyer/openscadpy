@@ -24,5 +24,4 @@ override_dh_auto_install:
 
 override_dh_clean:
 	dh_clean
-	make distclean
 	rm -f openscadpy.png
