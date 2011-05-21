@@ -1,6 +1,6 @@
 #!/usr/bin/make -f
 
-# export DH_VERBOSE=1
+export DH_VERBOSE=1
 
 # this hardcoded stuff is, to quote bug#571640, crap. unfortunately,
 # the solution suggested there (conflicting with qmake-qt3) does not
@@ -8,20 +8,99 @@
 # libcgal-dev
 QMAKEARGS=-makefile -nocache "QMAKE_CFLAGS_RELEASE=-g -O2" "QMAKE_CFLAGS_DEBUG=-g -O2" "QMAKE_CXXFLAGS_RELEASE=-g -O2" "QMAKE_CXXFLAGS_DEBUG=-g -O2" QMAKE_STRIP=: PREFIX=/usr
 
-%:
-	dh $@
+#%:
+#	dh $@
+#
+#override_dh_auto_configure:
+#	qmake-qt4 ${QMAKEARGS}
+#
+#override_dh_auto_build:
+#	dh_auto_build
+#	convert icons/icon-alpha.png -resize 688x688 -background transparent -gravity center -extent 688x688 openscadpy.png
+#
+##override_dh_auto_install:
+##	dh_auto_install
+##	ln -s /usr/share/openscadpy/examples debian/openscadpy/usr/share/doc/openscadpy/examples
+#
+#override_dh_clean:
+#	dh_clean
+#	rm -f openscadpy.png
 
-override_dh_auto_configure:
-	qmake-qt4 ${QMAKEARGS}
-
-override_dh_auto_build:
-	dh_auto_build
+openscadpy.png: icons/icon-alpha.png
 	convert icons/icon-alpha.png -resize 688x688 -background transparent -gravity center -extent 688x688 openscadpy.png
 
-override_dh_auto_install:
-	dh_auto_install
-	ln -s /usr/share/openscadpy/examples debian/openscadpy/usr/share/doc/openscadpy/examples
 
-override_dh_clean:
-	dh_clean
+build: Makefile openscadpy.png build-stamp
+build-stamp:
+	dh_testdir
+
+	# Add here commands to compile the package.
+	#	qmake-qt4 ${QMAKEARGS}
+	$(MAKE)
+	#	convert icons/icon-alpha.png -resize 688x688 -background transparent -gravity center -extent 688x688 openscadpy.png
+
+	touch build-stamp
+
+Makefile:
+	qmake-qt4 ${QMAKEARGS}
+
+
+clean: Makefile
+	dh_testdir
+	dh_testroot
+	rm -f build-stamp
 	rm -f openscadpy.png
+
+	# Add here commands to clean up after the build process.
+	$(MAKE) clean
+	$(MAKE) distclean
+
+	dh_clean
+
+install: build
+	dh_testdir
+	dh_testroot
+	dh_prep
+	dh_installdirs
+
+	# Add here commands to install the package into debian/<packagename>.
+	$(MAKE) INSTALL_ROOT=`pwd`/debian/`dh_listpackages`/usr install
+
+# Build architecture-independent files here.
+binary-indep: build install
+	dh_testdir
+	dh_testroot
+	dh_installchangelogs
+	dh_installdocs
+	dh_installexamples
+#	dh_installmenu
+#	dh_installdebconf
+#	dh_installlogrotate
+#	dh_installemacsen
+#	dh_installcatalogs
+#	dh_installpam
+#	dh_installmime
+#	dh_installinit
+#	dh_installcron
+#	dh_installinfo
+#	dh_installwm
+#	dh_installudev
+#	dh_lintian
+#	dh_bugfiles
+#	dh_undocumented
+	dh_installman
+	dh_link
+	dh_compress
+	dh_fixperms
+#	dh_perl
+	dh_installdeb
+	dh_gencontrol
+	dh_md5sums
+	dh_builddeb
+
+# Build architecture-dependent files here.
+binary-arch: build install
+# We have nothing to do by default.
+
+binary: binary-indep binary-arch
+.PHONY: build clean binary-indep binary-arch binary install

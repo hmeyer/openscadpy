@@ -63,3 +63,14 @@ Last-Update: <YYYY-MM-DD>
 +
 +[MakeBuilder]
 +Number Of Jobs=4
+--- openscadpy-2010.05.orig/openscadpy.pro
++++ openscadpy-2010.05/openscadpy.pro
+@@ -61,8 +61,6 @@ else {
+   TARGET = openscadpy
+ }
+ 
+-QMAKE_CLEAN += $$TARGET
+-
+ win32 {
+   RC_FILE = openscad_win32.rc
+ }
