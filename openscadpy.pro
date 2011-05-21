@@ -61,6 +61,8 @@ else {
   TARGET = openscadpy
 }
 
+QMAKE_CLEAN += $$TARGET
+
 win32 {
   RC_FILE = openscad_win32.rc
 }
