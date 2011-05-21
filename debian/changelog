@@ -1,3 +1,15 @@
+openscadpy (2010.05.03-1ubuntu1) natty; urgency=low
+
+  * distclean delete opencsg tgz 
+
+ -- Henning Meyer <hmeyer@gmx.eu>  Sat, 21 May 2011 20:38:43 +0200
+
+openscadpy (2010.05.02-1ubuntu1) natty; urgency=low
+
+  * download fail 
+
+ -- Henning Meyer <hmeyer@gmx.eu>  Sat, 21 May 2011 20:14:47 +0200
+
 openscadpy (2010.05.01-1ubuntu3) natty; urgency=low
 
   * needed to download OpenCSG - no net on launchpad

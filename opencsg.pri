@@ -16,5 +16,5 @@ opencsg {
 	opencsg.commands = cd opencsg;$(MAKE)
 
   QMAKE_EXTRA_TARGETS += opencsg
-  QMAKE_CLEAN += -r opencsg/OpenCSG-1.3.1 opencsg/OpenCSG-1.3.1.tar.gz
+  QMAKE_CLEAN += -r opencsg/OpenCSG-1.3.1
 }
