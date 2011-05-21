@@ -1,0 +1,65 @@
+Description: Upstream changes introduced in version 2010.05-1ubuntu1
+ This patch has been created by dpkg-source during the package build.
+ Here's the last changelog entry, hopefully it gives details on why
+ those changes were made:
+ .
+ openscadpy (2010.05-1ubuntu1) natty; urgency=low
+ .
+   * tried to fix several build errors
+ .
+ The person named in the Author field signed this changelog entry.
+Author: Henning Meyer <hmeyer@gmx.eu>
+
+---
+The information above should follow the Patch Tagging Guidelines, please
+checkout http://dep.debian.net/deps/dep3/ to learn about the format. Here
+are templates for supplementary fields that you might want to add:
+
+Origin: <vendor|upstream|other>, <url of original patch>
+Bug: <url in upstream bugtracker>
+Bug-Debian: http://bugs.debian.org/<bugnumber>
+Bug-Ubuntu: https://launchpad.net/bugs/<bugnumber>
+Forwarded: <no|not-needed|url proving that it has been forwarded>
+Reviewed-By: <name and email of someone who approved the patch>
+Last-Update: <YYYY-MM-DD>
+
+--- /dev/null
++++ openscadpy-2010.05/openscad.kdev4
+@@ -0,0 +1,3 @@
++[Project]
++Manager=KDevCustomMakeManager
++Name=openscad
+--- /dev/null
++++ openscadpy-2010.05/.kdev4/openscad.kdev4
+@@ -0,0 +1,31 @@
++[Buildset]
++BuildItems=@Variant(\x00\x00\x00\t\x00\x00\x00\x00\x01\x00\x00\x00\x0b\x00\x00\x00\x00\x01\x00\x00\x00\x10\x00o\x00p\x00e\x00n\x00s\x00c\x00a\x00d)
++
++[Launch]
++Launch Configurations=Launch Configuration 0
++
++[Launch][Launch Configuration 0]
++Configured Launch Modes=execute
++Configured Launchers=nativeAppLauncher
++Name=New Native Application Configuration
++Type=Native Application
++
++[Launch][Launch Configuration 0][Data]
++Arguments=
++Debugger Shell=
++Dependencies=@Variant(\x00\x00\x00\t\x00\x00\x00\x00\x00)
++Dependency Action=Nothing
++Display Demangle Names=true
++Display Static Members=false
++EnvironmentGroup=default
++Executable=file:///home/hmeyer/devel/openscad/openscad
++GDB Path=
++Remote GDB Config Script=
++Remote GDB Run Script=
++Remote GDB Shell Script=
++Try Setting Breakpoints On Loading Libraries=true
++Working Directory=
++isExecutable=true
++
++[MakeBuilder]
++Number Of Jobs=4
