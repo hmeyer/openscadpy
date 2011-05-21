@@ -25,32 +25,22 @@ template<typename T>
 std::ostream& operator<<(std::ostream &out, const std::vector<T> &rhs){
   out << "[";
   typename std::vector<T>::const_iterator it = rhs.begin();
-  typedef typename std::vector<T>::const_reference Tref;
-  if (it != rhs.end()) {
-	Tref t = *it++;
-	out << t;
-  }
-  while(it != rhs.end()) {
-    Tref t = *it++;
-    out << ", " << t; 
-  }
+  if (it != rhs.end())
+	out << *it++;
+  while(it != rhs.end())
+    out << ", " << *it++; 
   out << "]";
   return out;
 }
 
-template<typename T, long unsigned int N>
+template<typename T, std::size_t N>
 std::ostream& operator<<(std::ostream &out, const boost::array<T,N> &rhs){
   out << "[";
   typename boost::array<T,N>::const_iterator it = rhs.begin();
-  typedef typename boost::array<T,N>::const_reference Tref;
-  if (it != rhs.end()) {
-	Tref t = *it++;
-	out << t;
-  }
-  while(it != rhs.end()) {
-    Tref t = *it++;
-    out << ", " << t; 
-  }
+  if (it != rhs.end()) 
+	out << *it++;
+  while(it != rhs.end())
+    out << ", " << *it++; 
   out << "]";
   return out;
 }
