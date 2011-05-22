@@ -1,0 +1,44 @@
+Description: Upstream changes introduced in version 2010.05.03-1ubuntu5
+ This patch has been created by dpkg-source during the package build.
+ Here's the last changelog entry, hopefully it gives details on why
+ those changes were made:
+ .
+ openscadpy (2010.05.03-1ubuntu5) maverick; urgency=low
+ .
+   * python version agnostic
+ .
+ The person named in the Author field signed this changelog entry.
+Author: Henning Meyer <hmeyer@gmx.eu>
+
+---
+The information above should follow the Patch Tagging Guidelines, please
+checkout http://dep.debian.net/deps/dep3/ to learn about the format. Here
+are templates for supplementary fields that you might want to add:
+
+Origin: <vendor|upstream|other>, <url of original patch>
+Bug: <url in upstream bugtracker>
+Bug-Debian: http://bugs.debian.org/<bugnumber>
+Bug-Ubuntu: https://launchpad.net/bugs/<bugnumber>
+Forwarded: <no|not-needed|url proving that it has been forwarded>
+Reviewed-By: <name and email of someone who approved the patch>
+Last-Update: <YYYY-MM-DD>
+
+--- openscadpy-2010.05.03.orig/python.pri
++++ openscadpy-2010.05.03/python.pri
+@@ -2,11 +2,13 @@ python {
+ 	DEFINES += ENABLE_PYTHON BOOST_PYTHON_STATIC_LIB
+ 	HEADERS += src/pythonscripting.h
+ 	SOURCES += src/pythonscripting.cc
+-	INCLUDEPATH += /usr/include/python2.7/
+-	LIBS += -lpython2.7
+   	win32 {
+      		LIBS += -llibboost_python-vc90-mt-s-1_46_1
++		LIBS += -lpython2.7
+   	} else {
+-     		LIBS += -lboost_python-py26
++		PYVERSION = $$system(python -c \"import sys;v=sys.version_info;print str(v[0])+\'.\'+str(v[1])\")
++     		LIBS += -lboost_python
++		LIBS += -lpython$$PYVERSION
++		INCLUDEPATH += /usr/include/python$$PYVERSION/
+   	}
+ }

@@ -1,3 +1,15 @@
+openscadpy (2010.05.04-1ubuntu1) natty; urgency=low
+
+  * .desktop 2nd attempt
+
+ -- Henning Meyer <hmeyer@gmx.eu>  Sun, 22 May 2011 20:59:54 +0200
+
+openscadpy (2010.05.03-1ubuntu5) maverick; urgency=low
+
+  * python version agnostic 
+
+ -- Henning Meyer <hmeyer@gmx.eu>  Sun, 22 May 2011 20:42:41 +0200
+
 openscadpy (2010.05.03-1ubuntu4) natty; urgency=low
 
   * .desktop added 
