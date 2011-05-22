@@ -2,11 +2,13 @@ python {
 	DEFINES += ENABLE_PYTHON BOOST_PYTHON_STATIC_LIB
 	HEADERS += src/pythonscripting.h
 	SOURCES += src/pythonscripting.cc
-	INCLUDEPATH += /usr/include/python2.7/
-	LIBS += -lpython2.7
   	win32 {
      		LIBS += -llibboost_python-vc90-mt-s-1_46_1
+		LIBS += -lpython2.7
   	} else {
-     		LIBS += -lboost_python-py26
+		PYVERSION = $$system(python -c \"import sys;v=sys.version_info;print str(v[0])+\'.\'+str(v[1])\")
+     		LIBS += -lboost_python
+		LIBS += -lpython$$PYVERSION
+		INCLUDEPATH += /usr/include/python$$PYVERSION/
   	}
 }
