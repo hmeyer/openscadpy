@@ -1,0 +1,7 @@
+[Desktop Entry]
+Type=Application
+Version=1.0
+Name=OpenSCADpy
+Icon=openscadpy
+Exec=openscadpy %f
+Categories=Graphics;3DGraphics;Engineering;Python

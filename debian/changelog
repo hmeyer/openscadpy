@@ -1,3 +1,9 @@
+openscadpy (2010.05.03-1ubuntu4) natty; urgency=low
+
+  * .desktop added 
+
+ -- Henning Meyer <hmeyer@gmx.eu>  Sun, 22 May 2011 19:39:31 +0200
+
 openscadpy (2010.05.03-1ubuntu3) maverick; urgency=low
 
   * upload to maverick
