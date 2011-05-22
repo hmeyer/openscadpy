@@ -1,3 +1,9 @@
+openscadpy (2010.05.05-1ubuntu2) natty; urgency=low
+
+  * .desktop 5th attempt 
+
+ -- Henning Meyer <hmeyer@gmx.eu>  Sun, 22 May 2011 23:36:37 +0200
+
 openscadpy (2010.05.05-1ubuntu1) natty; urgency=low
 
   * .desktop 4th attempt
