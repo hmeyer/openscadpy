@@ -607,7 +607,7 @@
   </action>
   <action name="helpActionManual">
    <property name="text">
-    <string>OpenSCAD Manual</string>
+    <string>OpenSCADpy Manual</string>
    </property>
   </action>
   <action name="fileActionClearRecent">
@@ -640,7 +640,7 @@
   </action>
   <action name="helpActionHomepage">
    <property name="text">
-    <string>OpenSCAD Homepage</string>
+    <string>OpenSCADpy Homepage</string>
    </property>
   </action>
   <action name="designActionAutoReload">
