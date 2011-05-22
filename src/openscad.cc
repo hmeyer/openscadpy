@@ -211,10 +211,10 @@ int main(int argc, char **argv)
 	exdir.cd("../Resources"); // Examples can be bundled
 	if (!exdir.exists("examples")) exdir.cd("../../..");
 #elif defined(Q_OS_UNIX)
-	if (exdir.cd("../share/openscad/examples")) {
+	if (exdir.cd("../share/openscadpy/examples")) {
 		examplesdir = exdir.path();
 	} else
-		if (exdir.cd("../../share/openscad/examples")) {
+		if (exdir.cd("../../share/openscadpy/examples")) {
 			examplesdir = exdir.path();
 		} else
 			if (exdir.cd("../../examples")) {
@@ -230,10 +230,10 @@ int main(int argc, char **argv)
 	libdir.cd("../Resources"); // Libraries can be bundled
 	if (!libdir.exists("libraries")) libdir.cd("../../..");
 #elif defined(Q_OS_UNIX)
-	if (libdir.cd("../share/openscad/libraries")) {
+	if (libdir.cd("../share/openscadpy/libraries")) {
 		librarydir = libdir.path();
 	} else
-		if (libdir.cd("../../share/openscad/libraries")) {
+		if (libdir.cd("../../share/openscadpy/libraries")) {
 			librarydir = libdir.path();
 		} else
 			if (libdir.cd("../../libraries")) {
