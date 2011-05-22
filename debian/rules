@@ -65,6 +65,8 @@ install: build
 
 	# Add here commands to install the package into debian/<packagename>.
 	$(MAKE) INSTALL_ROOT=`pwd`/debian/`dh_listpackages` install
+	cp openscadpy.png debian/`dh_listpackages`/usr/share/pixmaps/
+	cp openscadpy.desktop debian/`dh_listpackages`/usr/share/applications/
 
 # Build architecture-independent files here.
 binary-indep: build install

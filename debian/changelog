@@ -1,3 +1,16 @@
+openscadpy (2010.05.04-1ubuntu4) natty; urgency=low
+
+  * .desktop 4th attempt
+  * accessible examples
+
+ -- Henning Meyer <hmeyer@gmx.eu>  Sun, 22 May 2011 22:39:35 +0200
+
+openscadpy (2010.05.04-1ubuntu3) natty; urgency=low
+
+  * .desktop 3rd attempt
+
+ -- Henning Meyer <hmeyer@gmx.eu>  Sun, 22 May 2011 22:15:50 +0200
+
 openscadpy (2010.05.04-1ubuntu2) maverick; urgency=low
 
   * maverick upload 
