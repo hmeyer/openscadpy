@@ -1,3 +1,9 @@
+openscadpy (2010.05.04-1ubuntu2) maverick; urgency=low
+
+  * maverick upload 
+
+ -- Henning Meyer <hmeyer@gmx.eu>  Sun, 22 May 2011 21:05:04 +0200
+
 openscadpy (2010.05.04-1ubuntu1) natty; urgency=low
 
   * .desktop 2nd attempt
