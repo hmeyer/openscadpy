@@ -9,6 +9,7 @@ Homepage: http://github.com/hmeyer/openscadpy
 Package: openscadpy
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}, libcgal5 (>=3.5), libqt4-opengl, libglew1.5, libboost-python-dev (>= 1.41), libboost-program-options-dev
+Recommends: python-numpy
 Description: python script file based graphical CAD environment
  OpenSCADpy is a software for creating solid 3D CAD objects. It focuses on CAD
  aspects rather than artistic ones.

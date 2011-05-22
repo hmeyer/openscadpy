@@ -1,3 +1,10 @@
+openscadpy (2010.05.03-1ubuntu3) maverick; urgency=low
+
+  * upload to maverick
+  * also numpy added to recommends
+
+ -- Henning Meyer <hmeyer@gmx.eu>  Sun, 22 May 2011 19:32:08 +0200
+
 openscadpy (2010.05.03-1ubuntu2) natty; urgency=low
 
   * install to /usr instead of /usr/local 
