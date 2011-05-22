@@ -109,7 +109,7 @@ using CGAL::OGL::Nef3_Converter;
 #define QUOTED(x__) QUOTE(x__)
 
 static char helptitle[] =
-	"OpenSCAD "
+	"OpenSCADpy "
 	QUOTED(OPENSCAD_VERSION)
   " (www.openscad.org)\n";
 static char copyrighttext[] =
@@ -419,11 +419,11 @@ MainWindow::setFileName(const QString &filename)
 {
 	if (filename.isEmpty()) {
 		this->fileName.clear();
-		setWindowTitle("OpenSCAD - New Document[*]");
+		setWindowTitle("OpenSCADpy - New Document[*]");
 	}
 	else {
 		QFileInfo fileinfo(filename);
-		setWindowTitle("OpenSCAD - " + fileinfo.fileName() + "[*]");
+		setWindowTitle("OpenSCADpy - " + fileinfo.fileName() + "[*]");
 
 		// Check that the canonical file path exists - only update recent files
 		// if it does. Should prevent empty list items on initial open etc.
@@ -739,7 +739,7 @@ void MainWindow::actionNew()
 
 void MainWindow::actionOpen()
 {
-	QString new_filename = QFileDialog::getOpenFileName(this, "Open File", "", "OpenSCAD Designs (*.scad)");
+	QString new_filename = QFileDialog::getOpenFileName(this, "Open File", "", "OpenSCADpy Designs (*.scad)");
 #ifdef ENABLE_MDI
 	new MainWindow(new_filename);
 #else
@@ -846,7 +846,7 @@ void MainWindow::actionSaveAs()
 {
 	QString new_filename = QFileDialog::getSaveFileName(this, "Save File",
 			this->fileName.isEmpty()?"Untitled.scad":this->fileName,
-			"OpenSCAD Designs (*.scad)");
+			"OpenSCADpy Designs (*.scad)");
 	if (!new_filename.isEmpty()) {
 		if (QFileInfo(new_filename).suffix().isEmpty()) {
 			new_filename.append(".scad");
@@ -1714,13 +1714,13 @@ void
 MainWindow::helpAbout()
 {
 	qApp->setWindowIcon(QApplication::windowIcon());
-	QMessageBox::information(this, "About OpenSCAD", QString(helptitle) + QString(copyrighttext));
+	QMessageBox::information(this, "About OpenSCADpy", QString(helptitle) + QString(copyrighttext));
 }
 
 void
 MainWindow::helpHomepage()
 {
-	QDesktopServices::openUrl(QUrl("http://openscad.org/"));
+	QDesktopServices::openUrl(QUrl("https://github.com/hmeyer/openscadpy/"));
 }
 
 void
