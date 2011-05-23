@@ -114,7 +114,46 @@ openscad.result = polyhedron(
 * Polygon
 @polygon(points [, paths, center])@ creates a polygon. Points is a list of coordinates, paths a list of point-index lists. If paths is omitted, a default path connecting all points in a row (and the last to the first) is created.
 
+h4. Transforms
 
+* Scale
+* Translate
+* Rotate
+* Mirror
+* Matrix
+* Color
+
+h4. CSG
+
+* Union
+* Difference
+* Intersection
+
+h4. Extrusion
+
+* Linear Extrusion
+@dxf_linear_extrude@
+@linear_extrude@
+* Rotational Extrusion
+@dxf_rotate_extrude@
+@rotate_extrude@
+
+h4. Projection
+
+@projection@
+
+h4. Import
+
+* Surface
+* STL
+* DXF
+
+h4. Special
+
+* Minkowski Sum
+* DXF Dimensions
+* DXF Cross
+* Render
 
 h4. Animation
 
