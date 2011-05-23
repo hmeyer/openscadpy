@@ -91,7 +91,6 @@ The variables @openscad.fn@, @openscad.fa@ and @openscad.fs@ work as documented 
 @polyhedron(points, faces, convexity=5)@ creates a Polyhedron. points is a list of coordinates. faces is a list of faces, representes as list of point indices.
 *Example: (Pyramid)*
 <pre><code>from openscad import *
-
 openscad.result = polyhedron(
 	[#points
 		[10, 0, 0],
@@ -109,11 +108,11 @@ openscad.result = polyhedron(
 	]
 )</pre></code>
 * Square
-@square(length [, center])@ creates a 2D-Square of _length_. If _length_ is a list, it creates a rectangle.
+@square(length [, center])@ creates a 2D-Square with edge-length _length_. If _length_ is a list [x,y], it creates a rectangle with edge-lengths @x * y@.
 * Circle
 @circle(r)@ creates a 2D-circle of radius _r_.
 * Polygon
-@polygon(points [, paths, center]) creates a polygon. Points is a list of coordinates, paths a list of point-index lists. If paths is omitted, a default path connecting all points in a row (and the last to the first) is created.
+@polygon(points [, paths, center])@ creates a polygon. Points is a list of coordinates, paths a list of point-index lists. If paths is omitted, a default path connecting all points in a row (and the last to the first) is created.
 
 
 
