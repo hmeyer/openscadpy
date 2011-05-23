@@ -17,8 +17,7 @@ h2. Getting OpenSCADpy
 h3. Ubuntu Linux (Natty, Maverick)
 
 Piece of cake:
-<pre><code>
-sudo apt-add-repository ppa:hmeyer/openscadpy
+<pre><code>sudo apt-add-repository ppa:hmeyer/openscadpy
 sudo apt-get update
 sudo apt-get install openscadpy
 </code></pre>
@@ -60,17 +59,16 @@ To build OpenSCADpy, you need some libraries and tools. The version numbers in b
 
 h4. building OpenSCADpy
 
-First, run @qmake-qt4@ to generate a Makefile. On some systems you need to
-run @qmake4@, @qmake@ or something alike to run the qt4 version of the tool.
-
-Then run @make@. Finally you might run @make install@ as root or simply copy the
-@openscadpy@ binary (OpenSCADpy.app on Mac OS X) to the bin directory of your choice.
+First, run @qmake-qt4@ to generate a Makefile. On some systems you need to run @qmake4@, @qmake@ or something alike to run the qt4 version of the tool.
+Then run @make@. Finally you might run @make install@ as root or simply copy the @openscadpy@ binary (OpenSCADpy.app on Mac OS X) to the bin directory of your choice.
 
 
 h2. Documentation
+
 As OpenSCADpy is forked from OpenSCAD, you might want to look at the "OpenSCAD Homepage":http://openscad.org/ for documentation.
 
 h3. Reference
+
 All objects are defined in Python language. All OpenSCAD specific methods are part of the openscad-module - so most likely you want to import this module to the global namespace: @from openscad import *@.
 When all your code is executed OpenSCADpy will render the content of the variable @openscad.result@. 
 @openscad.result = openscad.sphere(10)@ would create a sphere (with r=10).
@@ -80,6 +78,6 @@ The following is a list of all object classes in OpenSCADpy.
 h4. Primitives
 
 * Sphere
-@sphere(r=_radius_)
+@sphere(r=_radius_)@
 
 
