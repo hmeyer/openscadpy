@@ -6,12 +6,7 @@ h2. What is OpenSCADpy?
 
 OpenSCADPy is a fork of OpenSCAD, a software for creating solid 3D CAD objects. OpenSCADPy uses Python instead of OpenSCADs intrinsic language to model objects. It is free software and available for Linux/UNIX, MS Windows and Mac OS X.
 
-Unlike most free software for creating 3D models (such as the famous
-application Blender) it does not focus on the artistic aspects of 3D modelling
-but instead on the CAD aspects. Thus it might be the application you are
-looking for when you are planning to create 3D models of machine parts but
-pretty sure is not what you are looking for when you are more interested in
-creating computer-animated movies.
+Unlike most free software for creating 3D models (such as the famous application Blender) it does not focus on the artistic aspects of 3D modelling but instead on the CAD aspects. Thus it might be the application you are looking for when you are planning to create 3D models of machine parts but pretty sure is not what you are looking for when you are more interested in creating computer-animated movies.
 
 OpenSCADpy is not an interactive modeller. Instead it is something like a 3D-compiler that reads in a script file that describes the object and renders the 3D model from this script file (see examples below). This gives you (the designer) full control over the modelling process and enables you to easily change any step in the modelling process or make designs that are defined by configurable parameters.
 
@@ -20,10 +15,13 @@ OpenSCADpy provides two main modelling techniques: First there is constructive s
 h2. Getting OpenSCADpy
 
 h3. Ubuntu Linux (Natty, Maverick)
+
 Piece of cake:
-@sudo apt-add-repository ppa:hmeyer/openscadpy
+<pre><code>
+sudo apt-add-repository ppa:hmeyer/openscadpy
 sudo apt-get update
-sudo apt-get install openscadpy@
+sudo apt-get install openscadpy
+</code></pre>
 
 h3. All other systems
 
@@ -62,14 +60,26 @@ To build OpenSCADpy, you need some libraries and tools. The version numbers in b
 
 h4. building OpenSCADpy
 
-First, run 'qmake-qt4' to generate a Makefile. On some systems you need to
-run 'qmake4', 'qmake' or something alike to run the qt4 version of the tool.
+First, run @qmake-qt4@ to generate a Makefile. On some systems you need to
+run @qmake4@, @qmake@ or something alike to run the qt4 version of the tool.
 
-Then run make. Finally you might run 'make install' as root or simply copy the
-'openscad' binary (OpenSCAD.app on Mac OS X) to the bin directory of your choice.
+Then run @make@. Finally you might run @make install@ as root or simply copy the
+@openscadpy@ binary (OpenSCADpy.app on Mac OS X) to the bin directory of your choice.
 
 
-j2. Documentation
-=============
-Have a look at the OpenSCAD Homepage (http://openscad.org/) for documentation.
+h2. Documentation
+As OpenSCADpy is forked from OpenSCAD, you might want to look at the "OpenSCAD Homepage":http://openscad.org/ for documentation.
+
+h3. Reference
+All objects are defined in Python language. All OpenSCAD specific methods are part of the openscad-module - so most likely you want to import this module to the global namespace: @from openscad import *@.
+When all your code is executed OpenSCADpy will render the content of the variable @openscad.result@. 
+@openscad.result = openscad.sphere(10)@ would create a sphere (with r=10).
+
+The following is a list of all object classes in OpenSCADpy.
+
+h4. Primitives
+
+* Sphere
+@sphere(r=_radius_)
+
 
