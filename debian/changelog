@@ -1,3 +1,11 @@
+openscadpy (2010.05.06-1ubuntu1) natty; urgency=low
+
+  * *.py instead of *.scad
+  * suppressed build warnings
+  * debian make cleanup
+
+ -- Henning Meyer <hmeyer@gmx.eu>  Mon, 23 May 2011 11:04:12 +0200
+
 openscadpy (2010.05.05-1ubuntu3) maverick; urgency=low
 
   * maverick upload 

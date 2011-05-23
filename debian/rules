@@ -2,30 +2,6 @@
 
 export DH_VERBOSE=1
 
-# this hardcoded stuff is, to quote bug#571640, crap. unfortunately,
-# the solution suggested there (conflicting with qmake-qt3) does not
-# work here as this package indirectly build-depends on it via
-# libcgal-dev
-QMAKEARGS=-makefile -nocache "QMAKE_CFLAGS_RELEASE=-g -O2" "QMAKE_CFLAGS_DEBUG=-g -O2" "QMAKE_CXXFLAGS_RELEASE=-g -O2" "QMAKE_CXXFLAGS_DEBUG=-g -O2" QMAKE_STRIP=: PREFIX=/usr
-
-#%:
-#	dh $@
-#
-#override_dh_auto_configure:
-#	qmake-qt4 ${QMAKEARGS}
-#
-#override_dh_auto_build:
-#	dh_auto_build
-#	convert icons/icon-alpha.png -resize 688x688 -background transparent -gravity center -extent 688x688 openscadpy.png
-#
-##override_dh_auto_install:
-##	dh_auto_install
-##	ln -s /usr/share/openscadpy/examples debian/openscadpy/usr/share/doc/openscadpy/examples
-#
-#override_dh_clean:
-#	dh_clean
-#	rm -f openscadpy.png
-
 openscadpy.png: icons/icon-alpha.png
 	convert icons/icon-alpha.png -resize 688x688 -background transparent -gravity center -extent 688x688 openscadpy.png
 
@@ -33,16 +9,11 @@ openscadpy.png: icons/icon-alpha.png
 build: Makefile openscadpy.png build-stamp
 build-stamp:
 	dh_testdir
-
-	# Add here commands to compile the package.
-	#	qmake-qt4 ${QMAKEARGS}
 	$(MAKE)
-	#	convert icons/icon-alpha.png -resize 688x688 -background transparent -gravity center -extent 688x688 openscadpy.png
-
 	touch build-stamp
 
 Makefile:
-	qmake-qt4 ${QMAKEARGS}
+	qmake-qt4
 
 
 clean: Makefile
@@ -50,11 +21,9 @@ clean: Makefile
 	dh_testroot
 	rm -f build-stamp
 	rm -f openscadpy.png
-
 	# Add here commands to clean up after the build process.
 	$(MAKE) clean
 	$(MAKE) distclean
-
 	dh_clean
 
 install: build
@@ -62,7 +31,6 @@ install: build
 	dh_testroot
 	dh_prep
 	dh_installdirs
-
 	# Add here commands to install the package into debian/<packagename>.
 	$(MAKE) INSTALL_ROOT=`pwd`/debian/`dh_listpackages` install
 	mkdir -p debian/`dh_listpackages`/usr/share/pixmaps/
