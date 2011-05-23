@@ -39,7 +39,11 @@ install: build
 	cp openscadpy.desktop debian/`dh_listpackages`/usr/share/applications/
 
 # Build architecture-independent files here.
-binary-indep: build install
+binary-indep: 
+# We have nothing to do by default.
+
+# Build architecture-dependent files here.
+binary-arch: build install
 	dh_testdir
 	dh_testroot
 	dh_installchangelogs
@@ -70,9 +74,6 @@ binary-indep: build install
 	dh_md5sums
 	dh_builddeb
 
-# Build architecture-dependent files here.
-binary-arch: build install
-# We have nothing to do by default.
 
 binary: binary-indep binary-arch
 .PHONY: build clean binary-indep binary-arch binary install

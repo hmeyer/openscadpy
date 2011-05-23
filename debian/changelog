@@ -1,3 +1,9 @@
+openscadpy (2010.05.06-1ubuntu3) natty; urgency=low
+
+  * fix amd64 build - strange error in rules 
+
+ -- Henning Meyer <hmeyer@gmx.eu>  Mon, 23 May 2011 11:38:26 +0200
+
 openscadpy (2010.05.06-1ubuntu2) maverick; urgency=low
 
   * maverick upload 
