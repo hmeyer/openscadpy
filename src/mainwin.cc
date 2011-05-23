@@ -196,7 +196,7 @@ MainWindow::MainWindow(const QString &filename)
 
 	if (!examplesdir.isEmpty()) {
 		bool found_example = false;
-		QStringList examples = QDir(examplesdir).entryList(QStringList("*.scad"), 
+		QStringList examples = QDir(examplesdir).entryList(QStringList("*.py"), 
 		QDir::Files | QDir::Readable, QDir::Name);
 		foreach (const QString &ex, examples) {
 			this->menuExamples->addAction(ex, this, SLOT(actionOpenExample()));
@@ -739,7 +739,7 @@ void MainWindow::actionNew()
 
 void MainWindow::actionOpen()
 {
-	QString new_filename = QFileDialog::getOpenFileName(this, "Open File", "", "OpenSCADpy Designs (*.scad)");
+	QString new_filename = QFileDialog::getOpenFileName(this, "Open File", "", "OpenSCADpy Designs (*.py)");
 #ifdef ENABLE_MDI
 	new MainWindow(new_filename);
 #else
@@ -845,11 +845,11 @@ void MainWindow::actionSave()
 void MainWindow::actionSaveAs()
 {
 	QString new_filename = QFileDialog::getSaveFileName(this, "Save File",
-			this->fileName.isEmpty()?"Untitled.scad":this->fileName,
-			"OpenSCADpy Designs (*.scad)");
+			this->fileName.isEmpty()?"Untitled.py":this->fileName,
+			"OpenSCADpy Designs (*.py)");
 	if (!new_filename.isEmpty()) {
 		if (QFileInfo(new_filename).suffix().isEmpty()) {
-			new_filename.append(".scad");
+			new_filename.append(".py");
 
 			// Manual overwrite check since Qt doesn't do it, when using the
 			// defaultSuffix property
