@@ -80,15 +80,15 @@ h4. Primitives
 The variables @openscad.fn@, @openscad.fa@ and @openscad.fs@ work as documented in the "OpenSCAD Wiki":http://en.wikibooks.org/wiki/OpenSCAD_User_Manual/Other_Language_Features. Additionally to these global settings (which are evaluated at the time of creation) each primitive has local properties @obj.fn@, @obj.fa@ and @obj.fs@. So you could do @s = sphere(10);s.fn=17@
 
 * Cube
-@cube(length=l, center=False)@ creates a cube with length l.
-@cube(dim=[l,w,h], center=False)@ creates a box with dim l x w x h.
+@cube(length=l, center=False)@ creates a cube with length _l_.
+@cube(dim=[l,w,h], center=False)@ creates a box with dim _l_ x _w_ x _h_.
 * Sphere
 @sphere(r=radius)@ creates a ... yep a Sphere.
 * Cylinder
 @cylinder(h=height, r=radius, center=False)@ creates a cylinder.
 @cylinder(h=height, r1=radius1, r2=radius2, center=False)@ creates a cone.
 * Polyhedron
-@polyhedron(points, faces, convexity=5)@ creates a Polyhedron. points is a list of coordinates. faces is a list of faces, representes as list of point indices.
+@polyhedron(points, faces, convexity=5)@ creates a Polyhedron. _points_ is a list of coordinates. _faces_ is a list of faces, representes as list of point indices.
 *Example: (Pyramid)*
 <pre><code>from openscad import *
 openscad.result = polyhedron(
@@ -112,48 +112,83 @@ openscad.result = polyhedron(
 * Circle
 @circle(r)@ creates a 2D-circle of radius _r_.
 * Polygon
-@polygon(points [, paths, center])@ creates a polygon. Points is a list of coordinates, paths a list of point-index lists. If paths is omitted, a default path connecting all points in a row (and the last to the first) is created.
+@polygon(points [, paths, convexity=5])@ creates a polygon. _points_ is a list of coordinates, _paths_ a list of point-index lists. If _paths_ is omitted, a default path connecting all points in a row (and the last to the first) is created.
 
 h4. Transforms
 
+All transforms accept an object as last parameter. This parameter might be a single object - named _child_ - or a list of objects - named _children_.
+
 * Scale
-* Translate
+@scale(dim, object)@ scale object by _dim_. _dim_ is a list, e.g. _[2,2,1]_.
+* Translatea
+@translate(vec, object)@ translate _object_ by _vec_. _vec_ is a list, e.g. _[5,-7.3,0]_.
 * Rotate
+360 degrees is a full circle - to stay compatible with OpenSCAD - this might be subject to change (to 2*pi).
+@rotate(ang=angle [, vec=[0,0,1] ], object)@ Rotate _ang_ degrees around _vec_.
+@rotate(vec=[x,y,z], object)@ rotate _x_ degrees around X, _y_ degrees around Y and _z_ degrees around Z.
 * Mirror
+@mirror([x,y,z], object)@ mirror _object_ on a plane with normal _[x,y,z]_, crossing the origin.
 * Matrix
+@matrix(mat, object)@ use _mat_ (list with 16 elements - representing a 4 x 4 matrix) as a transformation matrix on _object_.
 * Color
+@color([r,g,b,a], object)@ pretty self explaining....
 
 h4. CSG
 
+All CSG-methods take an input list of objects.
+
 * Union
+@union(list)@ many to one
 * Difference
+@difference(list)@ all objects in list (but the first) are subtracted from the first.
 * Intersection
-
-h4. Extrusion
-
-* Linear Extrusion
-@dxf_linear_extrude@
-@linear_extrude@
-* Rotational Extrusion
-@dxf_rotate_extrude@
-@rotate_extrude@
-
-h4. Projection
-
-@projection@
+@intersection(list)@ intersect all objects in list.
 
 h4. Import
 
 * Surface
+@surface(file=filename, convexity=5, center=False)@
+<pre><code>#surface.dat
+10 9 8 7 6 5 5 5 5 5 
+9 8 7 6 6 4 3 2 1 0 
+8 7 6 6 4 3 2 1 0 0
+7 6 6 4 3 2 1 0 0 0
+6 6 4 3 2 1 1 0 0 0
+6 6 3 2 1 1 1 0 0 0
+6 6 2 1 1 1 1 0 0 0
+6 6 1 0 0 0 0 0 0 0
+3 1 0 0 0 0 0 0 0 0
+3 0 0 0 0 0 0 0 0 0</code></pre>
 * STL
+@import_stl(filename [, convexity=5])@ import STL.
 * DXF
+@import_dxf(file=filename [, layer=layername, origin=[0,0,0], scale=1.0, convexity=5])@ import DXF.
+
+h4. Extrusion
+If _slices_ is -1, optimal slice number will be calculated based on _fn_, _fa_ and _fs_.
+
+* Linear Extrusion
+@linear_extrude(h=height [, twist=0.0, convexity=5, slices=-1, center= False], object)@ extrude _object_.
+@dxf_linear_extrude( file=filename, [layer=layername,] h=height, [twist=0.0, origin=[0,0,0], scale=1.0, convexity=5, center=False)@ fusion of @linear_extrude@ and @import_dxf@ - might be removed in later releases.
+
+* Rotational Extrusion
+@rotate_extrude([convexity=5,] object)@ rotate extrude object a full circle.
+@dxf_rotate_extrude(file=filename [,layer=layername, origin=[0,0,0], scale=1.0, convexity=5])@ fusion of @rotate_extrude@ and @import_dxf@ - might be removed in later releases.
+
+h4. Projection
+
+@projection([convexity=5, cut_mode=False,] object)@ project object onto xy-Plane. If _cut_mode_ is _True_ don't project but cut.
 
 h4. Special
 
 * Minkowski Sum
+@minkowski(list, convexity=5)@ build a minkowski sum of all objects in list.
 * DXF Dimensions
+@DxfDim(filename, layername="", name [, origin=[0,0,0], scale=1])@ get Dimension with name _name_ from layer _layername_.
 * DXF Cross
+@DxfCross(filename, layername="", origin=[0,0,0], scale=1.0)@ return the crossing of two lines on layer _layername_.
 * Render
+@render(object)@ precalculate (and cache) object.
 
 h4. Animation
 
