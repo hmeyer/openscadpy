@@ -22,6 +22,7 @@
 #include <boost/parameter/python.hpp>
 #include <boost/python.hpp>
 #include <boost/mpl/vector.hpp>
+#pragma GCC diagnostic ignored "-Wunused-parameter" // "'boost_parameter_enabler_argument'
 
 
 BOOST_PARAMETER_KEYWORD(tag, dim)
