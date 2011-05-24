@@ -1,3 +1,5 @@
+# by Brad Pitcher (2011)
+
 from openscad import *
 from math import sqrt, pow, sin, cos, pi
 
