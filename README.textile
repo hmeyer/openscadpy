@@ -1,4 +1,4 @@
-h1. OpenSCADpy
+h1. OpenSCADpy "!http://api.flattr.com/button/flattr-badge-large.png(Flattr this)!":http://flattr.com/thing/278025/OpenSCADpy
 
 By Henning Meyer, Marius Kintel and Clifford Wolf
 
