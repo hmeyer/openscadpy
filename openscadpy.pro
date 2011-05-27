@@ -95,6 +95,9 @@ progresswidget {
 }
 
 findnreplace {
+  system(git submodule init)
+  system(git submodule update)
+
   DEFINES += USE_FINDNREPLACE
   INCLUDEPATH += qtfindreplacedialog/dialogs
   SOURCES += qtfindreplacedialog/dialogs/findform.cpp \
