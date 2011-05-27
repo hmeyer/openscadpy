@@ -1,3 +1,27 @@
+openscadpy (2010.05.07-1ubuntu4) maverick; urgency=low
+
+  * maverick upload 
+
+ -- Henning Meyer <hmeyer@gmx.eu>  Fri, 27 May 2011 22:32:02 +0200
+
+openscadpy (2010.05.07-1ubuntu3) natty; urgency=low
+
+  * README fix 
+
+ -- Henning Meyer <hmeyer@gmx.eu>  Fri, 27 May 2011 22:30:44 +0200
+
+openscadpy (2010.05.07-1ubuntu2) maverick; urgency=low
+
+  * maverick upload 
+
+ -- Henning Meyer <hmeyer@gmx.eu>  Fri, 27 May 2011 22:04:17 +0200
+
+openscadpy (2010.05.07-1ubuntu1) natty; urgency=low
+
+  * added find and replace
+
+ -- Henning Meyer <hmeyer@gmx.eu>  Fri, 27 May 2011 21:53:01 +0200
+
 openscadpy (2010.05.06-1ubuntu4) maverick; urgency=low
 
   * maverick upload 
