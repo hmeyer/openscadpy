@@ -9,6 +9,11 @@
 #include <boost/shared_ptr.hpp>
 using boost::shared_ptr;
 class AbstractNode;
+#ifdef USE_FINDNREPLACE
+class FindDialog;
+class FindReplaceDialog;
+#endif
+
 typedef shared_ptr<AbstractNode> AbstractNodePtr;
 
 class MainWindow : public QMainWindow, public Ui::MainWindow
@@ -57,6 +62,11 @@ public:
 
 protected:
 	void closeEvent(QCloseEvent *event);
+#ifdef USE_FINDNREPLACE
+    	boost::shared_ptr<FindDialog> m_findDialog;
+    	boost::shared_ptr<FindReplaceDialog> m_findReplaceDialog;
+#endif
+
 
 private slots:
 	void updatedFps();
