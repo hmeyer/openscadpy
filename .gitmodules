@@ -1,0 +1,3 @@
+[submodule "qtfindreplacedialog"]
+	path = qtfindreplacedialog
+	url = git://gitorious.org/qtfindreplacedialog/qtfindreplacedialog.git
