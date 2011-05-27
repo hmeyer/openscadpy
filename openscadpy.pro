@@ -8,6 +8,8 @@
   }
 }
 
+DEFINES += QT_NO_DEBUG_OUTPUT
+
 win32 {
   isEmpty(VERSION) VERSION = $$system(date /t)
 } else {
@@ -73,6 +75,7 @@ macx:CONFIG += mdi
 CONFIG += cgal
 CONFIG += opencsg
 CONFIG += progresswidget
+CONFIG += findnreplace
 CONFIG += boost
 CONFIG += python
 
@@ -89,6 +92,22 @@ progresswidget {
   FORMS   += src/ProgressWidget.ui
   HEADERS += src/ProgressWidget.h
   SOURCES += src/ProgressWidget.cc
+}
+
+findnreplace {
+  DEFINES += USE_FINDNREPLACE
+  INCLUDEPATH += qtfindreplacedialog/dialogs
+  SOURCES += qtfindreplacedialog/dialogs/findform.cpp \
+    qtfindreplacedialog/dialogs/finddialog.cpp \
+    qtfindreplacedialog/dialogs/findreplaceform.cpp \
+    qtfindreplacedialog/dialogs/findreplacedialog.cpp
+  HEADERS += qtfindreplacedialog/dialogs/findreplaceform.h \
+    qtfindreplacedialog/dialogs/findreplacedialog.h \
+    qtfindreplacedialog/dialogs/findform.h \
+    qtfindreplacedialog/dialogs/finddialog.h \
+    qtfindreplacedialog/dialogs/findreplace_global.h
+  FORMS += qtfindreplacedialog/dialogs/findreplaceform.ui \
+    qtfindreplacedialog/dialogs/findreplacedialog.ui
 }
 
 include(cgal.pri)

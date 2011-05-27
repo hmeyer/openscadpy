@@ -75,6 +75,12 @@
 #include "qlanguagefactory.h"
 #endif
 
+#ifdef USE_FINDNREPLACE
+#include "finddialog.h"
+#include "findreplacedialog.h"
+#endif
+
+
 #ifdef ENABLE_CGAL
 
 #if 1
@@ -121,6 +127,10 @@ static char copyrighttext[] =
 	"(at your option) any later version.";
 
 MainWindow::MainWindow(const QString &filename)
+#ifdef USE_FINDNREPLACE
+	:m_findDialog(new FindDialog(this)),
+	m_findReplaceDialog(new FindReplaceDialog(this))
+#endif
 {
 	setupUi(this);
 
@@ -170,6 +180,12 @@ MainWindow::MainWindow(const QString &filename)
 
 	animate_panel->hide();
 
+	m_findDialog->setModal(false);
+	m_findDialog->setTextEdit(editor);
+
+	m_findReplaceDialog->setModal(false);
+	m_findReplaceDialog->setTextEdit(editor);
+
 	// File menu
 	connect(this->fileActionNew, SIGNAL(triggered()), this, SLOT(actionNew()));
 	connect(this->fileActionOpen, SIGNAL(triggered()), this, SLOT(actionOpen()));
@@ -216,6 +232,10 @@ MainWindow::MainWindow(const QString &filename)
 	connect(this->editActionRedo, SIGNAL(triggered()), editor, SLOT(redo()));
 	connect(this->editActionCut, SIGNAL(triggered()), editor, SLOT(cut()));
 	connect(this->editActionCopy, SIGNAL(triggered()), editor, SLOT(copy()));
+#ifdef USE_FINDNREPLACE
+	connect(this->actionFind, SIGNAL(triggered()), m_findDialog.get(), SLOT(show()));
+	connect(this->actionReplace, SIGNAL(triggered()), m_findReplaceDialog.get(), SLOT(show()));
+#endif
 	connect(this->editActionPaste, SIGNAL(triggered()), editor, SLOT(paste()));
 	connect(this->editActionIndent, SIGNAL(triggered()), editor, SLOT(indentSelection()));
 	connect(this->editActionUnindent, SIGNAL(triggered()), editor, SLOT(unindentSelection()));

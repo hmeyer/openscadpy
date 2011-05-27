@@ -1,0 +1,195 @@
+h1. OpenSCADpy "!http://api.flattr.com/button/flattr-badge-large.png(Flattr this)!":http://flattr.com/thing/278025/OpenSCADpy
+
+By Henning Meyer, Marius Kintel and Clifford Wolf
+
+h2. What is OpenSCADpy?
+
+OpenSCADPy is a fork of OpenSCAD, a software for creating solid 3D CAD objects. OpenSCADPy uses Python instead of OpenSCADs intrinsic language to model objects. It is free software and available for Linux/UNIX, MS Windows and Mac OS X.
+
+Unlike most free software for creating 3D models (such as the famous application Blender) it does not focus on the artistic aspects of 3D modelling but instead on the CAD aspects. Thus it might be the application you are looking for when you are planning to create 3D models of machine parts but pretty sure is not what you are looking for when you are more interested in creating computer-animated movies.
+
+OpenSCADpy is not an interactive modeller. Instead it is something like a 3D-compiler that reads in a script file that describes the object and renders the 3D model from this script file (see examples below). This gives you (the designer) full control over the modelling process and enables you to easily change any step in the modelling process or make designs that are defined by configurable parameters.
+
+OpenSCADpy provides two main modelling techniques: First there is constructive solid geometry (aka CSG) and second there is extrusion of 2D outlines. As data exchange format format for this 2D outlines Autocad DXF files are used. In addition to 2D paths for extrusion it is also possible to read design parametes from DXF files. Besides DXF files OpenSCAD can read and create 3D models in the STL and OFF file formats.
+
+h2. Getting OpenSCADpy
+
+h3. Ubuntu Linux (Natty, Maverick)
+
+Piece of cake:
+<pre><code>sudo apt-add-repository ppa:hmeyer/openscadpy
+sudo apt-get update
+sudo apt-get install openscadpy
+</code></pre>
+
+h3. All other systems
+
+As there are no binaries available for your system, you have to build them yourself. We are currently working on installers for MS Win and maybe even MacOS. As debian packages are available for Ubuntu, it should be easy to produce deb's for Debian and RPMs (via Alien?) for Fedora. Please contact the maintainer if you need packages for your platform or if you can provide help building these.
+
+h4. Prerequisites
+
+To build OpenSCADpy, you need some libraries and tools. The version numbers in brackets specify the versions which have been used for development. Other versions may or may not work as well..
+
+* Qt4 (4.4 - 4.7):
+  http://www.qtsoftware.com/
+
+* CGAL (3.5 - 3.7):
+  http://www.cgal.org/
+
+* GMP (5.0.x):
+  http://www.gmplib.org/
+
+* boost (at least 1.41.0, required by CGAL and Python binding)
+  http://www.boost.org/
+
+* OpenCSG (1.3.0):
+  http://www.opencsg.org/
+
+* GLEW (1.5.x, also bundled with OpenCSG)
+  http://glew.sourceforge.net/
+
+* Eigen2 (2.0.11)
+  http://eigen.tuxfamily.org/
+
+* GCC C++ Compiler (>=4.2)
+  http://gcc.gnu.org/
+
+* Python (2.6|2.7)
+
+
+h4. building OpenSCADpy
+
+First, run @qmake-qt4@ to generate a Makefile. On some systems you need to run @qmake4@, @qmake@ or something alike to run the qt4 version of the tool.
+Then run @make@. Finally you might run @make install@ as root or simply copy the @openscadpy@ binary (OpenSCADpy.app on Mac OS X) to the bin directory of your choice.
+
+
+h2. Documentation
+
+As OpenSCADpy is forked from OpenSCAD, you might want to look at the "OpenSCAD Homepage":http://openscad.org/ for documentation.
+
+h3. Reference
+
+All objects are defined in Python language. All OpenSCAD specific methods are part of the openscad-module - so most likely you want to import this module to the global namespace: @from openscad import *@
+When all your code is executed OpenSCADpy will render the content of the variable @openscad.result@
+@openscad.result = openscad.sphere(10)@ would create a sphere (with r=10).
+
+The following is a list of all object classes in OpenSCADpy.
+
+h4. Primitives
+
+The variables @openscad.fn@, @openscad.fa@ and @openscad.fs@ work as documented in the "OpenSCAD Wiki":http://en.wikibooks.org/wiki/OpenSCAD_User_Manual/Other_Language_Features. Additionally to these global settings (which are evaluated at the time of creation) each primitive has local properties @obj.fn@, @obj.fa@ and @obj.fs@. So you could do @s = sphere(10);s.fn=17@
+
+* Cube
+@cube(length=l, center=False)@ creates a cube with length _l_.
+@cube(dim=[l,w,h], center=False)@ creates a box with dim _l_ x _w_ x _h_.
+* Sphere
+@sphere(r=radius)@ creates a ... yep a Sphere.
+* Cylinder
+@cylinder(h=height, r=radius, center=False)@ creates a cylinder.
+@cylinder(h=height, r1=radius1, r2=radius2, center=False)@ creates a cone.
+* Polyhedron
+@polyhedron(points, faces, convexity=5)@ creates a Polyhedron. _points_ is a list of coordinates. _faces_ is a list of faces, representes as list of point indices.
+*Example: (Pyramid)*
+<pre><code>from openscad import *
+openscad.result = polyhedron(
+	[#points
+		[10, 0, 0],
+		[0, 10, 0],
+		[-10, 0, 0],
+		[0, -10, 0],
+		[0, 0, 10]
+	],
+	[#faces
+		[0, 1, 2, 3],
+		[4, 1, 0],
+		[4, 2, 1],
+		[4, 3, 2],
+		[4, 0, 3]
+	]
+)</pre></code>
+* Square
+@square(length [, center])@ creates a 2D-Square with edge-length _length_. If _length_ is a list [x,y], it creates a rectangle with edge-lengths @x * y@.
+* Circle
+@circle(r)@ creates a 2D-circle of radius _r_.
+* Polygon
+@polygon(points [, paths, convexity=5])@ creates a polygon. _points_ is a list of coordinates, _paths_ a list of point-index lists. If _paths_ is omitted, a default path connecting all points in a row (and the last to the first) is created.
+
+h4. Transforms
+
+All transforms accept an object as last parameter. This parameter might be a single object - named _child_ - or a list of objects - named _children_.
+
+* Scale
+@scale(dim, object)@ scale object by _dim_. _dim_ is a list, e.g. _[2,2,1]_.
+* Translatea
+@translate(vec, object)@ translate _object_ by _vec_. _vec_ is a list, e.g. _[5,-7.3,0]_.
+* Rotate
+360 degrees is a full circle - to stay compatible with OpenSCAD - this might be subject to change (to 2*pi).
+@rotate(ang=angle [, vec=[0,0,1] ], object)@ Rotate _ang_ degrees around _vec_.
+@rotate(vec=[x,y,z], object)@ rotate _x_ degrees around X, _y_ degrees around Y and _z_ degrees around Z.
+* Mirror
+@mirror([x,y,z], object)@ mirror _object_ on a plane with normal _[x,y,z]_, crossing the origin.
+* Matrix
+@matrix(mat, object)@ use _mat_ (list with 16 elements - representing a 4 x 4 matrix) as a transformation matrix on _object_.
+* Color
+@color([r,g,b,a], object)@ pretty self explaining....
+
+h4. CSG
+
+All CSG-methods take an input list of objects.
+
+* Union
+@union(list)@ many to one
+* Difference
+@difference(list)@ all objects in list (but the first) are subtracted from the first.
+* Intersection
+@intersection(list)@ intersect all objects in list.
+
+h4. Import
+
+* Surface
+@surface(file=filename, convexity=5, center=False)@
+<pre><code>#surface.dat
+10 9 8 7 6 5 5 5 5 5 
+9 8 7 6 6 4 3 2 1 0 
+8 7 6 6 4 3 2 1 0 0
+7 6 6 4 3 2 1 0 0 0
+6 6 4 3 2 1 1 0 0 0
+6 6 3 2 1 1 1 0 0 0
+6 6 2 1 1 1 1 0 0 0
+6 6 1 0 0 0 0 0 0 0
+3 1 0 0 0 0 0 0 0 0
+3 0 0 0 0 0 0 0 0 0</code></pre>
+* STL
+@import_stl(filename [, convexity=5])@ import STL.
+* DXF
+@import_dxf(file=filename [, layer=layername, origin=[0,0,0], scale=1.0, convexity=5])@ import DXF.
+
+h4. Extrusion
+If _slices_ is -1, optimal slice number will be calculated based on _fn_, _fa_ and _fs_.
+
+* Linear Extrusion
+@linear_extrude(h=height [, twist=0.0, convexity=5, slices=-1, center= False], object)@ extrude _object_.
+@dxf_linear_extrude( file=filename, [layer=layername,] h=height, [twist=0.0, origin=[0,0,0], scale=1.0, convexity=5, center=False)@ fusion of @linear_extrude@ and @import_dxf@ - might be removed in later releases.
+
+* Rotational Extrusion
+@rotate_extrude([convexity=5,] object)@ rotate extrude object a full circle.
+@dxf_rotate_extrude(file=filename [,layer=layername, origin=[0,0,0], scale=1.0, convexity=5])@ fusion of @rotate_extrude@ and @import_dxf@ - might be removed in later releases.
+
+h4. Projection
+
+@projection([convexity=5, cut_mode=False,] object)@ project object onto xy-Plane. If _cut_mode_ is _True_ don't project but cut.
+
+h4. Special
+
+* Minkowski Sum
+@minkowski(list, convexity=5)@ build a minkowski sum of all objects in list.
+* DXF Dimensions
+@DxfDim(filename, layername="", name [, origin=[0,0,0], scale=1])@ get Dimension with name _name_ from layer _layername_.
+* DXF Cross
+@DxfCross(filename, layername="", origin=[0,0,0], scale=1.0)@ return the crossing of two lines on layer _layername_.
+* Render
+@render(object)@ precalculate (and cache) object.
+
+h4. Animation
+
+The variable @openscad.t@ works like documented in the "OpenSCAD Wiki":http://en.wikibooks.org/wiki/OpenSCAD_User_Manual/Other_Language_Features. It can be used for animation.
