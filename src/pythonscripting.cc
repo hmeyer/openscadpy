@@ -716,6 +716,17 @@ PythonScript::PythonScript(double time) {
   Py_Initialize();
   object openscad_module( (handle<>(PyImport_ImportModule(PyContext::nsopenscad.c_str()))) );
   ctx.init(openscad_module, time);
+  exec(
+"def nodeAdd(self, other):\n"
+"	return openscad.union([self, other])\n"
+"def nodeSub(self, other):\n"
+"	return openscad.difference([self, other])\n"
+"def nodeAnd(self, other):\n"
+"	return openscad.intersection([self, other])\n"
+"openscad.AbstractNode.__add__ = nodeAdd\n"
+"openscad.AbstractNode.__sub__ = nodeSub\n"
+"openscad.AbstractNode.__and__ = nodeAnd\n"
+  , ctx.main_namespace);
   //ImportOFFNode
   //CgaladvMinkowskiNode
   //CgaladvGlideNode
