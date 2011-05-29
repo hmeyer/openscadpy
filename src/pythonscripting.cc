@@ -723,9 +723,12 @@ PythonScript::PythonScript(double time) {
 "	return openscad.difference([self, other])\n"
 "def nodeAnd(self, other):\n"
 "	return openscad.intersection([self, other])\n"
+"def nodeMul(self, other):\n"
+"	return openscad.minkowski([self, other])\n"
 "openscad.AbstractNode.__add__ = nodeAdd\n"
 "openscad.AbstractNode.__sub__ = nodeSub\n"
 "openscad.AbstractNode.__and__ = nodeAnd\n"
+"openscad.AbstractNode.__mul__ = nodeMul\n"
   , ctx.main_namespace);
   //ImportOFFNode
   //CgaladvMinkowskiNode
