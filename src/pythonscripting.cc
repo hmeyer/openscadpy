@@ -58,13 +58,11 @@ class PyContext {
   object main_module;
   object openscad_namespace;
   
-  std::string path;
   public:
   static const std::string nsresult;
   static const std::string nsopenscad;
   PyContext() {};
     void init(object &openscad_module, double time=0.0){
-      path.clear();
       main_module = object((handle<>(borrowed(PyImport_AddModule("__main__")))));
       main_namespace = main_module.attr("__dict__");
       main_namespace[nsopenscad] = openscad_module;
@@ -80,8 +78,6 @@ class PyContext {
 	return openscad_namespace[nsresult];
       return object();
     }
-    const std::string &getPath() const { return path;}
-    void setPath(const std::string &p) { path = p;}
     Accuracy &getAcc() {
       acc.fn = extract<double>(openscad_namespace["fn"]);
       acc.fa = extract<double>(openscad_namespace["fa"]);
@@ -739,10 +735,14 @@ PythonScript::PythonScript(double time) {
 PythonScript::~PythonScript() {}
 
 AbstractNode::Pointer PythonScript::evaluate(const std::string &code, const std::string &path) {
-  ctx.setPath(path);
   try {
+    str dir(path);
+    if (len(dir)==0) dir =".";
+    object sys = import("sys"); 
+    sys.attr("path").attr("insert")(0, dir); 
     exec(code.c_str(), ctx.main_namespace);
     PyAbstractNode &resNode = extract<PyAbstractNode&>(ctx.getResult());
+    sys.attr("path").attr("remove")(dir); 
     return resNode.getNode();
   } catch(error_already_set) {
 //    PyErr_Print();
