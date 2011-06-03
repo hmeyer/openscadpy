@@ -15,4 +15,4 @@ def example001():
 		- rotcy([1,0,0], cy_r, cy_h) 
 		- rotcy([0,1,0], cy_r, cy_h))
 
-openscad.result = example001()
+openscad.assemble( example001() )

@@ -51,7 +51,7 @@ using namespace boost::python;
 using boost::make_shared;
 
 list empty_list;
-
+class PyAbstractNode;
 
 class PyContext {
   Accuracy acc;
@@ -77,6 +77,9 @@ class PyContext {
       if (openscad_namespace.contains(nsresult))
 	return openscad_namespace[nsresult];
       return object();
+    }
+    void setResult(const PyAbstractNode &n) {
+	openscad_namespace[nsresult] = n;
     }
     Accuracy &getAcc() {
       acc.fn = extract<double>(openscad_namespace["fn"]);
@@ -609,6 +612,11 @@ list pyDxfCross(const std::string &filename, const std::string &layername=std::s
 
 BOOST_PYTHON_FUNCTION_OVERLOADS(pyDxfCross_overloads, pyDxfCross, 1, 4)
 
+void assemble(const PyAbstractNode &n) {
+	ctx.setResult(n);	
+}
+
+
 BOOST_PYTHON_MODULE(openscad) {
   namespace py = boost::parameter::python;
   namespace mpl = boost::mpl;
@@ -616,9 +624,9 @@ BOOST_PYTHON_MODULE(openscad) {
     .add_property("highlight", &PyAbstractNode::getHighlight, &PyAbstractNode::setHighlight)
     .add_property("background", &PyAbstractNode::getBackground, &PyAbstractNode::setBackground);    
   class_<PyNodeAccuracy>("NodeAccuracy")
-    .add_property("fn", &PyNodeAccuracy::getfn, &PyNodeAccuracy::setfn)
-    .add_property("fs", &PyNodeAccuracy::getfs, &PyNodeAccuracy::setfs)
-    .add_property("fa", &PyNodeAccuracy::getfa, &PyNodeAccuracy::setfa);
+    .add_property("_fn", &PyNodeAccuracy::getfn, &PyNodeAccuracy::setfn)
+    .add_property("_fs", &PyNodeAccuracy::getfs, &PyNodeAccuracy::setfs)
+    .add_property("_fa", &PyNodeAccuracy::getfa, &PyNodeAccuracy::setfa);
   class_<PyUnionNode, bases<PyAbstractNode> >("union", init<list>());
   class_<PyDifferenceNode, bases<PyAbstractNode> >("difference", init<list>());
   class_<PyIntersectionNode, bases<PyAbstractNode> >("intersection", init<list>());
@@ -705,6 +713,7 @@ BOOST_PYTHON_MODULE(openscad) {
 */    
   def("DxfDim", pyDxfDim, pyDxfDim_overloads());
   def("DxfCross", pyDxfCross, pyDxfCross_overloads());
+  def("assemble", assemble);
 }
 
 PythonScript::PythonScript(double time) {
@@ -725,6 +734,18 @@ PythonScript::PythonScript(double time) {
 "openscad.AbstractNode.__sub__ = nodeSub\n"
 "openscad.AbstractNode.__and__ = nodeAnd\n"
 "openscad.AbstractNode.__mul__ = nodeMul\n"
+"def fn(self,val):\n"
+"	self._fn = val\n"
+"	return self\n"
+"openscad.NodeAccuracy.fn = fn\n"
+"def fs(self,val):\n"
+"	self._fs = val\n"
+"	return self\n"
+"openscad.NodeAccuracy.fs = fs\n"
+"def fa(self,val):\n"
+"	self._fa = val\n"
+"	return self\n"
+"openscad.NodeAccuracy.fa = fa\n"
   , ctx.main_namespace);
   //ImportOFFNode
   //CgaladvMinkowskiNode

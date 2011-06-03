@@ -70,14 +70,14 @@ As OpenSCADpy is forked from OpenSCAD, you might want to look at the "OpenSCAD H
 h3. Reference
 
 All objects are defined in Python language. All OpenSCAD specific methods are part of the openscad-module - so most likely you want to import this module to the global namespace: @from openscad import *@
-When all your code is executed OpenSCADpy will render the content of the variable @openscad.result@
-@openscad.result = openscad.sphere(10)@ would create a sphere (with r=10).
+OpenSCADpy will render the content of the call @openscad.assemble()@
+@openscad.assemble( openscad.sphere(10) )@ would create a sphere (with r=10).
 
 The following is a list of all object classes in OpenSCADpy.
 
 h4. Primitives
 
-The variables @openscad.fn@, @openscad.fa@ and @openscad.fs@ work as documented in the "OpenSCAD Wiki":http://en.wikibooks.org/wiki/OpenSCAD_User_Manual/Other_Language_Features. Additionally to these global settings (which are evaluated at the time of creation) each primitive has local properties @obj.fn@, @obj.fa@ and @obj.fs@. So you could do @s = sphere(10);s.fn=17@
+The variables @openscad.fn@, @openscad.fa@ and @openscad.fs@ work as documented in the "OpenSCAD Wiki":http://en.wikibooks.org/wiki/OpenSCAD_User_Manual/Other_Language_Features. Additionally to these global settings (which are evaluated at the time of creation) each primitive has local properties, set by @obj.fn(val)@, @obj.fa(val)@ and @obj.fs(val)@. So you could do @s = sphere(10).fn(17)@
 
 * Cube
 @cube(length=l, center=False)@ creates a cube with length _l_.

@@ -11,5 +11,5 @@ def example002():
 		) & translate([0, 0, 5],
 			cylinder(h=50, r1=20, r2=5, center=True))
 
-openscad.result = example002();
+assemble( example002() )
 

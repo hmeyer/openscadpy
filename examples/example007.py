@@ -43,8 +43,8 @@ def cutview():
 		difference(combo),r
 	])
 
-openscad.result = translate([0, 0, -10],
-	clip())
+assemble( translate([0, 0, -10],
+	clip()) )
 
 #openscad.result = cutview()
 

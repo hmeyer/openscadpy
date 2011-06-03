@@ -13,5 +13,5 @@ def example003():
 		)
 
 
-openscad.result = example003()
+assemble( example003() )
 
