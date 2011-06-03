@@ -77,7 +77,7 @@ The following is a list of all object classes in OpenSCADpy.
 
 h4. Primitives
 
-The variables @openscad.fn@, @openscad.fa@ and @openscad.fs@ work as documented in the "OpenSCAD Wiki":http://en.wikibooks.org/wiki/OpenSCAD_User_Manual/Other_Language_Features. Additionally to these global settings (which are evaluated at the time of creation) each primitive has local properties @obj.fn@, @obj.fa@ and @obj.fs@. So you could do @s = sphere(10);s.fn=17@
+The variables @openscad.fn@, @openscad.fa@ and @openscad.fs@ work as documented in the "OpenSCAD Wiki":http://en.wikibooks.org/wiki/OpenSCAD_User_Manual/Other_Language_Features. Additionally to these global settings (which are evaluated at the time of creation) each primitive has local properties, set by @obj.fn(val)@, @obj.fa(val)@ and @obj.fs(val)@. So you could do @s = sphere(10).fn(17)@
 
 * Cube
 @cube(length=l, center=False)@ creates a cube with length _l_.
