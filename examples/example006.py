@@ -22,7 +22,7 @@ def example006():
 					[+1, -1, 270]])
 			)
 			,[ [0, 0, 0], [1, 0, 0], [0, 1, 0] ])
-		+ map(lambda i: rotate(i[0],[0,0,1],
+		+ map(lambda i: rotate(i[0],[0,0,1], child=
 				rotate(ang=i[1],vec=[1,0,0], child=
 					translate([0,-50,0],
 						map(lambda j: translate([j[0],0,j[1]],
@@ -41,5 +41,4 @@ def example006():
 			])
 		)
 
-openscad.result = example006()
-print openscad.result
+assemble( example006() )

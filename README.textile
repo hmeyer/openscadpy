@@ -70,8 +70,8 @@ As OpenSCADpy is forked from OpenSCAD, you might want to look at the "OpenSCAD H
 h3. Reference
 
 All objects are defined in Python language. All OpenSCAD specific methods are part of the openscad-module - so most likely you want to import this module to the global namespace: @from openscad import *@
-When all your code is executed OpenSCADpy will render the content of the variable @openscad.result@
-@openscad.result = openscad.sphere(10)@ would create a sphere (with r=10).
+OpenSCADpy will render the content of the call @openscad.assemble()@
+@openscad.assemble( openscad.sphere(10) )@ would create a sphere (with r=10).
 
 The following is a list of all object classes in OpenSCADpy.
 

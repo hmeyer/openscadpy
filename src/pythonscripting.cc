@@ -51,7 +51,7 @@ using namespace boost::python;
 using boost::make_shared;
 
 list empty_list;
-
+class PyAbstractNode;
 
 class PyContext {
   Accuracy acc;
@@ -77,6 +77,9 @@ class PyContext {
       if (openscad_namespace.contains(nsresult))
 	return openscad_namespace[nsresult];
       return object();
+    }
+    void setResult(const PyAbstractNode &n) {
+	openscad_namespace[nsresult] = n;
     }
     Accuracy &getAcc() {
       acc.fn = extract<double>(openscad_namespace["fn"]);
@@ -609,6 +612,11 @@ list pyDxfCross(const std::string &filename, const std::string &layername=std::s
 
 BOOST_PYTHON_FUNCTION_OVERLOADS(pyDxfCross_overloads, pyDxfCross, 1, 4)
 
+void assemble(const PyAbstractNode &n) {
+	ctx.setResult(n);	
+}
+
+
 BOOST_PYTHON_MODULE(openscad) {
   namespace py = boost::parameter::python;
   namespace mpl = boost::mpl;
@@ -705,6 +713,7 @@ BOOST_PYTHON_MODULE(openscad) {
 */    
   def("DxfDim", pyDxfDim, pyDxfDim_overloads());
   def("DxfCross", pyDxfCross, pyDxfCross_overloads());
+  def("assemble", assemble);
 }
 
 PythonScript::PythonScript(double time) {
