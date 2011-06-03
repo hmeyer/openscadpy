@@ -616,9 +616,9 @@ BOOST_PYTHON_MODULE(openscad) {
     .add_property("highlight", &PyAbstractNode::getHighlight, &PyAbstractNode::setHighlight)
     .add_property("background", &PyAbstractNode::getBackground, &PyAbstractNode::setBackground);    
   class_<PyNodeAccuracy>("NodeAccuracy")
-    .add_property("fn", &PyNodeAccuracy::getfn, &PyNodeAccuracy::setfn)
-    .add_property("fs", &PyNodeAccuracy::getfs, &PyNodeAccuracy::setfs)
-    .add_property("fa", &PyNodeAccuracy::getfa, &PyNodeAccuracy::setfa);
+    .add_property("_fn", &PyNodeAccuracy::getfn, &PyNodeAccuracy::setfn)
+    .add_property("_fs", &PyNodeAccuracy::getfs, &PyNodeAccuracy::setfs)
+    .add_property("_fa", &PyNodeAccuracy::getfa, &PyNodeAccuracy::setfa);
   class_<PyUnionNode, bases<PyAbstractNode> >("union", init<list>());
   class_<PyDifferenceNode, bases<PyAbstractNode> >("difference", init<list>());
   class_<PyIntersectionNode, bases<PyAbstractNode> >("intersection", init<list>());
@@ -725,6 +725,18 @@ PythonScript::PythonScript(double time) {
 "openscad.AbstractNode.__sub__ = nodeSub\n"
 "openscad.AbstractNode.__and__ = nodeAnd\n"
 "openscad.AbstractNode.__mul__ = nodeMul\n"
+"def fn(self,val):\n"
+"	self._fn = val\n"
+"	return self\n"
+"openscad.NodeAccuracy.fn = fn\n"
+"def fs(self,val):\n"
+"	self._fs = val\n"
+"	return self\n"
+"openscad.NodeAccuracy.fs = fs\n"
+"def fa(self,val):\n"
+"	self._fa = val\n"
+"	return self\n"
+"openscad.NodeAccuracy.fa = fa\n"
   , ctx.main_namespace);
   //ImportOFFNode
   //CgaladvMinkowskiNode

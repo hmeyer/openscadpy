@@ -21,10 +21,8 @@ def screw(type = 2, r1 = 15, r2 = 20, n = 7, height = 100, t = 8):
 
 
 def nut(type = 2, r1 = 16, r2 = 21, r3 = 30, s = 6, n = 7, height = 100/5, t = 8/5):
-	cyl = cylinder(height,r3)
-	cyl.fn = s
 	return difference([
-		cyl,
+		cylinder(height,r3).fn(s),
 		translate([ 0, 0, -height/2 ], screw(type, r1, r2, n, height*2, t*2))
 	])
 
@@ -40,9 +38,7 @@ def spring(r1 = 100, r2 = 10, height = 100, hr = 12, steps = 16):
 		wirealpha = acos((2.0*i-steps)/steps)
 		points1.append(pointFromWirealpha(wirealpha))
 		points2.append(pointFromWirealpha(wirealpha-pi))
-	spring = linear_extrude(child=polygon(points1+points2),h=height, twist=180.0*height/hr, convexity=5)
-	spring.fn = steps*hr/r2
-	return spring
+	return linear_extrude(child=polygon(points1+points2),h=height, twist=180.0*height/hr, convexity=5).fn( steps*hr/r2 )
 	
 openscad.result = union([
 
