@@ -1,3 +1,15 @@
+openscadpy (2010.05.10-1ubuntu2) maverick; urgency=low
+
+  * maverick upload
+
+ -- Henning Meyer <hmeyer@gmx.eu>  Thu, 02 Jun 2011 02:30:51 +0200
+
+openscadpy (2010.05.10-1ubuntu1) natty; urgency=low
+
+  * add file path to load path 
+
+ -- Henning Meyer <hmeyer@gmx.eu>  Thu, 02 Jun 2011 02:30:28 +0200
+
 openscadpy (2010.05.09-1ubuntu6) maverick; urgency=low
 
   * maverick upload 
