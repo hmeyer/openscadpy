@@ -1,3 +1,16 @@
+openscadpy (2010.05.12-1ubuntu2) maverick; urgency=low
+
+  * maverick upload 
+
+ -- Henning Meyer <hmeyer@gmx.eu>  Mon, 06 Jun 2011 00:44:20 +0200
+
+openscadpy (2010.05.12-1ubuntu1) natty; urgency=low
+
+  * added transforms as object methods
+  * changed full circle to 2 * pi
+
+ -- Henning Meyer <hmeyer@gmx.eu>  Mon, 06 Jun 2011 00:42:54 +0200
+
 openscadpy (2010.05.11-1ubuntu2) maverick; urgency=low
 
   * maverick upload 
