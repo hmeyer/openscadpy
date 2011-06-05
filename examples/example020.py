@@ -16,8 +16,8 @@ def screw(type = 2, r1 = 15, r2 = 20, n = 7, height = 100, t = 8):
 		]
 
 	return linear_extrude(child=difference( [circle(r2)] +
-		[ rotate(i*360/n, child=polygon(p[type-1])) for i in range(0,n)]),
-		h=height, twist=360*t/n,convexity=t)
+		[ rotate(i*2*pi/n, child=polygon(p[type-1])) for i in range(0,n)]),
+		h=height, twist=pi*2*t/n,convexity=t)
 
 
 def nut(type = 2, r1 = 16, r2 = 21, r3 = 30, s = 6, n = 7, height = 100/5, t = 8/5):
@@ -38,7 +38,7 @@ def spring(r1 = 100, r2 = 10, height = 100, hr = 12, steps = 16):
 		wirealpha = acos((2.0*i-steps)/steps)
 		points1.append(pointFromWirealpha(wirealpha))
 		points2.append(pointFromWirealpha(wirealpha-pi))
-	return linear_extrude(child=polygon(points1+points2),h=height, twist=180.0*height/hr, convexity=5).fn( steps*hr/r2 )
+	return linear_extrude(child=polygon(points1+points2),h=height, twist=pi*height/hr, convexity=5).fn( steps*hr/r2 )
 	
 openscad.result = union([
 

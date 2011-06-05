@@ -1,4 +1,5 @@
 from openscad import *
+from math import pi
 
 def shape():
 	return union([
@@ -12,13 +13,13 @@ def shape():
 					translate([ 50, 50 ],
 						square(15, True) )
 				]),
-				rotate(45, child=
+				rotate(pi/4, child=
 					translate([ 0, -15 ],
 						square([ 100, 30 ])
 					)
 				)
 			])),
-			rotate(-45, child=scale([ 0.7, 1.3 ], circle(5)))
+			rotate(-pi/4, child=scale([ 0.7, 1.3 ], circle(5)))
 		]),
  		import_dxf( "example009.dxf",
 			"body",scale=2.0, convexity=10)	

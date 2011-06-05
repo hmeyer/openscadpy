@@ -1,6 +1,8 @@
+from math import pi
+
 def example001():
 	def rotcy(rot, rad, height):
-		return openscad.rotate(90, rot,
+		return openscad.rotate(pi/2, rot,
 			openscad.cylinder(height,rad,center=True))
 	def r_from_dia(d):
 		return d/2.0

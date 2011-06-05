@@ -1,4 +1,5 @@
 from openscad import *
+from math import pi
 
 def thing():
 	openscad.fa = 30
@@ -6,8 +7,8 @@ def thing():
 	return difference([
 		sphere(25),
 		cyl,
-		rotate(90, [ 1, 0, 0 ], cyl),
-		rotate(90, [ 0, 1, 0 ], cyl)
+		rotate(pi/2, [ 1, 0, 0 ], cyl),
+		rotate(pi/2, [ 0, 1, 0 ], cyl)
 		])
 
 def demo_proj():
@@ -23,11 +24,11 @@ def demo_cut():
 	t = thing()
 	t.background = True
 	return union(
-		[rotate(-30, [ 1, 1, 0 ],
+		[rotate(-pi/6, [ 1, 1, 0 ],
 			translate([ 0, 0, -i ],
 				linear_extrude(child=projection(cut_mode=True, child=
 					translate([ 0, 0, i ],
-						rotate(+30, [ 1, 1, 0 ], thing())
+						rotate(+pi/6, [ 1, 1, 0 ], thing())
 					)
 				), h=0.5, center=True)
 			)

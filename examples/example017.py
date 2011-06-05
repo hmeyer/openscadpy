@@ -1,4 +1,5 @@
 from openscad import *
+from math import pi
 
 # To render the DXF file from the command line:
 # openscad -x example017.dxf -D'mode="parts"' example017.scad
@@ -74,7 +75,7 @@ def shape_X_disc(r1, holetrans, holelen, r2):
 			translate([ 0, holetrans ],
 				square([ thickness, holelen ], True)
 			)
-		), [ 0, 120, 240 ])
+		), [ 0, 2*pi/3, 4*pi/3 ])
 		+ [circle(r2)])
 
 def shape_inner_disc():
@@ -136,11 +137,11 @@ def construct(extraspace=0): #1.5*thickness
 		color([ 0.7, 0.7, 1 ],
 			map(lambda alpha: rotate(alpha, child=
 				translate([ 0, thickness*2 + locklen1 + inner1_to_inner2 + boltlen + midhole, extraspace ],
-					rotate([ 90, 0, -90 ],
+					rotate([ pi/2, 0, -pi/2 ],
 						linear_extrude(child=shape_tripod(), h=thickness, convexity=10, center=True)
 					)
 				)
-			),[ 0, 120, 240 ])
+			),[ 0, 2*pi/3, 4*pi/3 ])
 		)
 	]
 	if  extraspace == 0:
