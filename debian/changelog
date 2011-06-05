@@ -1,3 +1,16 @@
+openscadpy (2010.05.11-1ubuntu2) maverick; urgency=low
+
+  * maverick upload 
+
+ -- Henning Meyer <hmeyer@gmx.eu>  Sat, 04 Jun 2011 00:19:39 +0200
+
+openscadpy (2010.05.11-1ubuntu1) natty; urgency=low
+
+  * obj.fn(x), obj.fs(y), obj.fa(z) are now callable and return obj
+  * openscad.assemble( obj ) will render obj 
+
+ -- Henning Meyer <hmeyer@gmx.eu>  Sat, 04 Jun 2011 00:18:13 +0200
+
 openscadpy (2010.05.10-1ubuntu2) maverick; urgency=low
 
   * maverick upload
