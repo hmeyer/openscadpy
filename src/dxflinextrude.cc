@@ -54,17 +54,17 @@ static void add_slice(PolySet *ps, DxfData::Path *pt, double rot1, double rot2, 
 	{
 		int k = j - 1;
 
-		double jx1 = pt->points[j]->x *  cos(rot1*M_PI/180) + pt->points[j]->y * sin(rot1*M_PI/180);
-		double jy1 = pt->points[j]->x * -sin(rot1*M_PI/180) + pt->points[j]->y * cos(rot1*M_PI/180);
+		double jx1 = pt->points[j]->x *  cos(rot1) + pt->points[j]->y * sin(rot1);
+		double jy1 = pt->points[j]->x * -sin(rot1) + pt->points[j]->y * cos(rot1);
 
-		double jx2 = pt->points[j]->x *  cos(rot2*M_PI/180) + pt->points[j]->y * sin(rot2*M_PI/180);
-		double jy2 = pt->points[j]->x * -sin(rot2*M_PI/180) + pt->points[j]->y * cos(rot2*M_PI/180);
+		double jx2 = pt->points[j]->x *  cos(rot2) + pt->points[j]->y * sin(rot2);
+		double jy2 = pt->points[j]->x * -sin(rot2) + pt->points[j]->y * cos(rot2);
 
-		double kx1 = pt->points[k]->x *  cos(rot1*M_PI/180) + pt->points[k]->y * sin(rot1*M_PI/180);
-		double ky1 = pt->points[k]->x * -sin(rot1*M_PI/180) + pt->points[k]->y * cos(rot1*M_PI/180);
+		double kx1 = pt->points[k]->x *  cos(rot1) + pt->points[k]->y * sin(rot1);
+		double ky1 = pt->points[k]->x * -sin(rot1) + pt->points[k]->y * cos(rot1);
 
-		double kx2 = pt->points[k]->x *  cos(rot2*M_PI/180) + pt->points[k]->y * sin(rot2*M_PI/180);
-		double ky2 = pt->points[k]->x * -sin(rot2*M_PI/180) + pt->points[k]->y * cos(rot2*M_PI/180);
+		double kx2 = pt->points[k]->x *  cos(rot2) + pt->points[k]->y * sin(rot2);
+		double ky2 = pt->points[k]->x * -sin(rot2) + pt->points[k]->y * cos(rot2);
 
 		double dia1_len_sq = (jy1-ky2)*(jy1-ky2) + (jx1-kx2)*(jx1-kx2);
 		double dia2_len_sq = (jy2-ky1)*(jy2-ky1) + (jx2-kx1)*(jx2-kx1);
@@ -124,7 +124,7 @@ PolySet *DxfLinearExtrudeNode::render_polyset(render_mode_e) const
 {
   double slices = this->slices;
   if (has_twist && slices<2) {
-	  slices = (int)std::max(2.0, std::abs(get_fragments_from_r(height, *this) * twist / 360));
+	  slices = (int)std::max(2.0, std::abs(get_fragments_from_r(height, *this) * twist / (2*M_PI)));
   }  
 	QString key = mk_cache_id();
 	if (PolySet::ps_cache.contains(key)) {
@@ -189,7 +189,7 @@ PolySet *DxfLinearExtrudeNode::render_polyset(render_mode_e) const
 	if (has_twist)
 	{
 		dxf_tesselate(ps, dxf, 0, false, true, h1);
-		dxf_tesselate(ps, dxf, twist, true, true, h2);
+		dxf_tesselate(ps, dxf, twist*180/M_PI, true, true, h2);
 		for (int j = 0; j < slices; j++)
 		{
 			double t1 = twist*j / slices;

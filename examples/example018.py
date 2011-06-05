@@ -1,11 +1,12 @@
 from openscad import *
+from math import pi
 
 def thing(type):
 	return [sphere(30), 
 		cube(60, True), 
 		cylinder(50, 30, center=True),
 		union([cube(45, True)]+
-			[rotate([0,0,45][i:i+3], cube(50, True)) for i in [0,1,2]]
+			[rotate([0,0,pi/4][i:i+3], cube(50, True)) for i in [0,1,2]]
 		)
 		][(type+1)%4]
 

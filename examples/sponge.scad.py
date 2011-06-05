@@ -1,4 +1,5 @@
 from openscad import *
+from math import pi
 
 iterations = 3
 cubesize = 100
@@ -20,8 +21,8 @@ def sponge(maxIter=3):
 	return difference(
 		[cube(cubesize, True),
  			s,
- 		 	rotate([90,0,0],s),
- 			rotate([0,90,0],s)
+ 		 	rotate([pi/2,0,0],s),
+ 			rotate([0,pi/2,0],s)
  		])
 
 

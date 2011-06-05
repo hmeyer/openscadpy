@@ -67,7 +67,7 @@ def sierpinski_rec(iters, size, inverse, square):
 			height = get_height(size/2, square)
 			return translate(
 				[0, 0, height],
-				rotate([180, 0, 180], pyramid(size/2, height, square))
+				rotate([pi, 0, pi], pyramid(size/2, height, square))
 			)
 		else:
 			height = get_height(size, square)

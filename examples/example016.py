@@ -32,6 +32,6 @@ openscad.result = difference(
 		difference([
 			blk2(),
 			chop()
-		]), 12)),  [0, 90, 180, 270])
+		]), 12)),  [0, pi/2, pi, 3*pi/2])
 )
 

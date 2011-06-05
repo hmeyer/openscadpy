@@ -117,6 +117,7 @@ openscad.result = polyhedron(
 h4. Transforms
 
 All transforms accept an object as last parameter. This parameter might be a single object - named _child_ - or a list of objects - named _children_.
+Transforms are also accessible via @obj.scale([x,yz])@, @obj.rotate(ang)@ and so on.
 
 * Scale
 @scale(dim, object)@ scale object by _dim_. _dim_ is a list, e.g. _[2,2,1]_.
@@ -124,7 +125,7 @@ All transforms accept an object as last parameter. This parameter might be a sin
 @translate(vec, object)@ translate _object_ by _vec_. _vec_ is a list, e.g. _[5,-7.3,0]_.
 * Rotate
 360 degrees is a full circle - to stay compatible with OpenSCAD - this might be subject to change (to 2*pi).
-@rotate(ang=angle [, vec=[0,0,1] ], object)@ Rotate _ang_ degrees around _vec_.
+@rotate(ang=angle [, vec=[0,0,1] ], object)@ Rotate _ang_ degrees around _vec_ (2*pi being a full circle).
 @rotate(vec=[x,y,z], object)@ rotate _x_ degrees around X, _y_ degrees around Y and _z_ degrees around Z.
 * Mirror
 @mirror([x,y,z], object)@ mirror _object_ on a plane with normal _[x,y,z]_, crossing the origin.

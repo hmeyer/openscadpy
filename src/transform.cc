@@ -53,8 +53,8 @@ TransformScaleNode::TransformScaleNode(const Float3 &scale, const NodeList &chil
 TransformRotateNode::TransformRotateNode(const Float3 &rotation, const NodeList &children, const Props p) 
   :TransformNode(children,p) {
   for (int i = 0; i < rotation.static_size; i++) {
-	  double c = cos(rotation[i]*M_PI/180.0);
-	  double s = sin(rotation[i]*M_PI/180.0);
+	  double c = cos(rotation[i]);
+	  double s = sin(rotation[i]);
 	  double x = i == 0, y = i == 1, z = i == 2;
 	  double mr[16] = {
 		  x*x*(1-c)+c,
@@ -90,8 +90,8 @@ TransformRotateAxisNode::TransformRotateAxisNode(const Float3 &axis, FloatType a
   if (x != 0.0 || y != 0.0 || z != 0.0) {
       double sn = 1.0 / sqrt(x*x + y*y + z*z);
       x *= sn, y *= sn, z *= sn;
-      double c = cos(angle*M_PI/180.0);
-      double s = sin(angle*M_PI/180.0);
+      double c = cos(angle);
+      double s = sin(angle);
 
       m[ 0] = x*x*(1-c)+c;
       m[ 1] = y*x*(1-c)+z*s;

@@ -1,5 +1,5 @@
 from openscad import *
-
+from math import pi
 
 def dilate(r,obj):
 	return minkowski([
@@ -21,7 +21,7 @@ def morphClose(r,obj):
 	return erode(r, dilate(r, obj) )
 
 thing = union([cube(50, True),
-		rotate([20,30,40], cube([10,10,100], True))
+		rotate([pi/9,pi/6,pi/4], cube([10,10,100], True))
 		])
 
 #openscad.result = thing

@@ -7,4 +7,4 @@ from openscad import *
 s = surface("example010.dat",5,True)
 
 openscad.result = intersection([
-	s, rotate(45, [0, 0, 1], child=s)	])
+	s, rotate(pi/4, [0, 0, 1], child=s)	])

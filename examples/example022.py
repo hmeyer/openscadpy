@@ -1,8 +1,9 @@
 from openscad import *
+from math import pi
 
 # size is a vector [w, h, d]
 def roundedBox(size, radius, sidesonly):
-	rot = [ [0,0,0], [90,0,90], [90,90,0] ]
+	rot = [ [0,0,0], [pi/2,0,pi/2], [pi/2,pi/2,0] ]
 	res = []
 	def r(x):
 		res.append(x)
