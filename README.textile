@@ -117,6 +117,7 @@ openscad.result = polyhedron(
 h4. Transforms
 
 All transforms accept an object as last parameter. This parameter might be a single object - named _child_ - or a list of objects - named _children_.
+Transforms are also accessible via @obj.scale([x,yz])@, @obj.rotate(ang)@ and so on.
 
 * Scale
 @scale(dim, object)@ scale object by _dim_. _dim_ is a list, e.g. _[2,2,1]_.
