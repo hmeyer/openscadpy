@@ -2,7 +2,7 @@ from openscad import *
 from math import pi
 
 def thing():
-	openscad.fa = 30
+	fa( 30 )
 	cyl = cylinder(h=62.5,r1=12.5,r2=6.25, center=True)
 	return difference([
 		sphere(25),

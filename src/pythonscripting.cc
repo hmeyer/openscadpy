@@ -68,10 +68,10 @@ class PyContext {
       main_namespace[nsopenscad] = openscad_module;
       openscad_namespace = openscad_module.attr("__dict__");
       if (openscad_namespace.contains(nsresult)) openscad_namespace[nsresult].del();
-      openscad_namespace["fn"] = acc.fn;
-      openscad_namespace["fs"] = acc.fs;
-      openscad_namespace["fa"] = acc.fa;     
-      openscad_namespace["t"] = time;     
+      openscad_namespace["_fn"] = acc.fn;
+      openscad_namespace["_fs"] = acc.fs;
+      openscad_namespace["_fa"] = acc.fa;     
+      openscad_namespace["_t"] = time;     
     }
     object getResult() {
       if (openscad_namespace.contains(nsresult))
@@ -82,10 +82,25 @@ class PyContext {
 	openscad_namespace[nsresult] = n;
     }
     Accuracy &getAcc() {
-      acc.fn = extract<double>(openscad_namespace["fn"]);
-      acc.fa = extract<double>(openscad_namespace["fa"]);
-      acc.fs = extract<double>(openscad_namespace["fs"]);
+      acc.fn = extract<double>(openscad_namespace["_fn"]);
+      acc.fa = extract<double>(openscad_namespace["_fa"]);
+      acc.fs = extract<double>(openscad_namespace["_fs"]);
       return acc;
+    }
+    double fn(double val=-1) {
+      if (val!=-1) openscad_namespace["_fn"] = val;
+      return extract<double>(openscad_namespace["_fn"]);
+    }
+    double fs(double val=-1) {
+      if (val!=-1) openscad_namespace["_fs"] = val;
+      return extract<double>(openscad_namespace["_fs"]);
+    }
+    double fa(double val=-1) {
+      if (val!=-1) openscad_namespace["_fa"] = val;
+      return extract<double>(openscad_namespace["_fa"]);
+    }
+    double t() {
+      return extract<double>(openscad_namespace["_t"]);
     }
     object main_namespace;
 };
@@ -616,6 +631,23 @@ void assemble(const PyAbstractNode &n) {
 	ctx.setResult(n);	
 }
 
+double fn(double val=-1) {
+	return ctx.fn(val);
+}
+BOOST_PYTHON_FUNCTION_OVERLOADS(fn_overloads, fn, 0, 1)
+
+double fs(double val=-1) {
+	return ctx.fs(val);
+}
+BOOST_PYTHON_FUNCTION_OVERLOADS(fs_overloads, fs, 0, 1)
+
+double fa(double val=-1) {
+	return ctx.fa(val);
+}
+BOOST_PYTHON_FUNCTION_OVERLOADS(fa_overloads, fa, 0, 1)
+double t() {
+	return ctx.t();
+}
 
 BOOST_PYTHON_MODULE(openscad) {
   namespace py = boost::parameter::python;
@@ -714,6 +746,10 @@ BOOST_PYTHON_MODULE(openscad) {
   def("DxfDim", pyDxfDim, pyDxfDim_overloads());
   def("DxfCross", pyDxfCross, pyDxfCross_overloads());
   def("assemble", assemble);
+  def("fn", fn, fn_overloads());
+  def("fs", fs, fs_overloads());
+  def("fa", fa, fa_overloads());
+  def("t", t);
 }
 
 PythonScript::PythonScript(double time) {
