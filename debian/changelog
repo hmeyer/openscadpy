@@ -1,3 +1,15 @@
+openscadpy (2010.06.01-1ubuntu2) maverick; urgency=low
+
+  * maverick upload
+
+ -- Henning Meyer <hmeyer@gmx.eu>  Wed, 15 Jun 2011 15:26:37 +0200
+
+openscadpy (2010.06.01-1ubuntu1) natty; urgency=low
+
+  * changed fn, fa, fs and t to functions
+
+ -- Henning Meyer <hmeyer@gmx.eu>  Wed, 15 Jun 2011 15:25:44 +0200
+
 openscadpy (2010.05.12-1ubuntu2) maverick; urgency=low
 
   * maverick upload 
