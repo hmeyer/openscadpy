@@ -34,7 +34,7 @@
 using boost::make_shared;
 
 
-TransformNode::TransformNode(const NodeList &children, const Props p) 
+TransformNode::TransformNode(const NodeList &children, const Props p)
   :AbstractNode(p,children) {
   for (int i = 0; i < 16; i++)
     m[i] = i % 5 == 0 ? 1.0 : 0.0;
@@ -42,7 +42,7 @@ TransformNode::TransformNode(const NodeList &children, const Props p)
     m[i] = -1;
 }
 
-TransformScaleNode::TransformScaleNode(const Float3 &scale, const NodeList &children, const Props p) 
+TransformScaleNode::TransformScaleNode(const Float3 &scale, const NodeList &children, const Props p)
   :TransformNode(children,p) {
     m[0] = scale[0];
     m[5] = scale[1];
@@ -50,7 +50,7 @@ TransformScaleNode::TransformScaleNode(const Float3 &scale, const NodeList &chil
     if (m[10] <= 0) m[10] = 1;
 }
 
-TransformRotateNode::TransformRotateNode(const Float3 &rotation, const NodeList &children, const Props p) 
+TransformRotateNode::TransformRotateNode(const Float3 &rotation, const NodeList &children, const Props p)
   :TransformNode(children,p) {
   for (int i = 0; i < rotation.static_size; i++) {
 	  double c = cos(rotation[i]);
@@ -84,7 +84,7 @@ TransformRotateNode::TransformRotateNode(const Float3 &rotation, const NodeList 
   }
 }
 
-TransformRotateAxisNode::TransformRotateAxisNode(const Float3 &axis, FloatType angle, const NodeList &children, const Props p) 
+TransformRotateAxisNode::TransformRotateAxisNode(const Float3 &axis, FloatType angle, const NodeList &children, const Props p)
   :TransformNode(children,p) {
   FloatType x = axis[0], y = axis[1], z =axis[2];
   if (x != 0.0 || y != 0.0 || z != 0.0) {
@@ -180,7 +180,7 @@ CGAL_Nef_polyhedron TransformNode::render_cgal_nef_polyhedron() const
 		// Unfortunately CGAL provides no transform method for CGAL_Nef_polyhedron2
 		// objects. So we convert in to our internal 2d data format, transform it,
 		// tesselate it and create a new CGAL_Nef_polyhedron2 from it.. What a hack!
-		
+
 		CGAL_Aff_transformation2 t(
 				m[0], m[4], m[12],
 				m[1], m[5], m[13], m[15]);

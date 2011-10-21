@@ -37,12 +37,12 @@ public:
 	typedef shared_ptr< ImportNode > Pointer;
 	QString filename;
 	int convexity;
-	ImportNode(const QString &filename, int convexity, const Props p=Props()) 
+	ImportNode(const QString &filename, int convexity, const Props p=Props())
 	  :AbstractPolyNode(p), filename(filename), convexity(convexity) { }
 };
 
 class ImportSTLNode : public ImportNode {
-public:	
+public:
   ImportSTLNode(const QString &filename, int convexity, const Props p=Props()):ImportNode(filename, convexity, p) {}
   virtual PolySet *render_polyset(render_mode_e mode) const;
   virtual QString dump(QString indent) const;
@@ -52,7 +52,7 @@ class ImportDXFNode : public ImportNode, public Accuracy {
   QString layername;
   Float2 origin;
   double scale;
-public:	
+public:
   typedef shared_ptr<ImportDXFNode> Pointer;
   ImportDXFNode(const QString &filename,const QString &layername, Float2 origin, int convexity=5, double scale=1.0, const Accuracy &acc=Accuracy(), const Props p=Props())
     :ImportNode(filename, convexity, p), Accuracy(acc), layername(layername), origin(origin), scale(scale) {}
@@ -61,7 +61,7 @@ public:
 };
 
 class ImportOFFNode : public ImportNode {
-public:	
+public:
   ImportOFFNode(const QString &filename, int convexity, const Props p=Props()):ImportNode(filename, convexity, p) {}
   virtual PolySet *render_polyset(render_mode_e mode) const;
   virtual QString dump(QString indent) const;

@@ -10,7 +10,7 @@ fanrot = DxfDim(dxf,"","fanrot")
 frame = union( [
 	dxf_linear_extrude(dxf, "body",
 		bodywidth, convexity=10, center=True)]
-	+map(lambda z: 
+	+map(lambda z:
 		translate([0, 0, z],
 			dxf_linear_extrude(dxf, "plate",
 				platewidth, convexity = 10, center=True)),

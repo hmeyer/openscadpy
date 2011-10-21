@@ -34,7 +34,7 @@ public:
 	typedef shared_ptr<ProjectionNode> Pointer;
 	int convexity;
 	bool cut_mode;
-	ProjectionNode(const AbstractNode::NodeList &children, bool cut_mode, int convexity, const Props p=Props()) 
+	ProjectionNode(const AbstractNode::NodeList &children, bool cut_mode, int convexity, const Props p=Props())
 	  : AbstractPolyNode(p, children), convexity(convexity), cut_mode(cut_mode) {}
 	virtual PolySet *render_polyset(render_mode_e mode) const;
 	virtual QString dump(QString indent) const;

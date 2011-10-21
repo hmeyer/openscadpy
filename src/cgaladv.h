@@ -43,7 +43,7 @@ public:
 };
 
 class CgaladvMinkowskiNode : public CgaladvNode {
-public:	
+public:
   CgaladvMinkowskiNode(const AbstractNode::NodeList &children, int convexity, const Props p=Props())
     :CgaladvNode(children, convexity, p) {}
 #ifdef ENABLE_CGAL
@@ -54,7 +54,7 @@ public:
 };
 
 class CgaladvGlideNode : public CgaladvNode {
-public:	
+public:
   CgaladvGlideNode(const AbstractNode::NodeList &children, const void * /*path*/, int convexity, const Props p=Props())
     :CgaladvNode(children, convexity, p) {}
 #ifdef ENABLE_CGAL
@@ -67,7 +67,7 @@ public:
 class CgaladvSubdivNode : public CgaladvNode {
   QString subdiv_type;
   int level;
-public:	
+public:
   CgaladvSubdivNode(const AbstractNode::NodeList &children, QString subdiv_type, int level, int convexity, const Props p=Props())
     :CgaladvNode(children, convexity, p), subdiv_type(subdiv_type), level(level) {}
 #ifdef ENABLE_CGAL
@@ -78,7 +78,7 @@ public:
 };
 
 class CgaladvHullNode : public CgaladvNode {
-public:	
+public:
   CgaladvHullNode(const AbstractNode::NodeList &children, int convexity, const Props p=Props())
     :CgaladvNode(children, convexity, p) {}
 #ifdef ENABLE_CGAL

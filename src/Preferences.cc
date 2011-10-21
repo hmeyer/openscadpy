@@ -185,7 +185,7 @@ QVariant Preferences::getValue(const QString &key) const
 
 void Preferences::updateGUI()
 {
-	QList<QListWidgetItem *> found = 
+	QList<QListWidgetItem *> found =
 		this->colorSchemeChooser->findItems(getValue("3dview/colorscheme").toString(),
 																				Qt::MatchExactly);
 	if (!found.isEmpty()) this->colorSchemeChooser->setCurrentItem(found.first());

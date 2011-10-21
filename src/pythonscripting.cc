@@ -57,7 +57,7 @@ class PyContext {
   Accuracy acc;
   object main_module;
   object openscad_namespace;
-  
+
   public:
   static const std::string nsresult;
   static const std::string nsopenscad;
@@ -70,8 +70,8 @@ class PyContext {
       if (openscad_namespace.contains(nsresult)) openscad_namespace[nsresult].del();
       openscad_namespace["_fn"] = acc.fn;
       openscad_namespace["_fs"] = acc.fs;
-      openscad_namespace["_fa"] = acc.fa;     
-      openscad_namespace["_t"] = time;     
+      openscad_namespace["_fa"] = acc.fa;
+      openscad_namespace["_t"] = time;
     }
     object getResult() {
       if (openscad_namespace.contains(nsresult))
@@ -131,7 +131,7 @@ ArrayVec list2ArrayVec(const list &l) {
   for(int i=0;i<len(l);++i) {
     extract<list> x(l[i]);
     if (x.check()) v.push_back(list2StdArray<typename ArrayVec::value_type>(x()));
-  }  
+  }
   return v;
 }
 
@@ -141,7 +141,7 @@ Vec list2Vec(const list &l) {
   for(int i=0;i<len(l);++i) {
     extract<typename Vec::value_type> x(l[i]);
     if (x.check()) v.push_back(x());
-  }  
+  }
   return v;
 }
 
@@ -151,7 +151,7 @@ VecVec list2VecVec(const list &l) {
   for(int i=0;i<len(l);++i) {
     extract<list> x(l[i]);
     if (x.check()) v.push_back(list2Vec<typename VecVec::value_type>(x()));
-  }  
+  }
   return v;
 }
 
@@ -167,10 +167,10 @@ public:
   AbstractNode::Pointer getNode() const { return node; }
   void setHighlight(bool set=true) {
     node->props.highlight = set;
-  }  
+  }
   bool getHighlight(void) const {
     return node->props.highlight;
-  }  
+  }
   void setBackground(bool set=true) {
     node->props.background = set;
   }
@@ -203,7 +203,7 @@ public:
   virtual double getfa(void) const {return accp->fa;}
 };
 
-template<csg_type_e type> 
+template<csg_type_e type>
 class PyCSGNode: public PyAbstractNode {
 public:
   PyCSGNode(const list &l) {
@@ -239,7 +239,7 @@ public:
       const list &lchildren = args[children|empty_list];
       if (len(lchildren) > 0) childlist = list2NodeList(lchildren);
       else childlist.append(args[child|PyAbstractNode()].getNode());
-      
+
       double a = args[ang|std::numeric_limits<double>::quiet_NaN()];
       if (myIsNaN( a )) {
 	const list &lvec = args[vec|empty_list];
@@ -335,7 +335,7 @@ public:
       } else rad1 = rad2 = rad;
       CylinderNode::Pointer p = make_shared<CylinderNode>(rad1, rad2, height, args[center|false], ctx.getAcc());
       node = p;
-      initAcc(p);      
+      initAcc(p);
     }
 };
 
@@ -354,7 +354,7 @@ class PyPolyhedronNode: public PyAbstractNode {
 public:
   PyPolyhedronNode(const list &points, const list &triangles, unsigned int convexity=5) {
     node = make_shared<PolyhedronNode>(
-      list2ArrayVec<Vec3D>(points), 
+      list2ArrayVec<Vec3D>(points),
       list2VecVec<VecPaths>(triangles), convexity);
   }
 };
@@ -363,11 +363,11 @@ public:
 class PySquareNode: public PyAbstractNode {
 public:
   PySquareNode(const list &dim, bool center=false) {
-    node = make_shared<SquareNode>(list2StdArray<Float2>(dim), center);  
+    node = make_shared<SquareNode>(list2StdArray<Float2>(dim), center);
   }
   PySquareNode(double l, bool center=false) {
     Float2 dim = {{ l,l }};
-    node = make_shared<SquareNode>(dim, center);  
+    node = make_shared<SquareNode>(dim, center);
   }
 };
 
@@ -384,7 +384,7 @@ class PyPolygonNode: public PyAbstractNode {
 public:
   PyPolygonNode(const list &points, const list &paths=list(), unsigned int convexity=5) {
     node = make_shared<PolygonNode>(
-      list2ArrayVec<Vec2D>(points), 
+      list2ArrayVec<Vec2D>(points),
       list2VecVec<VecPaths>(paths), convexity);
   }
 };
@@ -404,13 +404,13 @@ public:
     template <class ArgumentPack>
     PyDxfLinearExtrudeNodeBase(ArgumentPack const& args) {
       DxfLinearExtrudeNode::Pointer p(new DxfLinearExtrudeNode(
-	AbstractNode::NodeList(), QString::fromStdString(args[file]), 
+	AbstractNode::NodeList(), QString::fromStdString(args[file]),
 	QString::fromStdString(args[layer|std::string()]),
 	args[h], args[twist|.0], list2StdArray<Float2>(args[origin|empty_list]), args[scale|1.0],
 	args[convexity|5], args[slices|-1], args[center|false], ctx.getAcc()
       ));
       initAcc(p);
-      node = p;     
+      node = p;
     }
 };
 
@@ -437,14 +437,14 @@ public:
       const list &lchildren = args[children|empty_list];
       if (len(lchildren) > 0) childlist = list2NodeList(lchildren);
       else childlist.append(args[child|PyAbstractNode()].getNode());
-      
+
       DxfLinearExtrudeNode::Pointer p(new DxfLinearExtrudeNode(
 	childlist, QString(), QString(),
 	args[h], args[twist|.0], Float2(), 0,
 	args[convexity|5], args[slices|-1], args[center|false], ctx.getAcc()
       ));
       initAcc(p);
-      node = p;     
+      node = p;
     }
 };
 
@@ -466,13 +466,13 @@ public:
     template <class ArgumentPack>
     PyDxfRotateExtrudeNodeBase(ArgumentPack const& args) {
       DxfRotateExtrudeNode::Pointer p = make_shared<DxfRotateExtrudeNode>(
-	AbstractNode::NodeList(), QString::fromStdString(args[file]), 
+	AbstractNode::NodeList(), QString::fromStdString(args[file]),
 	QString::fromStdString(args[layer|std::string()]),
 	list2StdArray<Float2>(args[origin|empty_list]), args[scale|1.0],
 	args[convexity|5], ctx.getAcc()
       );
       initAcc(p);
-      node = p;     
+      node = p;
     }
 };
 
@@ -497,12 +497,12 @@ public:
       else childlist.append(args[child|PyAbstractNode()].getNode());
 
       DxfRotateExtrudeNode::Pointer p = make_shared<DxfRotateExtrudeNode>(
-	childlist, 
+	childlist,
 	QString(), QString(), Float2(), 1.0,
 	args[convexity|5], ctx.getAcc()
       );
       initAcc(p);
-      node = p;     
+      node = p;
     }
 };
 
@@ -519,7 +519,7 @@ class PySurfaceNodeBase: public PyAbstractNode {
 public:
     template <class ArgumentPack>
     PySurfaceNodeBase(ArgumentPack const& args) {
-      node = make_shared<SurfaceNode>(QString::fromStdString(args[file]), args[convexity|5], args[center|false]);    
+      node = make_shared<SurfaceNode>(QString::fromStdString(args[file]), args[convexity|5], args[center|false]);
     }
 };
 
@@ -544,10 +544,10 @@ public:
     template <class ArgumentPack>
     PyImportDXFNodeBase(ArgumentPack const& args) {
       ImportDXFNode::Pointer p = make_shared<ImportDXFNode>(QString::fromStdString(args[file]),
-	QString::fromStdString(args[layer|std::string()]), 
-	list2StdArray<Float2>(args[origin|empty_list]), args[convexity|5], args[scale|1.0], ctx.getAcc());      
+	QString::fromStdString(args[layer|std::string()]),
+	list2StdArray<Float2>(args[origin|empty_list]), args[convexity|5], args[scale|1.0], ctx.getAcc());
       initAcc(p);
-      node = p;     
+      node = p;
     }
 };
 
@@ -570,7 +570,7 @@ public:
       const list &lchildren = args[children|empty_list];
       if (len(lchildren) > 0) childlist = list2NodeList(lchildren);
       else childlist.append(args[child|PyAbstractNode()].getNode());
-      node = make_shared<ProjectionNode>(childlist, args[cut_mode|false], args[convexity|5]);    
+      node = make_shared<ProjectionNode>(childlist, args[cut_mode|false], args[convexity|5]);
     }
 };
 
@@ -600,7 +600,7 @@ BOOST_PARAMETER_FUNCTION((double), pyDxfDim, tag,
       (origin, *, empty_list)
       (scale, *, 1.0))
 ){
-*/  
+*/
 double pyDxfDim(const std::string &file, const std::string &layer=std::string(), const std::string &name=std::string(), list origin=empty_list, double scale=1.0) {
   return dxf_dim(QString::fromStdString(file), QString::fromStdString(layer), QString::fromStdString(name), list2StdArray<Float2>(origin), scale);
 }
@@ -628,7 +628,7 @@ list pyDxfCross(const std::string &filename, const std::string &layername=std::s
 BOOST_PYTHON_FUNCTION_OVERLOADS(pyDxfCross_overloads, pyDxfCross, 1, 4)
 
 void assemble(const PyAbstractNode &n) {
-	ctx.setResult(n);	
+	ctx.setResult(n);
 }
 
 double fn(double val=-1) {
@@ -654,7 +654,7 @@ BOOST_PYTHON_MODULE(openscad) {
   namespace mpl = boost::mpl;
   class_<PyAbstractNode>("AbstractNode")
     .add_property("highlight", &PyAbstractNode::getHighlight, &PyAbstractNode::setHighlight)
-    .add_property("background", &PyAbstractNode::getBackground, &PyAbstractNode::setBackground);    
+    .add_property("background", &PyAbstractNode::getBackground, &PyAbstractNode::setBackground);
   class_<PyNodeAccuracy>("NodeAccuracy")
     .add_property("_fn", &PyNodeAccuracy::getfn, &PyNodeAccuracy::setfn)
     .add_property("_fs", &PyNodeAccuracy::getfs, &PyNodeAccuracy::setfs)
@@ -671,7 +671,7 @@ BOOST_PYTHON_MODULE(openscad) {
     .def(py::init< mpl::vector< tag::ang(double), tag::vec*(list), tag::children(list)> >())
     .def(py::init< mpl::vector< tag::vec(list), tag::child(PyAbstractNode)> >())
     .def(py::init< mpl::vector< tag::vec(list), tag::children(list)> >());
-  
+
   class_<PyMirrorNode, bases<PyAbstractNode> >("mirror", init<list, PyAbstractNode>()).def(init<list, list>());
   class_<PyMatrixNode, bases<PyAbstractNode> >("matrix", init<list, PyAbstractNode>()).def(init<list, list>());
   class_<PyColorNode, bases<PyAbstractNode> >("color", init<list, PyAbstractNode>()).def(init<list, list>());
@@ -684,7 +684,7 @@ BOOST_PYTHON_MODULE(openscad) {
   class_<PyCylinderNode, bases<PyCylinderNodeBase> >("cylinder", no_init)
     .def(py::init< mpl::vector< tag::h(double), tag::r(double), tag::center*(bool)> >())
     .def(py::init< mpl::vector< tag::h(double), tag::r1(double), tag::r2(double), tag::center*(bool)> >());
-  
+
   class_<PyPolyhedronNode, bases<PyAbstractNode> >("polyhedron", init<list, list, optional<unsigned int> >());
   class_<PySquareNode, bases<PyAbstractNode> >("square", init<list, optional<bool> >()).def(init<double, optional<bool> >());
   class_<PyCircleNode, bases<PyAbstractNode, PyNodeAccuracy> >("circle", init<double>());
@@ -704,12 +704,12 @@ BOOST_PYTHON_MODULE(openscad) {
     .def(py::init< mpl::vector< tag::h(double), tag::twist*(double),
 	 tag::convexity*(unsigned int), tag::slices*(int), tag::center*(bool), tag::children(list) > >());
 
-    
+
   class_<PyDxfRotateExtrudeNodeBase, bases<PyAbstractNode, PyNodeAccuracy> >("_DXFRotateExtrudeBase", no_init);
   class_<PyDxfRotateExtrudeNode, bases<PyDxfRotateExtrudeNodeBase> >("dxf_rotate_extrude", no_init)
     .def(py::init< mpl::vector< tag::file(std::string), tag::layer*(std::string),
 	 tag::origin*(list), tag::scale*(double), tag::convexity*(unsigned int)> >());
-    
+
   class_<PyRotateExtrudeNodeBase, bases<PyAbstractNode, PyNodeAccuracy> >("_RotateExtrudeBase", no_init);
   class_<PyRotateExtrudeNode, bases<PyRotateExtrudeNodeBase> >("rotate_extrude", no_init)
     .def(py::init< mpl::vector< tag::convexity*(unsigned int), tag::child(PyAbstractNode) > >())
@@ -731,18 +731,18 @@ BOOST_PYTHON_MODULE(openscad) {
   class_<PyProjectionNode, bases<PyProjectionNodeBase> >("projection", no_init)
     .def(py::init< mpl::vector< tag::convexity*(unsigned int), tag::cut_mode*(bool), tag::child(PyAbstractNode) > >())
     .def(py::init< mpl::vector< tag::convexity*(unsigned int), tag::cut_mode*(bool), tag::children(list) > >());
-  
+
   class_<PyMinkowskiNode, bases<PyAbstractNode> >("minkowski", init<list, optional<unsigned int> >());
-    
-    
+
+
 /* doesn't work: error: no matching function for call to ´def(const char [7])´
   def< pyDxfDim_fwd
       , mpl::vector<
             double, tag::file(std::string), tag::layer*(std::string), tag::name*(std::string),
             tag::origin*(list), tag::scale*(double)
         >
-    >("dxfdim");   
-*/    
+    >("dxfdim");
+*/
   def("DxfDim", pyDxfDim, pyDxfDim_overloads());
   def("DxfCross", pyDxfCross, pyDxfCross_overloads());
   def("assemble", assemble);
@@ -825,11 +825,11 @@ AbstractNode::Pointer PythonScript::evaluate(const std::string &code, const std:
   try {
     str dir(path);
     if (len(dir)==0) dir =".";
-    object sys = import("sys"); 
-    sys.attr("path").attr("insert")(0, dir); 
+    object sys = import("sys");
+    sys.attr("path").attr("insert")(0, dir);
     exec(code.c_str(), ctx.main_namespace);
     PyAbstractNode &resNode = extract<PyAbstractNode&>(ctx.getResult());
-    sys.attr("path").attr("remove")(dir); 
+    sys.attr("path").attr("remove")(dir);
     return resNode.getNode();
   } catch(error_already_set) {
 //    PyErr_Print();
@@ -851,7 +851,7 @@ std::string PythonScript::error() {
     {
       object traceback(py::import("traceback"));
       object format_exception(traceback.attr("format_exception"));
-      object formatted_list(format_exception(hexc,hval,htb));    
+      object formatted_list(format_exception(hexc,hval,htb));
       object formatted(str("\n").join(formatted_list));
       return extract<std::string>(formatted);
     }

@@ -99,7 +99,7 @@ double dxf_dim(const QString &filename, const QString &layername, const QString 
 	return -1;
 }
 
-	
+
 Float2 dxf_cross(const QString &filename, const QString &layername, Float2 origin, double scale) {
 	QFileInfo fileInfo(filename);
 

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 #
-# This is be used to verify that all the dependant libraries of a  Mac OS X executable 
+# This is be used to verify that all the dependant libraries of a  Mac OS X executable
 # are present and that they are backwards compatible with at least 10.5.
 # Run with an executable as parameter
 # Will return 0 if the executable an all libraries are OK
@@ -56,7 +56,7 @@ def find_dependencies(file):
     if DEBUG: print "Executing " + " ".join(args)
     p = subprocess.Popen(args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     output,err = p.communicate()
-    if p.returncode != 0: 
+    if p.returncode != 0:
         print "Failed with return code " + str(p.returncode) + ":"
         print err
         return None
@@ -80,13 +80,13 @@ def validate_lib(lib):
 
     p  = subprocess.Popen(["lipo", lib, "-verify_arch", "x86_64"], stdout=subprocess.PIPE)
     output = p.communicate()[0]
-    if p.returncode != 0: 
+    if p.returncode != 0:
         print "Error: x86_64 architecture not supported: " + lib
         return False
 
     p  = subprocess.Popen(["lipo", lib, "-verify_arch", "i386"], stdout=subprocess.PIPE)
     output = p.communicate()[0]
-    if p.returncode != 0: 
+    if p.returncode != 0:
         print "Error: i386 architecture not supported: " + lib
         return False
     return True
@@ -115,7 +115,7 @@ if __name__ == '__main__':
                 continue
             if absfile in processed:
                 processed[absfile].append(dep)
-            else: 
+            else:
                 processed[absfile] = [dep]
                 if DEBUG: print "Pending: " + absfile
                 pending.append(absfile)

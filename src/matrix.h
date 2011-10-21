@@ -28,7 +28,7 @@ std::ostream& operator<<(std::ostream &out, const std::vector<T> &rhs){
   if (it != rhs.end())
 	out << *it++;
   while(it != rhs.end())
-    out << ", " << *it++; 
+    out << ", " << *it++;
   out << "]";
   return out;
 }
@@ -37,10 +37,10 @@ template<typename T, std::size_t N>
 std::ostream& operator<<(std::ostream &out, const boost::array<T,N> &rhs){
   out << "[";
   typename boost::array<T,N>::const_iterator it = rhs.begin();
-  if (it != rhs.end()) 
+  if (it != rhs.end())
 	out << *it++;
   while(it != rhs.end())
-    out << ", " << *it++; 
+    out << ", " << *it++;
   out << "]";
   return out;
 }

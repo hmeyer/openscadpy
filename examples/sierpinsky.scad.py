@@ -82,7 +82,7 @@ def sierpinski_rec(iters, size, inverse, square):
 					[0, -size+tiny, 0],
 					[size-tiny, 0, 0],
 					[-size+tiny, 0, 0],
-					[0, size-tiny, 0], 
+					[0, size-tiny, 0],
 					[0, 0, height-tiny]
 				]
 		else:
@@ -95,7 +95,7 @@ def sierpinski_rec(iters, size, inverse, square):
 					[-sval+tiny, -cval+tiny, 0],
 					[0, 0, height-tiny]
 				]
-	
+
 		pyramids = []
 		for t in trans:
 			pyramids.append(
@@ -105,7 +105,7 @@ def sierpinski_rec(iters, size, inverse, square):
 			pyramids.append(
 				translate([0, 0, 0], sierpinski(iters-1, size*2, True, square))
 			)
-		
+
 		return union(pyramids)
 
 def sierpinski(iters=4, size=35, inverse=False, square=True):

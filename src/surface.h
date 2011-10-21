@@ -39,7 +39,7 @@ public:
 	QString filename;
 	bool center;
 	int convexity;
-	SurfaceNode(const QString &filename, int convexity, bool center=false, const Props p=Props()) 
+	SurfaceNode(const QString &filename, int convexity, bool center=false, const Props p=Props())
 	  :AbstractPolyNode(p),filename(filename), center(center), convexity(convexity) { }
 	virtual PolySet *render_polyset(render_mode_e mode) const;
 	virtual QString dump(QString indent) const;

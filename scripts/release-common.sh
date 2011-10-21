@@ -4,7 +4,7 @@
 # This should work under Mac OS X and Windows (msys). Linux support pending.
 # The script will create a file called openscad-<versionstring>.zip
 # in the current directory.
-# 
+#
 # Usage: release-common.sh [-v <versionstring>]
 #  -v   Version string (e.g. -v 2010.01)
 #
@@ -41,11 +41,11 @@ fi
 echo "Building openscad-$VERSION $CONFIGURATION..."
 
 case $OS in
-    MACOSX) 
+    MACOSX)
         CONFIG=deploy
         TARGET=
         ;;
-    WIN) 
+    WIN)
         unset CONFIG
         export QTDIR=/c/devmingw/qt2009.03
         export QTMAKESPEC=win32-g++
@@ -59,7 +59,7 @@ esac
 qmake VERSION=$VERSION CONFIG+=$CONFIG CONFIG-=debug openscad.pro
 make -s clean
 case $OS in
-    MACOSX) 
+    MACOSX)
         rm -rf OpenSCAD.app
         ;;
     WIN)

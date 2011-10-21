@@ -27,7 +27,7 @@ public:
 		Aligns x,y to the grid or to existing point if one close enough exists.
 		Returns the value stored if a point already existing or an uninitialized new value
 		if not.
-	*/ 
+	*/
 	T &align(double &x, double &y) {
 		int64_t ix = (int64_t)round(x / res);
 		int64_t iy = (int64_t)round(y / res);
@@ -124,7 +124,7 @@ public:
 				return true;
 		}
 		return false;
-		
+
 	}
 	bool eq(double x1, double y1, double z1, double x2, double y2, double z2) {
 		align(x1, y1, z1);

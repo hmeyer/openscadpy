@@ -204,7 +204,7 @@ PolySet *CylinderNode::render_polyset(render_mode_e) const {
 
     generate_circle(circle1, r1);
     generate_circle(circle2, r2);
-    
+
     for (int i=0; i<fragments; i++) {
       int j = (i+1) % fragments;
       if (r1 == r2) {

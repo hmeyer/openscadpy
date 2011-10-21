@@ -7,7 +7,7 @@ def roundedBox(size, radius, sidesonly):
 	res = []
 	def r(x):
 		res.append(x)
-	if sidesonly: 
+	if sidesonly:
 		r(cube([size[0]-2*radius, size[1], size[2]], True))
 		r(cube([size[0], size[1]-2*radius, size[2]], True))
 

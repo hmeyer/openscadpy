@@ -10,12 +10,12 @@
 ;; it under the terms of the GNU General Public License as published by
 ;; the Free Software Foundation; either version 2 of the License, or
 ;; (at your option) any later version.
-;; 
+;;
 ;; This program is distributed in the hope that it will be useful,
 ;; but WITHOUT ANY WARRANTY; without even the implied warranty of
 ;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ;; GNU General Public License for more details.
-;; 
+;;
 ;; You should have received a copy of the GNU General Public License
 ;; along with this program; see the file COPYING.  If not, write to
 ;; the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
@@ -45,10 +45,10 @@
   :group 'scad-font-lock)
 
 (defcustom scad-functions
-  '("cos" "acos" "sin" "asin" "tan" "atan" 
+  '("cos" "acos" "sin" "asin" "tan" "atan"
     "pow" "log" "ln"
-    "abs" "min" "max" "sqrt" "round" "ceil" "floor" "lookup" 
-    "str" 
+    "abs" "min" "max" "sqrt" "round" "ceil" "floor" "lookup"
+    "str"
     "dxf_dim" "dxf_cross"
     )
   "SCAD functions."
@@ -58,7 +58,7 @@
 (defcustom scad-modules
   '("for" "if" "assign" "intersection_for"
     "echo"
-    "cube" "sphere" "cylinder" "polyhedron" 
+    "cube" "sphere" "cylinder" "polyhedron"
     "scale" "rotate" "translate" "mirror" "multmatrix" "color"
     "union" "difference" "intersection" "render" "surface"
     "square" "circle" "polygon" "dxf_linear_extrude" "linear_extrude" "dxf_rotate_extrude" "rotate_extrude"
@@ -70,8 +70,8 @@
   :group 'scad-font-lock)
 
 (defcustom scad-operators
-  '("+" "-" "*" "/" "%" 
-    "&&" "||" "!" 
+  '("+" "-" "*" "/" "%"
+    "&&" "||" "!"
     "<" "<=" "==" "!=" ">" ">="
     "?" ":" "=")
   "SCAD operators."
@@ -81,14 +81,14 @@
 (defvar scad-mode-map
   (let ((map (make-sparse-keymap)))
     (define-key map "\t" 'scad-indent-line)
-    (define-key map [return] 'newline-and-indent) 
+    (define-key map [return] 'newline-and-indent)
     map)
   "Keymap for `scad-mode'.")
 
 (defvar scad-mode-syntax-table
   (let ((st (make-syntax-table)))
-    ;; support comment style: “// ...” 
-    ;; support comment style: “/* ... */” 
+    ;; support comment style: “// ...”
+    ;; support comment style: “/* ... */”
     (modify-syntax-entry ?\/ ". 124b" st)
     (modify-syntax-entry ?\n "> b" st)
     (modify-syntax-entry ?* ". 23" st)

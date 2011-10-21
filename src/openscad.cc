@@ -155,7 +155,7 @@ int main(int argc, char **argv)
 	po::variables_map vm;
 	po::store(po::command_line_parser(argc, argv).options(all_options).positional(p).run(), vm);
 //	po::notify(vm);
-	
+
 	if (vm.count("help")) help(argv[0]);
 	if (vm.count("version")) version();
 
@@ -169,7 +169,7 @@ int main(int argc, char **argv)
 			help(argv[0]);
 		off_output_file = vm["o"].as<string>().c_str();
 	}
-	if (vm.count("x")) { 
+	if (vm.count("x")) {
 		if (stl_output_file || off_output_file || dxf_output_file)
 			help(argv[0]);
 		dxf_output_file = vm["x"].as<string>().c_str();
@@ -314,7 +314,7 @@ int main(int argc, char **argv)
 	{
 #ifdef Q_WS_MAC
 		installAppleEventHandlers();
-#endif		
+#endif
 
 		QString qfilename;
 		if (filename) qfilename = QFileInfo(original_path, filename).absoluteFilePath();
