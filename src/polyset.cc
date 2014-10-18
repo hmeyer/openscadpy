@@ -376,7 +376,7 @@ public:
 				if (fc[v]++ > 0)
 					facet_is_degenerated = true;
 			}
-			
+
 			if (!facet_is_degenerated)
 				B.begin_facet();
 #ifdef GEN_SURFACE_DEBUG
@@ -640,7 +640,7 @@ CGAL_Nef_polyhedron PolySet::render_cgal_nef_polyhedron() const
 					p = CGAL_Nef_polyhedron2::Point(x, y);
 					grid.data(x, y) = p;
 				}
-				plist.push_back(p);		
+				plist.push_back(p);
 			}
 			// FIXME: If a border (path) has a duplicate vertex in dxf,
 			// the CGAL_Nef_polyhedron2 constructor will crash.

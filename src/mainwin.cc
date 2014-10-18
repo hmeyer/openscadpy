@@ -212,7 +212,7 @@ MainWindow::MainWindow(const QString &filename)
 
 	if (!examplesdir.isEmpty()) {
 		bool found_example = false;
-		QStringList examples = QDir(examplesdir).entryList(QStringList("*.py"), 
+		QStringList examples = QDir(examplesdir).entryList(QStringList("*.py"),
 		QDir::Files | QDir::Readable, QDir::Name);
 		foreach (const QString &ex, examples) {
 			this->menuExamples->addAction(ex, this, SLOT(actionOpenExample()));
@@ -334,7 +334,7 @@ MainWindow::MainWindow(const QString &filename)
 	connect(screen, SIGNAL(doAnimateUpdate()), this, SLOT(animateUpdate()));
 
 	connect(Preferences::inst(), SIGNAL(requestRedraw()), this->screen, SLOT(updateGL()));
-	connect(Preferences::inst(), SIGNAL(fontChanged(const QString&,uint)), 
+	connect(Preferences::inst(), SIGNAL(fontChanged(const QString&,uint)),
 					this, SLOT(setFont(const QString&,uint)));
 	Preferences::inst()->apply();
 
@@ -674,9 +674,9 @@ void MainWindow::compileCSG(bool procevents)
 		PRINT("Compiling design (CSG Products normalization)...");
 		if (procevents)
 			QApplication::processEvents();
-		
+
 		root_norm_term = root_raw_term->link();
-		
+
 		// CSG normalization
 		while (1) {
 			CSGTerm *n = root_norm_term->normalize();
@@ -685,25 +685,25 @@ void MainWindow::compileCSG(bool procevents)
 				break;
 			root_norm_term = n;
 		}
-		
+
 		assert(root_norm_term);
 
 		root_chain = new CSGChain();
 		root_chain->import(root_norm_term);
-		
+
 		if (root_chain->polysets.size() > 1000) {
 			PRINTF("WARNING: Normalized tree has %d elements!", root_chain->polysets.size());
 			PRINTF("WARNING: OpenCSG rendering has been disabled.");
 		} else {
 			enableOpenCSG = true;
 		}
-		
+
 		if (highlight_terms.size() > 0)
 		{
 			PRINTF("Compiling highlights (%d CSG Trees)...", highlight_terms.size());
 			if (procevents)
 				QApplication::processEvents();
-			
+
 			highlights_chain = new CSGChain();
 			for (int i = 0; i < highlight_terms.size(); i++) {
 				while (1) {
@@ -716,13 +716,13 @@ void MainWindow::compileCSG(bool procevents)
 				highlights_chain->import(highlight_terms[i]);
 			}
 		}
-		
+
 		if (background_terms.size() > 0)
 		{
 			PRINTF("Compiling background (%d CSG Trees)...", background_terms.size());
 			if (procevents)
 				QApplication::processEvents();
-			
+
 			background_chain = new CSGChain();
 			for (int i = 0; i < background_terms.size(); i++) {
 				while (1) {
@@ -735,7 +735,7 @@ void MainWindow::compileCSG(bool procevents)
 				background_chain->import(background_terms[i]);
 			}
 		}
-		
+
 		PRINT("CSG generation finished.");
 		int s = t.elapsed() / 1000;
 		PRINTF("Total rendering time: %d hours, %d minutes, %d seconds", s / (60*60), (s / 60) % 60, s % 60);
@@ -766,7 +766,7 @@ void MainWindow::actionOpen()
 	if (!new_filename.isEmpty()) {
 		if (!maybeSave())
 			return;
-		
+
 		setCurrentOutput();
 		openFile(new_filename);
 		clearCurrentOutput();
@@ -1015,7 +1015,7 @@ void MainWindow::actionCompile()
 		filename.sprintf("frame%05d.png", int(round(s*t)));
 		img.save(filename, "PNG");
 	}
-	
+
 	clearCurrentOutput();
 }
 
@@ -1393,7 +1393,7 @@ static void renderGLviaCGAL(void *vp)
 		typedef Explorer::Halfedge_around_face_const_circulator heafcc_t;
 		typedef Explorer::Point Point;
 		Explorer E = m->root_N->p2.explorer();
-		
+
 		// Draw 2D edges
 		glDisable(GL_DEPTH_TEST);
 		glDisable(GL_LIGHTING);

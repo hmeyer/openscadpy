@@ -28,7 +28,7 @@ def shape_tripod():
 	x8 = x7 - thickness
 	x9 = x8 - thickness
 	x10 = x9 - thickness
-	
+
 	y1 = 0
 	y2 = y1 + thickness
 	y3 = y2 + thickness
@@ -58,12 +58,12 @@ def shape_tripod():
 		]),
 		translate([ x5, y1 ],
 			square([ boltlen - thickness, thickness*2 ])),
-	
+
 		translate([ x5 + boltlen - thickness, y2 ],
 			circle(thickness)),
 
 		translate([ x2, y2 ],roundedCorner),
-	
+
 		translate([ x8, y5 ],roundedCorner)
 	])
 
@@ -91,7 +91,7 @@ def shape_outer_disc():
 		midhole + boltlen + inner1_to_inner2 + thickness + locklen1/2,
 		locklen1,
 		midhole + boltlen + inner1_to_inner2)
-		
+
 
 def parts():
 	tripod_x_off = locklen1 - locklen2 + inner1_to_inner2;

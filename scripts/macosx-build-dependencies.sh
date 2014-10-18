@@ -1,9 +1,9 @@
 #!/bin/sh
 #
 # This script builds all library dependencies of OpenSCAD for Mac OS X.
-# The libraries will be build in 32- and 64-bit mode and backwards compatible with 
+# The libraries will be build in 32- and 64-bit mode and backwards compatible with
 # 10.5 "Leopard".
-# 
+#
 # Usage:
 # - Edit the BASEDIR variable. This is where libraries will be built and installed
 # - Edit the OPENSCADDIR variable. This is where patches are fetched from
@@ -110,8 +110,8 @@ build_boost()
   ./bootstrap.sh --prefix=$DEPLOYDIR --with-libraries=thread,program_options
   ./bjam cflags="-mmacosx-version-min=10.5 -arch i386 -arch x86_64" linkflags="-mmacosx-version-min=10.5 -arch i386 -arch x86_64"
   ./bjam install
-  install_name_tool -id $DEPLOYDIR/lib/libboost_thread.dylib $DEPLOYDIR/lib/libboost_thread.dylib 
-  install_name_tool -id $DEPLOYDIR/lib/libboost_program_options.dylib $DEPLOYDIR/lib/libboost_program_options.dylib 
+  install_name_tool -id $DEPLOYDIR/lib/libboost_thread.dylib $DEPLOYDIR/lib/libboost_thread.dylib
+  install_name_tool -id $DEPLOYDIR/lib/libboost_program_options.dylib $DEPLOYDIR/lib/libboost_program_options.dylib
 }
 
 build_cgal()
@@ -138,7 +138,7 @@ build_glew()
   cd glew-$version
   mkdir -p $DEPLOYDIR/lib/pkgconfig
   # To avoid running strip on a fat archive as this is not supported by strip
-  sed -i bak -e "s/\$(STRIP) -x lib\/\$(LIB.STATIC)//" Makefile 
+  sed -i bak -e "s/\$(STRIP) -x lib\/\$(LIB.STATIC)//" Makefile
   make GLEW_DEST=$DEPLOYDIR CFLAGS.EXTRA="-no-cpp-precomp -dynamic -fno-common -mmacosx-version-min=10.5 -arch i386 -arch x86_64" LDFLAGS.EXTRA="-mmacosx-version-min=10.5 -arch i386 -arch x86_64" install
 }
 

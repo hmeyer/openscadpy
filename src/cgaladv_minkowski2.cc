@@ -55,8 +55,8 @@ void print_polygon (const CGAL::Polygon_2<Kernel, Container>& P)
 // Pretty-print a polygon with holes.
 //
 template<class Kernel, class Container>
-void print_polygon_with_holes (const CGAL::Polygon_with_holes_2<Kernel, Container>& pwh) { 
-  if (! pwh.is_unbounded()) { 
+void print_polygon_with_holes (const CGAL::Polygon_with_holes_2<Kernel, Container>& pwh) {
+  if (! pwh.is_unbounded()) {
 		std::cout << "{ Outer boundary = ";
 		print_polygon (pwh.outer_boundary());
 	} else
@@ -66,7 +66,7 @@ void print_polygon_with_holes (const CGAL::Polygon_with_holes_2<Kernel, Containe
   unsigned int k = 1;
 
   std::cout << "  " << pwh.number_of_holes() << " holes:" << std::endl;
-  for (hit = pwh.holes_begin(); hit != pwh.holes_end(); ++hit, ++k) { 
+  for (hit = pwh.holes_begin(); hit != pwh.holes_end(); ++hit, ++k) {
     std::cout << "    Hole #" << k << " = ";
     print_polygon (*hit);
   }
@@ -135,7 +135,7 @@ CGAL_Nef_polyhedron2 minkowski2(CGAL_Nef_polyhedron2 a, CGAL_Nef_polyhedron2 b)
 
 		// Make a CGAL_Nef_polyhedron2 out of just the boundary for starters
 		return p2nef2(x.outer_boundary());
-	}	
+	}
 }
 
 #endif

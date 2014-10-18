@@ -12,7 +12,7 @@ openscad.result = difference([
 
 		rotate(pi/2,[1, 0, 0], child=
 			translate([ -25, -125, -25], ext("E"))),
-		
+
 		rotate(pi/2, [0, 1, 0], child=
 			translate([ -125, -125, -25], ext("B")))
 	]),

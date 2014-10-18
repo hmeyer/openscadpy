@@ -40,10 +40,10 @@
 #include <boost/make_shared.hpp>
 #include <boost/concept_check.hpp>
 DxfLinearExtrudeNode::DxfLinearExtrudeNode(const AbstractNode::NodeList &children, const QString &filename, const QString &layer,
-			      double height, double twist, Float2 origin, double scale, 
+			      double height, double twist, Float2 origin, double scale,
 			     int convexity, int slices, bool center, const Accuracy &acc, const Props p)
-  :AbstractPolyNode(p,children), Accuracy(acc), convexity(convexity), slices(slices), height(height), twist(twist), 
-  origin(origin), scale(scale), filename(filename), layername(layer), 
+  :AbstractPolyNode(p,children), Accuracy(acc), convexity(convexity), slices(slices), height(height), twist(twist),
+  origin(origin), scale(scale), filename(filename), layername(layer),
   center(center), has_twist(twist!=0.0) {
 }
 
@@ -125,7 +125,7 @@ PolySet *DxfLinearExtrudeNode::render_polyset(render_mode_e) const
   double slices = this->slices;
   if (has_twist && slices<2) {
 	  slices = (int)std::max(2.0, std::abs(get_fragments_from_r(height, *this) * twist / (2*M_PI)));
-  }  
+  }
 	QString key = mk_cache_id();
 	if (PolySet::ps_cache.contains(key)) {
 		PRINT(PolySet::ps_cache[key]->msg);
@@ -134,7 +134,7 @@ PolySet *DxfLinearExtrudeNode::render_polyset(render_mode_e) const
 
 	print_messages_push();
 	DxfData *dxf;
-	
+
 	if (filename.isEmpty()) {
 #ifdef ENABLE_CGAL
 	  // Before extruding, union all (2D) children nodes
@@ -180,7 +180,7 @@ PolySet *DxfLinearExtrudeNode::render_polyset(render_mode_e) const
 		}
 		PRINTF("   %9.5f %10.5f ... %10.5f %10.5f",
 				dxf->paths[i].points.first()->x / scale + origin[0],
-				dxf->paths[i].points.first()->y / scale + origin[1], 
+				dxf->paths[i].points.first()->y / scale + origin[1],
 				dxf->paths[i].points.last()->x / scale + origin[0],
 				dxf->paths[i].points.last()->y / scale + origin[1]);
 	}
@@ -230,8 +230,8 @@ QString DxfLinearExtrudeNode::dump(QString indent) const
 		QFileInfo fileInfo(filename);
 		text.sprintf("linear_extrude(file = \"%s\", cache = \"%x.%x\", layer = \"%s\", "
 				"height = %g, origin = [ %g %g ], scale = %g, center = %s, convexity = %d",
-				filename.toAscii().data(), (int)fileInfo.lastModified().toTime_t(), 
-				(int)fileInfo.size(), layername.toAscii().data(), height, origin[0], 
+				filename.toAscii().data(), (int)fileInfo.lastModified().toTime_t(),
+				(int)fileInfo.size(), layername.toAscii().data(), height, origin[0],
 				origin[1], scale, center ? "true" : "false", convexity);
 		if (has_twist) {
 			QString t2;

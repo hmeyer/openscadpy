@@ -10,7 +10,7 @@ diff -ru OpenCSG-1.3.0/Makefile OpenCSG-1.3.0-mac/Makefile
 +# Template: subdirs
 +# Command: /usr/bin/qmake -macx CONFIG+=x86\ x86_64 -o Makefile opencsg.pro
 +#############################################################################
- 
+
 -all:
 -	for X in $(SUBDIRS); do make -C $$X ; done
 +first: make_default
@@ -33,19 +33,19 @@ diff -ru OpenCSG-1.3.0/Makefile OpenCSG-1.3.0-mac/Makefile
 +MKDIR         = mkdir -p
 +SUBTARGETS    =  \
 +		sub-src
- 
+
 -clean:
 -	for X in $(SUBDIRS); do make -C $$X clean; done
-+src/$(MAKEFILE): 
-+	@$(CHK_DIR_EXISTS) src/ || $(MKDIR) src/ 
++src/$(MAKEFILE):
++	@$(CHK_DIR_EXISTS) src/ || $(MKDIR) src/
 +	cd src/ && $(QMAKE) /Users/kintel/code/metalab/checkout/OpenSCAD/libraries-tmp/src/OpenCSG-1.3.0-patched/src/src.pro -macx CONFIG+=x86\ x86_64 -o $(MAKEFILE)
 +sub-src-qmake_all:  FORCE
-+	@$(CHK_DIR_EXISTS) src/ || $(MKDIR) src/ 
++	@$(CHK_DIR_EXISTS) src/ || $(MKDIR) src/
 +	cd src/ && $(QMAKE) /Users/kintel/code/metalab/checkout/OpenSCAD/libraries-tmp/src/OpenCSG-1.3.0-patched/src/src.pro -macx CONFIG+=x86\ x86_64 -o $(MAKEFILE)
 +sub-src: src/$(MAKEFILE) FORCE
 +	cd src/ && $(MAKE) -f $(MAKEFILE)
 +sub-src-make_default: src/$(MAKEFILE) FORCE
-+	cd src/ && $(MAKE) -f $(MAKEFILE) 
++	cd src/ && $(MAKE) -f $(MAKEFILE)
 +sub-src-make_first: src/$(MAKEFILE) FORCE
 +	cd src/ && $(MAKE) -f $(MAKEFILE) first
 +sub-src-all: src/$(MAKEFILE) FORCE
@@ -136,7 +136,7 @@ diff -ru OpenCSG-1.3.0/Makefile OpenCSG-1.3.0-mac/Makefile
 +uninstall:  uninstall_subtargets FORCE
 +
 +FORCE:
- 
+
 -distclean:
 -	for X in $(SUBDIRS); do make -C $$X distclean; done
 diff -ru OpenCSG-1.3.0/RenderTexture/RenderTexture.h OpenCSG-1.3.0-mac/RenderTexture/RenderTexture.h
@@ -144,26 +144,26 @@ diff -ru OpenCSG-1.3.0/RenderTexture/RenderTexture.h OpenCSG-1.3.0-mac/RenderTex
 +++ OpenCSG-1.3.0-mac/RenderTexture/RenderTexture.h	2010-05-09 02:51:07.000000000 +0200
 @@ -294,8 +294,8 @@
      bool _BindDepthBuffer( ) const;
- 
+
  protected: // data
 -    int          _iWidth;     // width of the pbuffer
 -    int          _iHeight;    // height of the pbuffer
 +    GLint          _iWidth;     // width of the pbuffer
 +    GLint          _iHeight;    // height of the pbuffer
-     
+
      bool         _bIsTexture;
      bool         _bIsDepthTexture;
 @@ -342,8 +342,8 @@
-     
+
      // Texture stuff
      GLenum       _iTextureTarget;
 -    unsigned int _iTextureID;
 -    unsigned int _iDepthTextureID;
 +    GLuint _iTextureID;
 +    GLuint _iDepthTextureID;
-     
+
      unsigned short* _pPoorDepthTexture; // [Redge]
- 
+
 diff -ru OpenCSG-1.3.0/example/Makefile OpenCSG-1.3.0-mac/example/Makefile
 --- OpenCSG-1.3.0/example/Makefile	2010-02-06 21:35:10.000000000 +0100
 +++ OpenCSG-1.3.0-mac/example/Makefile	2010-05-09 02:51:11.000000000 +0200
@@ -178,23 +178,23 @@ diff -ru OpenCSG-1.3.0/example/Makefile OpenCSG-1.3.0-mac/example/Makefile
 -# Command: $(QMAKE) -o Makefile example.pro
 +# Command: /usr/bin/qmake -macx CONFIG+=x86\ x86_64 -o Makefile example.pro
  #############################################################################
- 
+
  ####### Compiler, tools and options
- 
+
 -CC       = gcc
 -CXX      = g++
 -LEX      = flex
 -YACC     = yacc
 -CFLAGS   = -pipe -Wall -W -O2
 -CXXFLAGS = -pipe -Wall -W -O2
--LEXFLAGS = 
+-LEXFLAGS =
 -YACCFLAGS= -d
 -INCPATH  = -I. -I../glew/include -I../include -I/usr/X11R6/include -I/usr/X11R6/include
 -LINK     = g++
--LFLAGS   = 
+-LFLAGS   =
 -LIBS     = $(SUBLIBS) -L/usr/X11R6/lib -L/usr/X11R6/lib -L../lib -lopencsg -lglut -L../glew/lib -lGLEW -lGLU -lGL -lXmu -lXext -lX11 -lm
 -AR       = ar cqs
--RANLIB   = 
+-RANLIB   =
 -MOC      = $(QTDIR)/bin/moc
 -UIC      = $(QTDIR)/bin/uic
 -QMAKE    = qmake
@@ -215,7 +215,7 @@ diff -ru OpenCSG-1.3.0/example/Makefile OpenCSG-1.3.0-mac/example/Makefile
 +INCPATH       = -I/usr/local/Qt4.6/mkspecs/macx-g++ -I. -I/Library/Frameworks/QtCore.framework/Versions/4/Headers -I/usr/include/QtCore -I/Library/Frameworks/QtGui.framework/Versions/4/Headers -I/usr/include/QtGui -I/usr/include -I../include -I/opt/local/include -I/System/Library/Frameworks/OpenGL.framework/Versions/A/Headers -I/System/Library/Frameworks/AGL.framework/Headers -I. -F/Library/Frameworks
 +LINK          = g++
 +LFLAGS        = -headerpad_max_install_names -arch x86_64 -Xarch_x86_64 -mmacosx-version-min=10.5 -arch i386
-+LIBS          = $(SUBLIBS) -F/Library/Frameworks -L/Library/Frameworks -L../lib -lopencsg -lGLEW -framework GLUT -L/opt/local/lib -framework OpenGL -framework AGL -framework QtGui -framework QtCore 
++LIBS          = $(SUBLIBS) -F/Library/Frameworks -L/Library/Frameworks -L../lib -lopencsg -lGLEW -framework GLUT -L/opt/local/lib -framework OpenGL -framework AGL -framework QtGui -framework QtCore
 +AR            = ar cq
 +RANLIB        = ranlib -s
 +QMAKE         = /usr/bin/qmake
@@ -225,7 +225,7 @@ diff -ru OpenCSG-1.3.0/example/Makefile OpenCSG-1.3.0-mac/example/Makefile
 +SED           = sed
 +COPY_FILE     = cp -f
 +COPY_DIR      = cp -f -R
-+STRIP         = 
++STRIP         =
 +INSTALL_FILE  = $(COPY_FILE)
 +INSTALL_DIR   = $(COPY_DIR)
 +INSTALL_PROGRAM = $(COPY_FILE)
@@ -237,30 +237,30 @@ diff -ru OpenCSG-1.3.0/example/Makefile OpenCSG-1.3.0-mac/example/Makefile
 -MKDIR    = mkdir -p
 +MKDIR         = mkdir -p
 +export MACOSX_DEPLOYMENT_TARGET = 10.4
- 
+
  ####### Output directory
- 
+
 -OBJECTS_DIR = ./
 +OBJECTS_DIR   = ./
- 
+
  ####### Files
- 
+
 -HEADERS = displaylistPrimitive.h
 -SOURCES = displaylistPrimitive.cpp \
 -		main.cpp
 -OBJECTS = displaylistPrimitive.o \
 +SOURCES       = displaylistPrimitive.cpp \
-+		main.cpp 
++		main.cpp
 +OBJECTS       = displaylistPrimitive.o \
  		main.o
--FORMS = 
--UICDECLS = 
--UICIMPLS = 
--SRCMOC   = 
--OBJMOC = 
+-FORMS =
+-UICDECLS =
+-UICIMPLS =
+-SRCMOC   =
+-OBJMOC =
 -DIST	   = example.pro
 -QMAKE_TARGET = opencsgexample
--DESTDIR  = 
+-DESTDIR  =
 -TARGET   = opencsgexample
 +DIST          = /usr/local/Qt4.6/mkspecs/common/unix.conf \
 +		/usr/local/Qt4.6/mkspecs/common/mac.conf \
@@ -291,7 +291,7 @@ diff -ru OpenCSG-1.3.0/example/Makefile OpenCSG-1.3.0-mac/example/Makefile
 +		/usr/local/Qt4.6/mkspecs/features/include_source_dir.prf \
 +		example.pro
 +QMAKE_TARGET  = opencsgexample
-+DESTDIR       = 
++DESTDIR       =
 +TARGET        = opencsgexample.app/Contents/MacOS/opencsgexample
 +
 +####### Custom Compiler Variables
@@ -306,49 +306,49 @@ diff -ru OpenCSG-1.3.0/example/Makefile OpenCSG-1.3.0-mac/example/Makefile
 +		-arch \
 +		i386
 +
- 
+
  first: all
  ####### Implicit rules
- 
+
 -.SUFFIXES: .c .o .cpp .cc .cxx .C
 +.SUFFIXES: .o .c .cpp .cc .cxx .C
- 
+
  .cpp.o:
 -	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o $@ $<
 +	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o "$@" "$<"
- 
+
  .cc.o:
 -	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o $@ $<
 +	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o "$@" "$<"
- 
+
  .cxx.o:
 -	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o $@ $<
 +	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o "$@" "$<"
- 
+
  .C.o:
 -	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o $@ $<
 +	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o "$@" "$<"
- 
+
  .c.o:
 -	$(CC) -c $(CFLAGS) $(INCPATH) -o $@ $<
 +	$(CC) -c $(CFLAGS) $(INCPATH) -o "$@" "$<"
- 
+
  ####### Build rules
- 
+
 -all: Makefile $(TARGET)
 -
--$(TARGET):  $(UICDECLS) $(OBJECTS) $(OBJMOC)  
+-$(TARGET):  $(UICDECLS) $(OBJECTS) $(OBJMOC)
 -	$(LINK) $(LFLAGS) -o $(TARGET) $(OBJECTS) $(OBJMOC) $(LIBS) $(OBJCOMP)
 -
 -mocables: $(SRCMOC)
 -uicables: $(UICDECLS) $(UICIMPLS)
 -
--$(MOC): 
+-$(MOC):
 -	( cd $(QTDIR)/src/moc ; $(MAKE) )
 +all: Makefile opencsgexample.app/Contents/PkgInfo opencsgexample.app/Contents/Resources/empty.lproj opencsgexample.app/Contents/Info.plist $(TARGET)
- 
-+$(TARGET):  $(OBJECTS)  
-+	@$(CHK_DIR_EXISTS) opencsgexample.app/Contents/MacOS/ || $(MKDIR) opencsgexample.app/Contents/MacOS/ 
+
++$(TARGET):  $(OBJECTS)
++	@$(CHK_DIR_EXISTS) opencsgexample.app/Contents/MacOS/ || $(MKDIR) opencsgexample.app/Contents/MacOS/
 +	$(LINK) $(LFLAGS) -o $(TARGET) $(OBJECTS) $(OBJCOMP) $(LIBS)
 +
 +Makefile: example.pro  /usr/local/Qt4.6/mkspecs/macx-g++/qmake.conf /usr/local/Qt4.6/mkspecs/common/unix.conf \
@@ -413,43 +413,43 @@ diff -ru OpenCSG-1.3.0/example/Makefile OpenCSG-1.3.0-mac/example/Makefile
 +qmake:  FORCE
 +	@$(QMAKE) -macx CONFIG+=x86\ x86_64 -o Makefile example.pro
 +
-+opencsgexample.app/Contents/PkgInfo: 
-+	@$(CHK_DIR_EXISTS) opencsgexample.app/Contents || $(MKDIR) opencsgexample.app/Contents 
++opencsgexample.app/Contents/PkgInfo:
++	@$(CHK_DIR_EXISTS) opencsgexample.app/Contents || $(MKDIR) opencsgexample.app/Contents
 +	@$(DEL_FILE) opencsgexample.app/Contents/PkgInfo
 +	@echo "APPL????" >opencsgexample.app/Contents/PkgInfo
-+opencsgexample.app/Contents/Resources/empty.lproj: 
-+	@$(CHK_DIR_EXISTS) opencsgexample.app/Contents/Resources || $(MKDIR) opencsgexample.app/Contents/Resources 
++opencsgexample.app/Contents/Resources/empty.lproj:
++	@$(CHK_DIR_EXISTS) opencsgexample.app/Contents/Resources || $(MKDIR) opencsgexample.app/Contents/Resources
 +	@touch opencsgexample.app/Contents/Resources/empty.lproj
-+	
-+opencsgexample.app/Contents/Info.plist: 
-+	@$(CHK_DIR_EXISTS) opencsgexample.app/Contents || $(MKDIR) opencsgexample.app/Contents 
++
++opencsgexample.app/Contents/Info.plist:
++	@$(CHK_DIR_EXISTS) opencsgexample.app/Contents || $(MKDIR) opencsgexample.app/Contents
 +	@$(DEL_FILE) opencsgexample.app/Contents/Info.plist
 +	@sed -e "s,@ICON@,,g" -e "s,@EXECUTABLE@,opencsgexample,g" -e "s,@TYPEINFO@,????,g" /usr/local/Qt4.6/mkspecs/macx-g++/Info.plist.app >opencsgexample.app/Contents/Info.plist
- dist: 
+ dist:
 -	@mkdir -p .tmp/opencsgexample && $(COPY_FILE) --parents $(SOURCES) $(HEADERS) $(FORMS) $(DIST) .tmp/opencsgexample/ && ( cd `dirname .tmp/opencsgexample` && $(TAR) opencsgexample.tar opencsgexample && $(GZIP) opencsgexample.tar ) && $(MOVE) `dirname .tmp/opencsgexample`/opencsgexample.tar.gz . && $(DEL_FILE) -r .tmp/opencsgexample
 -
 -mocclean:
-+	@$(CHK_DIR_EXISTS) .tmp/opencsgexample1.0.0 || $(MKDIR) .tmp/opencsgexample1.0.0 
++	@$(CHK_DIR_EXISTS) .tmp/opencsgexample1.0.0 || $(MKDIR) .tmp/opencsgexample1.0.0
 +	$(COPY_FILE) --parents $(SOURCES) $(DIST) .tmp/opencsgexample1.0.0/ && $(COPY_FILE) --parents displaylistPrimitive.h .tmp/opencsgexample1.0.0/ && $(COPY_FILE) --parents displaylistPrimitive.cpp main.cpp .tmp/opencsgexample1.0.0/ && (cd `dirname .tmp/opencsgexample1.0.0` && $(TAR) opencsgexample1.0.0.tar opencsgexample1.0.0 && $(COMPRESS) opencsgexample1.0.0.tar) && $(MOVE) `dirname .tmp/opencsgexample1.0.0`/opencsgexample1.0.0.tar.gz . && $(DEL_FILE) -r .tmp/opencsgexample1.0.0
- 
+
 -uiclean:
- 
+
 -yaccclean:
 -lexclean:
 -clean:
-+clean:compiler_clean 
++clean:compiler_clean
  	-$(DEL_FILE) $(OBJECTS)
  	-$(DEL_FILE) *~ core *.core
- 
+
 @@ -108,20 +208,50 @@
  ####### Sub-libraries
- 
+
  distclean: clean
 -	-$(DEL_FILE) $(TARGET) $(TARGET)
 +	-$(DEL_FILE) -r opencsgexample.app
 +	-$(DEL_FILE) Makefile
- 
- 
+
+
 -FORCE:
 +mocclean: compiler_moc_header_clean compiler_moc_source_clean
 +
@@ -476,32 +476,32 @@ diff -ru OpenCSG-1.3.0/example/Makefile OpenCSG-1.3.0-mac/example/Makefile
 +compiler_yacc_impl_clean:
 +compiler_lex_make_all:
 +compiler_lex_clean:
-+compiler_clean: 
- 
++compiler_clean:
+
  ####### Compile
- 
+
  displaylistPrimitive.o: displaylistPrimitive.cpp displaylistPrimitive.h
 +	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o displaylistPrimitive.o displaylistPrimitive.cpp
- 
+
  main.o: main.cpp displaylistPrimitive.h
 +	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o main.o main.cpp
- 
+
  ####### Install
- 
--install: all 
+
+-install: all
 +install:   FORCE
- 
--uninstall: 
+
+-uninstall:
 +uninstall:   FORCE
 +
 +FORCE:
- 
+
 diff -ru OpenCSG-1.3.0/example/example.pro OpenCSG-1.3.0-mac/example/example.pro
 --- OpenCSG-1.3.0/example/example.pro	2010-02-06 21:35:10.000000000 +0100
 +++ OpenCSG-1.3.0-mac/example/example.pro	2010-05-09 02:51:14.000000000 +0200
 @@ -2,9 +2,16 @@
  TARGET		= opencsgexample
- 
+
  CONFIG	 	+= opengl warn_on release
 -INCLUDEPATH += ../glew/include ../include
 -
@@ -516,7 +516,7 @@ diff -ru OpenCSG-1.3.0/example/example.pro OpenCSG-1.3.0-mac/example/example.pro
 +  INCLUDEPATH   += ../glew/include
 +  LIBS          += -lglut -L../glew/lib
 +}
- 
+
  HEADERS		= displaylistPrimitive.h
  SOURCES		= displaylistPrimitive.cpp main.cpp
 diff -ru OpenCSG-1.3.0/example/main.cpp OpenCSG-1.3.0-mac/example/main.cpp
@@ -524,7 +524,7 @@ diff -ru OpenCSG-1.3.0/example/main.cpp OpenCSG-1.3.0-mac/example/main.cpp
 +++ OpenCSG-1.3.0-mac/example/main.cpp	2010-05-09 02:51:20.000000000 +0200
 @@ -22,7 +22,11 @@
  //
- 
+
  #include <GL/glew.h>
 +#ifdef __APPLE__
 +#include <GLUT/glut.h>
@@ -555,23 +555,23 @@ diff -ru OpenCSG-1.3.0/src/Makefile OpenCSG-1.3.0-mac/src/Makefile
 -# Command: $(QMAKE) -o Makefile src.pro
 +# Command: /usr/bin/qmake -macx CONFIG+=x86\ x86_64 -o Makefile src.pro
  #############################################################################
- 
+
  ####### Compiler, tools and options
- 
+
 -CC       = gcc
 -CXX      = g++
 -LEX      = flex
 -YACC     = yacc
--CFLAGS   = -pipe -Wall -W -O2 -fPIC 
+-CFLAGS   = -pipe -Wall -W -O2 -fPIC
 -CXXFLAGS = -pipe -Wall -W -O2 -fPIC
--LEXFLAGS = 
+-LEXFLAGS =
 -YACCFLAGS= -d
 -INCPATH  = -I. -I../include -I../glew/include -I.. -I/usr/X11R6/include
 -LINK     = g++
 -LFLAGS   =  -shared -Wl,-soname,libopencsg.so.1 -Wl,-rpath,../lib
 -LIBS     = $(SUBLIBS) -L/usr/X11R6/lib -lGLU -lGL -lXmu
 -AR       = ar cqs
--RANLIB   = 
+-RANLIB   =
 -QMAKE    = qmake
 -TAR      = tar -cf
 -GZIP     = gzip -9f
@@ -590,7 +590,7 @@ diff -ru OpenCSG-1.3.0/src/Makefile OpenCSG-1.3.0-mac/src/Makefile
 +INCPATH       = -I/usr/local/Qt4.6/mkspecs/macx-g++ -I. -I/Library/Frameworks/QtCore.framework/Versions/4/Headers -I/usr/include/QtCore -I/Library/Frameworks/QtGui.framework/Versions/4/Headers -I/usr/include/QtGui -I/usr/include -I../include -I.. -I../../../deploy/include -I/System/Library/Frameworks/OpenGL.framework/Versions/A/Headers -I/System/Library/Frameworks/AGL.framework/Headers -I. -F/Library/Frameworks
 +LINK          = g++
 +LFLAGS        = -headerpad_max_install_names -arch x86_64 -Xarch_x86_64 -mmacosx-version-min=10.5 -arch i386 -single_module -dynamiclib -compatibility_version	1.3 -current_version	1.3.0 -install_name	/Users/kintel/code/metalab/checkout/OpenSCAD/libraries-tmp/deploy/lib/libopencsg.1.dylib
-+LIBS          = $(SUBLIBS) -F/Library/Frameworks -L/Library/Frameworks -L/Users/kintel/code/metalab/checkout/OpenSCAD/libraries-tmp/deploy/lib -lGLEW -framework OpenGL -framework AGL -framework QtGui -framework QtCore 
++LIBS          = $(SUBLIBS) -F/Library/Frameworks -L/Library/Frameworks -L/Users/kintel/code/metalab/checkout/OpenSCAD/libraries-tmp/deploy/lib -lGLEW -framework OpenGL -framework AGL -framework QtGui -framework QtCore
 +AR            = ar cq
 +RANLIB        = ranlib -s
 +QMAKE         = /usr/bin/qmake
@@ -600,7 +600,7 @@ diff -ru OpenCSG-1.3.0/src/Makefile OpenCSG-1.3.0-mac/src/Makefile
 +SED           = sed
 +COPY_FILE     = cp -f
 +COPY_DIR      = cp -f -R
-+STRIP         = 
++STRIP         =
 +INSTALL_FILE  = $(COPY_FILE)
 +INSTALL_DIR   = $(COPY_DIR)
 +INSTALL_PROGRAM = $(COPY_FILE)
@@ -612,14 +612,14 @@ diff -ru OpenCSG-1.3.0/src/Makefile OpenCSG-1.3.0-mac/src/Makefile
 -MKDIR    = mkdir -p
 +MKDIR         = mkdir -p
 +export MACOSX_DEPLOYMENT_TARGET = 10.4
- 
+
  ####### Output directory
- 
+
 -OBJECTS_DIR = ./
 +OBJECTS_DIR   = ./
- 
+
  ####### Files
- 
+
 -HEADERS = ../include/opencsg.h \
 -		opencsgConfig.h \
 -		area.h \
@@ -657,7 +657,7 @@ diff -ru OpenCSG-1.3.0/src/Makefile OpenCSG-1.3.0-mac/src/Makefile
 -		stencilManager.cpp \
 -		../RenderTexture/RenderTexture.cpp
 -OBJECTS = area.o \
-+		stencilManager.cpp 
++		stencilManager.cpp
 +OBJECTS       = area.o \
  		batch.o \
  		context.o \
@@ -675,11 +675,11 @@ diff -ru OpenCSG-1.3.0/src/Makefile OpenCSG-1.3.0-mac/src/Makefile
  		settings.o \
 -		stencilManager.o \
 -		RenderTexture.o
--FORMS = 
--UICDECLS = 
--UICIMPLS = 
--SRCMOC   = 
--OBJMOC = 
+-FORMS =
+-UICDECLS =
+-UICIMPLS =
+-SRCMOC   =
+-OBJMOC =
 -DIST	   = src.pro
 -QMAKE_TARGET = opencsg
 -DESTDIR  = ../lib/
@@ -719,7 +719,7 @@ diff -ru OpenCSG-1.3.0/src/Makefile OpenCSG-1.3.0-mac/src/Makefile
 +		/usr/local/Qt4.6/mkspecs/features/include_source_dir.prf \
 +		src.pro
 +QMAKE_TARGET  = opencsg
-+DESTDIR       = 
++DESTDIR       =
 +TARGET        = libopencsg.1.3.0.dylib
 +TARGETA       = libopencsg.a
 +TARGETD       = libopencsg.1.3.0.dylib
@@ -739,41 +739,41 @@ diff -ru OpenCSG-1.3.0/src/Makefile OpenCSG-1.3.0-mac/src/Makefile
 +		-arch \
 +		i386
 +
- 
+
  first: all
  ####### Implicit rules
- 
+
 -.SUFFIXES: .c .o .cpp .cc .cxx .C
 +.SUFFIXES: .o .c .cpp .cc .cxx .C
- 
+
  .cpp.o:
 -	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o $@ $<
 +	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o "$@" "$<"
- 
+
  .cc.o:
 -	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o $@ $<
 +	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o "$@" "$<"
- 
+
  .cxx.o:
 -	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o $@ $<
 +	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o "$@" "$<"
- 
+
  .C.o:
 -	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o $@ $<
 +	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o "$@" "$<"
- 
+
  .c.o:
 -	$(CC) -c $(CFLAGS) $(INCPATH) -o $@ $<
 +	$(CC) -c $(CFLAGS) $(INCPATH) -o "$@" "$<"
- 
+
  ####### Build rules
- 
+
 -all: Makefile  ../lib/$(TARGET)
 +all: Makefile  $(TARGET)
- 
--../lib/$(TARGET):  $(UICDECLS) $(OBJECTS) $(OBJMOC) $(SUBLIBS) $(OBJCOMP)  
+
+-../lib/$(TARGET):  $(UICDECLS) $(OBJECTS) $(OBJMOC) $(SUBLIBS) $(OBJCOMP)
 -	test -d ../lib/ || mkdir -p ../lib/
-+$(TARGET):  $(OBJECTS) $(SUBLIBS) $(OBJCOMP)  
++$(TARGET):  $(OBJECTS) $(SUBLIBS) $(OBJCOMP)
  	-$(DEL_FILE) $(TARGET) $(TARGET0) $(TARGET1) $(TARGET2)
 -	$(LINK) $(LFLAGS) -o $(TARGET) $(OBJECTS) $(OBJMOC) $(LIBS) $(OBJCOMP)
 +	$(LINK) $(LFLAGS) -o $(TARGET) $(OBJECTS) $(LIBS) $(OBJCOMP)
@@ -785,14 +785,14 @@ diff -ru OpenCSG-1.3.0/src/Makefile OpenCSG-1.3.0-mac/src/Makefile
 -	-$(DEL_FILE) ../lib/$(TARGET1)
 -	-$(DEL_FILE) ../lib/$(TARGET2)
 -	-$(MOVE) $(TARGET) $(TARGET0) $(TARGET1) $(TARGET2) ../lib/
- 
- 
- 
+
+
+
  staticlib: $(TARGETA)
- 
+
 -$(TARGETA):  $(UICDECLS) $(OBJECTS) $(OBJMOC) $(OBJCOMP)
-+$(TARGETA):  $(OBJECTS) $(OBJCOMP) 
- 	-$(DEL_FILE) $(TARGETA) 
++$(TARGETA):  $(OBJECTS) $(OBJCOMP)
+ 	-$(DEL_FILE) $(TARGETA)
 -	$(AR) $(TARGETA) $(OBJECTS) $(OBJMOC)
 +	$(AR) $(TARGETA) $(OBJECTS)
 +	$(RANLIB) $(TARGETA)
@@ -858,30 +858,30 @@ diff -ru OpenCSG-1.3.0/src/Makefile OpenCSG-1.3.0-mac/src/Makefile
 +/Library/Frameworks/QtCore.framework/QtCore.prl:
 +qmake:  FORCE
 +	@$(QMAKE) -macx CONFIG+=x86\ x86_64 -o Makefile src.pro
- 
- dist: 
+
+ dist:
 -	@mkdir -p .tmp/opencsg && $(COPY_FILE) --parents $(SOURCES) $(HEADERS) $(FORMS) $(DIST) .tmp/opencsg/ && ( cd `dirname .tmp/opencsg` && $(TAR) opencsg.tar opencsg && $(GZIP) opencsg.tar ) && $(MOVE) `dirname .tmp/opencsg`/opencsg.tar.gz . && $(DEL_FILE) -r .tmp/opencsg
-+	@$(CHK_DIR_EXISTS) .tmp/opencsg1.3.0 || $(MKDIR) .tmp/opencsg1.3.0 
++	@$(CHK_DIR_EXISTS) .tmp/opencsg1.3.0 || $(MKDIR) .tmp/opencsg1.3.0
 +	$(COPY_FILE) --parents $(SOURCES) $(DIST) .tmp/opencsg1.3.0/ && $(COPY_FILE) --parents ../include/opencsg.h opencsgConfig.h area.h batch.h context.h channelManager.h frameBufferObject.h frameBufferObjectExt.h occlusionQuery.h offscreenBuffer.h opencsgRender.h openglHelper.h primitiveHelper.h scissorMemo.h settings.h stencilManager.h .tmp/opencsg1.3.0/ && $(COPY_FILE) --parents area.cpp batch.cpp context.cpp channelManager.cpp frameBufferObject.cpp frameBufferObjectExt.cpp occlusionQuery.cpp offscreenBuffer.cpp opencsgRender.cpp openglHelper.cpp primitive.cpp primitiveHelper.cpp renderGoldfeather.cpp renderSCS.cpp scissorMemo.cpp settings.cpp stencilManager.cpp .tmp/opencsg1.3.0/ && (cd `dirname .tmp/opencsg1.3.0` && $(TAR) opencsg1.3.0.tar opencsg1.3.0 && $(COMPRESS) opencsg1.3.0.tar) && $(MOVE) `dirname .tmp/opencsg1.3.0`/opencsg1.3.0.tar.gz . && $(DEL_FILE) -r .tmp/opencsg1.3.0
 +
- 
+
 -yaccclean:
 -lexclean:
 -clean:
-+clean:compiler_clean 
++clean:compiler_clean
  	-$(DEL_FILE) $(OBJECTS)
  	-$(DEL_FILE) *~ core *.core
- 
+
 @@ -170,44 +243,77 @@
  ####### Sub-libraries
- 
+
  distclean: clean
 -	-$(DEL_FILE) ../lib/$(TARGET) $(TARGET)
 -	-$(DEL_FILE) ../lib/$(TARGET0) ../lib/$(TARGET1) ../lib/$(TARGET2) $(TARGETA)
 -
 -
 -FORCE:
-+	-$(DEL_FILE) $(TARGET) 
++	-$(DEL_FILE) $(TARGET)
 +	-$(DEL_FILE) $(TARGET0) $(TARGET1) $(TARGET2) $(TARGETA)
 +	-$(DEL_FILE) Makefile
 +
@@ -911,26 +911,26 @@ diff -ru OpenCSG-1.3.0/src/Makefile OpenCSG-1.3.0-mac/src/Makefile
 +compiler_yacc_impl_clean:
 +compiler_lex_make_all:
 +compiler_lex_clean:
-+compiler_clean: 
- 
++compiler_clean:
+
  ####### Compile
- 
+
  area.o: area.cpp opencsgConfig.h \
  		area.h \
  		openglHelper.h
 +	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o area.o area.cpp
- 
+
  batch.o: batch.cpp opencsgConfig.h \
  		batch.h \
  		primitiveHelper.h \
  		area.h
 +	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o batch.o batch.cpp
- 
+
  context.o: context.cpp opencsgConfig.h \
  		context.h \
  		offscreenBuffer.h
 +	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o context.o context.cpp
- 
+
  channelManager.o: channelManager.cpp opencsgConfig.h \
  		channelManager.h \
  		offscreenBuffer.h \
@@ -940,21 +940,21 @@ diff -ru OpenCSG-1.3.0/src/Makefile OpenCSG-1.3.0-mac/src/Makefile
 +		area.h \
 +		settings.h
 +	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o channelManager.o channelManager.cpp
- 
+
  frameBufferObject.o: frameBufferObject.cpp opencsgConfig.h \
  		frameBufferObject.h \
  		offscreenBuffer.h
 +	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o frameBufferObject.o frameBufferObject.cpp
- 
+
  frameBufferObjectExt.o: frameBufferObjectExt.cpp opencsgConfig.h \
  		frameBufferObjectExt.h \
  		offscreenBuffer.h
 +	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o frameBufferObjectExt.o frameBufferObjectExt.cpp
- 
+
  occlusionQuery.o: occlusionQuery.cpp opencsgConfig.h \
  		occlusionQuery.h
 +	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o occlusionQuery.o occlusionQuery.cpp
- 
+
  offscreenBuffer.o: offscreenBuffer.cpp opencsgConfig.h \
  		context.h \
 @@ -215,27 +321,28 @@
@@ -962,7 +962,7 @@ diff -ru OpenCSG-1.3.0/src/Makefile OpenCSG-1.3.0-mac/src/Makefile
  		frameBufferObjectExt.h \
  		pBufferTexture.h
 +	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o offscreenBuffer.o offscreenBuffer.cpp
- 
+
  opencsgRender.o: opencsgRender.cpp opencsgConfig.h \
  		opencsgRender.h \
  		primitiveHelper.h \
@@ -971,7 +971,7 @@ diff -ru OpenCSG-1.3.0/src/Makefile OpenCSG-1.3.0-mac/src/Makefile
 +		area.h \
 +		settings.h
 +	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o opencsgRender.o opencsgRender.cpp
- 
+
  openglHelper.o: openglHelper.cpp opencsgConfig.h \
  		openglHelper.h \
  		area.h
@@ -980,10 +980,10 @@ diff -ru OpenCSG-1.3.0/src/Makefile OpenCSG-1.3.0-mac/src/Makefile
 -		pBufferTexture.h \
 -		offscreenBuffer.h
 +	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o openglHelper.o openglHelper.cpp
- 
+
  primitive.o: primitive.cpp opencsgConfig.h
 +	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o primitive.o primitive.cpp
- 
+
  primitiveHelper.o: primitiveHelper.cpp opencsgConfig.h \
  		openglHelper.h \
 -		primitiveHelper.h \
@@ -991,7 +991,7 @@ diff -ru OpenCSG-1.3.0/src/Makefile OpenCSG-1.3.0-mac/src/Makefile
 +		area.h \
 +		primitiveHelper.h
 +	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o primitiveHelper.o primitiveHelper.cpp
- 
+
  renderGoldfeather.o: renderGoldfeather.cpp opencsgConfig.h \
  		opencsgRender.h \
 @@ -243,10 +350,11 @@
@@ -1005,7 +1005,7 @@ diff -ru OpenCSG-1.3.0/src/Makefile OpenCSG-1.3.0-mac/src/Makefile
 -		area.h
 +		stencilManager.h
 +	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o renderGoldfeather.o renderGoldfeather.cpp
- 
+
  renderSCS.o: renderSCS.cpp opencsgConfig.h \
  		opencsgRender.h \
 @@ -254,29 +362,57 @@
@@ -1018,7 +1018,7 @@ diff -ru OpenCSG-1.3.0/src/Makefile OpenCSG-1.3.0-mac/src/Makefile
 -		area.h
 +		scissorMemo.h
 +	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o renderSCS.o renderSCS.cpp
- 
+
  scissorMemo.o: scissorMemo.cpp opencsgConfig.h \
  		openglHelper.h \
 -		scissorMemo.h \
@@ -1026,10 +1026,10 @@ diff -ru OpenCSG-1.3.0/src/Makefile OpenCSG-1.3.0-mac/src/Makefile
 +		scissorMemo.h \
  		channelManager.h
 +	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o scissorMemo.o scissorMemo.cpp
- 
+
  settings.o: settings.cpp opencsgConfig.h
 +	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o settings.o settings.cpp
- 
+
  stencilManager.o: stencilManager.cpp opencsgConfig.h \
  		area.h \
  		openglHelper.h \
@@ -1038,34 +1038,34 @@ diff -ru OpenCSG-1.3.0/src/Makefile OpenCSG-1.3.0-mac/src/Makefile
 -RenderTexture.o: ../RenderTexture/RenderTexture.cpp ../RenderTexture/RenderTexture.h
 -	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o RenderTexture.o ../RenderTexture/RenderTexture.cpp
 +	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o stencilManager.o stencilManager.cpp
- 
+
  ####### Install
- 
--install: all 
+
+-install: all
 +install_target: first FORCE
-+	@$(CHK_DIR_EXISTS) $(INSTALL_ROOT)/Users/kintel/code/metalab/checkout/OpenSCAD/libraries-tmp/deploy/lib/ || $(MKDIR) $(INSTALL_ROOT)/Users/kintel/code/metalab/checkout/OpenSCAD/libraries-tmp/deploy/lib/ 
++	@$(CHK_DIR_EXISTS) $(INSTALL_ROOT)/Users/kintel/code/metalab/checkout/OpenSCAD/libraries-tmp/deploy/lib/ || $(MKDIR) $(INSTALL_ROOT)/Users/kintel/code/metalab/checkout/OpenSCAD/libraries-tmp/deploy/lib/
 +	-$(INSTALL_PROGRAM) "$(TARGET)" "$(INSTALL_ROOT)/Users/kintel/code/metalab/checkout/OpenSCAD/libraries-tmp/deploy/lib/$(TARGET)"
 +	-$(SYMLINK) "$(TARGET)" "$(INSTALL_ROOT)/Users/kintel/code/metalab/checkout/OpenSCAD/libraries-tmp/deploy/lib/$(TARGET0)"
 +	-$(SYMLINK) "$(TARGET)" "$(INSTALL_ROOT)/Users/kintel/code/metalab/checkout/OpenSCAD/libraries-tmp/deploy/lib/$(TARGET1)"
 +	-$(SYMLINK) "$(TARGET)" "$(INSTALL_ROOT)/Users/kintel/code/metalab/checkout/OpenSCAD/libraries-tmp/deploy/lib/$(TARGET2)"
 +
 +uninstall_target:  FORCE
-+	-$(DEL_FILE) "$(INSTALL_ROOT)/Users/kintel/code/metalab/checkout/OpenSCAD/libraries-tmp/deploy/lib/$(TARGET)" 
-+	 -$(DEL_FILE) "$(INSTALL_ROOT)/Users/kintel/code/metalab/checkout/OpenSCAD/libraries-tmp/deploy/lib/$(TARGET0)" 
-+	 -$(DEL_FILE) "$(INSTALL_ROOT)/Users/kintel/code/metalab/checkout/OpenSCAD/libraries-tmp/deploy/lib/$(TARGET1)" 
++	-$(DEL_FILE) "$(INSTALL_ROOT)/Users/kintel/code/metalab/checkout/OpenSCAD/libraries-tmp/deploy/lib/$(TARGET)"
++	 -$(DEL_FILE) "$(INSTALL_ROOT)/Users/kintel/code/metalab/checkout/OpenSCAD/libraries-tmp/deploy/lib/$(TARGET0)"
++	 -$(DEL_FILE) "$(INSTALL_ROOT)/Users/kintel/code/metalab/checkout/OpenSCAD/libraries-tmp/deploy/lib/$(TARGET1)"
 +	 -$(DEL_FILE) "$(INSTALL_ROOT)/Users/kintel/code/metalab/checkout/OpenSCAD/libraries-tmp/deploy/lib/$(TARGET2)"
-+	-$(DEL_DIR) $(INSTALL_ROOT)/Users/kintel/code/metalab/checkout/OpenSCAD/libraries-tmp/deploy/lib/ 
++	-$(DEL_DIR) $(INSTALL_ROOT)/Users/kintel/code/metalab/checkout/OpenSCAD/libraries-tmp/deploy/lib/
 +
 +
 +install_headers: first FORCE
-+	@$(CHK_DIR_EXISTS) $(INSTALL_ROOT)/Users/kintel/code/metalab/checkout/OpenSCAD/libraries-tmp/deploy/include/ || $(MKDIR) $(INSTALL_ROOT)/Users/kintel/code/metalab/checkout/OpenSCAD/libraries-tmp/deploy/include/ 
++	@$(CHK_DIR_EXISTS) $(INSTALL_ROOT)/Users/kintel/code/metalab/checkout/OpenSCAD/libraries-tmp/deploy/include/ || $(MKDIR) $(INSTALL_ROOT)/Users/kintel/code/metalab/checkout/OpenSCAD/libraries-tmp/deploy/include/
 +	-$(INSTALL_FILE) /Users/kintel/code/metalab/checkout/OpenSCAD/libraries-tmp/src/OpenCSG-1.3.0-patched/include/opencsg.h $(INSTALL_ROOT)/Users/kintel/code/metalab/checkout/OpenSCAD/libraries-tmp/deploy/include/
 +
- 
--uninstall: 
+
+-uninstall:
 +uninstall_headers:  FORCE
 +	-$(DEL_FILE) -r $(INSTALL_ROOT)/Users/kintel/code/metalab/checkout/OpenSCAD/libraries-tmp/deploy/include/opencsg.h
-+	-$(DEL_DIR) $(INSTALL_ROOT)/Users/kintel/code/metalab/checkout/OpenSCAD/libraries-tmp/deploy/include/ 
++	-$(DEL_DIR) $(INSTALL_ROOT)/Users/kintel/code/metalab/checkout/OpenSCAD/libraries-tmp/deploy/include/
 +
 +
 +install:  install_target install_headers  FORCE
@@ -1073,7 +1073,7 @@ diff -ru OpenCSG-1.3.0/src/Makefile OpenCSG-1.3.0-mac/src/Makefile
 +uninstall: uninstall_target uninstall_headers   FORCE
 +
 +FORCE:
- 
+
 diff -ru OpenCSG-1.3.0/src/channelManager.cpp OpenCSG-1.3.0-mac/src/channelManager.cpp
 --- OpenCSG-1.3.0/src/channelManager.cpp	2010-02-06 21:35:10.000000000 +0100
 +++ OpenCSG-1.3.0-mac/src/channelManager.cpp	2010-05-09 02:51:32.000000000 +0200
@@ -1085,7 +1085,7 @@ diff -ru OpenCSG-1.3.0/src/channelManager.cpp OpenCSG-1.3.0-mac/src/channelManag
 +#elif !defined(__APPLE__)
  #include <GL/glxew.h>
  #endif
- 
+
 @@ -170,9 +170,11 @@
  #ifdef WIN32
                  && WGLEW_ARB_pbuffer
@@ -1103,17 +1103,17 @@ diff -ru OpenCSG-1.3.0/src/frameBufferObject.h OpenCSG-1.3.0-mac/src/frameBuffer
 --- OpenCSG-1.3.0/src/frameBufferObject.h	2010-02-06 21:35:10.000000000 +0100
 +++ OpenCSG-1.3.0-mac/src/frameBufferObject.h	2010-05-09 02:51:36.000000000 +0200
 @@ -79,10 +79,10 @@
- 
+
              /// Texture stuff
              GLenum       textureTarget;
 -            unsigned int textureID;
 -            unsigned int depthID;
 +            GLuint textureID;
 +            GLuint depthID;
- 
+
 -            unsigned int framebufferID;
 +            GLuint framebufferID;
- 
+
              bool         initialized;
          };
 diff -ru OpenCSG-1.3.0/src/occlusionQuery.cpp OpenCSG-1.3.0-mac/src/occlusionQuery.cpp
@@ -1121,7 +1121,7 @@ diff -ru OpenCSG-1.3.0/src/occlusionQuery.cpp OpenCSG-1.3.0-mac/src/occlusionQue
 +++ OpenCSG-1.3.0-mac/src/occlusionQuery.cpp	2010-05-09 02:51:40.000000000 +0200
 @@ -57,7 +57,7 @@
          }
- 
+
          unsigned int OcclusionQueryARB::getQueryResult() {
 -            unsigned int fragmentCount;
 +            GLuint fragmentCount;
@@ -1130,7 +1130,7 @@ diff -ru OpenCSG-1.3.0/src/occlusionQuery.cpp OpenCSG-1.3.0-mac/src/occlusionQue
          }
 @@ -94,7 +94,7 @@
          }
- 
+
          unsigned int OcclusionQueryNV::getQueryResult() {
 -            unsigned int fragmentCount;
 +            GLuint fragmentCount;
@@ -1141,20 +1141,20 @@ diff -ru OpenCSG-1.3.0/src/openglHelper.cpp OpenCSG-1.3.0-mac/src/openglHelper.c
 --- OpenCSG-1.3.0/src/openglHelper.cpp	2010-02-06 21:35:10.000000000 +0100
 +++ OpenCSG-1.3.0-mac/src/openglHelper.cpp	2010-05-09 02:51:44.000000000 +0200
 @@ -29,13 +29,13 @@
- 
+
          GLfloat projection[16];
          GLfloat modelview[16];
 -        int canvasPos[4];
 +        GLint canvasPos[4];
- 
+
 -        int stencilBits = 0;
 +        GLint stencilBits = 0;
          int stencilMax = 0;
          int stencilMask = 0;
- 
+
 -        int scissorPos[4];
 +        GLint scissorPos[4];
- 
+
          void scissor(const PCArea& area) {
              const int dx = area.maxx - area.minx;
 diff -ru OpenCSG-1.3.0/src/openglHelper.h OpenCSG-1.3.0-mac/src/openglHelper.h
@@ -1167,7 +1167,7 @@ diff -ru OpenCSG-1.3.0/src/openglHelper.h OpenCSG-1.3.0-mac/src/openglHelper.h
 -        extern int canvasPos[4];
 +        extern GLint canvasPos[4];
              // copy of the viewport size during CSG computation
- 
+
 -        extern int stencilBits;
 +        extern GLint stencilBits;
              // number of stencil bits in the pbuffer
@@ -1175,27 +1175,27 @@ diff -ru OpenCSG-1.3.0/src/openglHelper.h OpenCSG-1.3.0-mac/src/openglHelper.h
              // the number where the stencil value would "wrap around" to zero
          extern int stencilMask;
              // stencilMax - 1
- 
+
 -        extern int scissorPos[4];
 +        extern GLint scissorPos[4];
              // copy of the scissor settings for CSG computation
- 
+
          void scissor(const PCArea& area);
 diff -ru OpenCSG-1.3.0/src/pBufferTexture.h OpenCSG-1.3.0-mac/src/pBufferTexture.h
 --- OpenCSG-1.3.0/src/pBufferTexture.h	2010-02-06 21:35:10.000000000 +0100
 +++ OpenCSG-1.3.0-mac/src/pBufferTexture.h	2010-05-09 02:51:53.000000000 +0200
 @@ -22,7 +22,7 @@
- 
+
  #ifndef __OpenCSG__pbuffer_texture_h__
  #define __OpenCSG__pbuffer_texture_h__
 -
 +#ifndef __APPLE__
  #include "opencsgConfig.h"
  #include "offscreenBuffer.h"
- 
+
 @@ -84,5 +84,27 @@
      } // namespace OpenGL
- 
+
  } // namespace OpenCSG
 +#else
 +
@@ -1218,7 +1218,7 @@ diff -ru OpenCSG-1.3.0/src/pBufferTexture.h OpenCSG-1.3.0-mac/src/pBufferTexture
 +    };
 +  }
 +}
- 
+
 +#endif // __APPLE__
  #endif // __OpenCSG__frame_buffer_object_h__
 diff -ru OpenCSG-1.3.0/src/src.pro OpenCSG-1.3.0-mac/src/src.pro
@@ -1229,12 +1229,12 @@ diff -ru OpenCSG-1.3.0/src/src.pro OpenCSG-1.3.0-mac/src/src.pro
  TARGET		= opencsg
  VERSION     = 1.3.0
 -DESTDIR     = ../lib
- 
+
  CONFIG		+= opengl warn_on release
 -INCLUDEPATH += ../include ../glew/include ../
 +INCLUDEPATH += ../include ../
 +
-+# Optionally specify deployment location using the 
++# Optionally specify deployment location using the
 +# MACOSX_DEPLOY_DIR env. variable
 +DEPLOYDIR = $$(MACOSX_DEPLOY_DIR)
 +
@@ -1255,7 +1255,7 @@ diff -ru OpenCSG-1.3.0/src/src.pro OpenCSG-1.3.0-mac/src/src.pro
 +  INSTALLS += target
 +  target.path = $$DESTDIR
 +}
- 
+
  HEADERS		= ../include/opencsg.h \
  		  opencsgConfig.h \
 @@ -18,12 +39,11 @@

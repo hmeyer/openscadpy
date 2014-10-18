@@ -129,7 +129,7 @@ CSGTerm *AbstractNode::render_csg_term_from_nef(const Float20 &m, QVector<CSGTer
 		}
 
 		ps = new PolySet();
-		
+
 		CGAL_Polyhedron P;
 		N.p3.convert_to_Polyhedron(P);
 

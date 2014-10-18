@@ -7,7 +7,7 @@
 # This script creates a binary release of OpenSCAD for Mac OS X.
 # The script will create a file called openscad-<versionstring>.zip
 # in the current directory.
-# 
+#
 # Usage: makedmg.sh [-v <versionstring>]
 #  -v   Version string (e.g. -v 2010.01)
 #
@@ -47,8 +47,8 @@ install_name_tool -change libopencsg.1.dylib @executable_path/../Frameworks/libo
 install_name_tool -change QtOpenGL.framework/Versions/4/QtOpenGL @executable_path/../Frameworks/QtOpenGL OpenSCAD.app/Contents/MacOS/openscad
 install_name_tool -change QtGui.framework/Versions/4/QtGui @executable_path/../Frameworks/QtGui OpenSCAD.app/Contents/MacOS/openscad
 install_name_tool -change QtCore.framework/Versions/4/QtCore @executable_path/../Frameworks/QtCore OpenSCAD.app/Contents/MacOS/openscad
-install_name_tool -change QtGui.framework/Versions/4/QtGui @executable_path/../Frameworks/QtGui OpenSCAD.app/Contents/Frameworks/QtOpenGL 
-install_name_tool -change QtCore.framework/Versions/4/QtCore @executable_path/../Frameworks/QtCore OpenSCAD.app/Contents/Frameworks/QtOpenGL 
+install_name_tool -change QtGui.framework/Versions/4/QtGui @executable_path/../Frameworks/QtGui OpenSCAD.app/Contents/Frameworks/QtOpenGL
+install_name_tool -change QtCore.framework/Versions/4/QtCore @executable_path/../Frameworks/QtCore OpenSCAD.app/Contents/Frameworks/QtOpenGL
 install_name_tool -change QtCore.framework/Versions/4/QtCore @executable_path/../Frameworks/QtCore OpenSCAD.app/Contents/Frameworks/QtGui
 install_name_tool -change /opt/local/lib/libGLEW.1.5.1.dylib @executable_path/../Frameworks/libGLEW.1.5.1.dylib OpenSCAD.app/Contents/MacOS/openscad
 install_name_tool -id libopencsg.dylib OpenSCAD.app/Contents/Frameworks/libopencsg.dylib

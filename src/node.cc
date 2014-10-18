@@ -202,7 +202,7 @@ CGAL_Nef_polyhedron AbstractPolyNode::render_cgal_nef_polyhedron() const
 		cgal_nef_cache.insert(cache_id, new cgal_nef_cache_entry(N), N.weight());
 		print_messages_pop();
 		progress_report();
-		
+
 		ps->unlink();
 		return N;
 	}

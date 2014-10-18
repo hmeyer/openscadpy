@@ -39,7 +39,7 @@ def spring(r1 = 100, r2 = 10, height = 100, hr = 12, steps = 16):
 		points1.append(pointFromWirealpha(wirealpha))
 		points2.append(pointFromWirealpha(wirealpha-pi))
 	return linear_extrude(child=polygon(points1+points2),h=height, twist=pi*height/hr, convexity=5).fn( steps*hr/r2 )
-	
+
 openscad.result = union([
 
 	translate([ -30, 0, 0 ],
@@ -47,6 +47,6 @@ openscad.result = union([
 
 	translate([ 30, 0, 0 ],
 		nut()),
-	
+
 	spring()
 	])

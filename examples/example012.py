@@ -7,7 +7,7 @@ from math import pi
 
 openscad.result = difference([
 	sphere(20),
-	
+
 	translate([ -2.92, 0.5, +20 ], rotate([pi, 0, pi],
 			import_stl("example012.stl", 5)
 	))])

@@ -136,8 +136,8 @@ void dxf_tesselate(PolySet *ps, DxfData *dxf, double rot, bool up, bool /* do_tr
 			} else {
 				prev_pi->neigh_next = pi;
 				pi->neigh_prev = prev_pi;
-				edge_to_path[edge_t(prev_pi, pi)] = 1; 
-				edge_to_path[edge_t(pi, prev_pi)] = 1; 
+				edge_to_path[edge_t(prev_pi, pi)] = 1;
+				edge_to_path[edge_t(pi, prev_pi)] = 1;
 				cdt.insert_constraint(prev, vh);
 			}
 			prev_pi = pi;
@@ -149,8 +149,8 @@ void dxf_tesselate(PolySet *ps, DxfData *dxf, double rot, bool up, bool /* do_tr
 			prev_pi->neigh_next = first_pi;
 			first_pi->neigh_prev = prev_pi;
 
-			edge_to_path[edge_t(first_pi, prev_pi)] = 1; 
-			edge_to_path[edge_t(prev_pi, first_pi)] = 1; 
+			edge_to_path[edge_t(first_pi, prev_pi)] = 1;
+			edge_to_path[edge_t(prev_pi, first_pi)] = 1;
 
 			cdt.insert_constraint(prev, first);
 		}

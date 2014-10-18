@@ -17,14 +17,14 @@ Using STL-imported models is tricky and triggers multiple issues:
 1) null-faces causes F6 rendering to fail while F5 rendering succeeds.
    (null-faces are exported by OpenSCAD). Example: adns2610_dev_circuit_inv.stl
    by Andrew Plumb
-2) Even very simple imported STL models don't render correctly with F5 when taking 
+2) Even very simple imported STL models don't render correctly with F5 when taking
    a difference(), though F6 looks correct. Example: test_cube.stl by Andrew Plumb
    with this scad file:
    difference() {
      import_stl("test_cube.stl");
      translate([2,2,2]) cylinder(h=10);
    }
-3) More complex STL models with something simple unioned or subtracted fails rendering 
+3) More complex STL models with something simple unioned or subtracted fails rendering
    using F6 even though F5 works. Example: adns2610_dev_circuit_inv.stl
    by Andrew Plumb with the three null-faces removed by MeshLab with this scad file:
    union() {
@@ -32,7 +32,7 @@ Using STL-imported models is tricky and triggers multiple issues:
      sphere(r=5);
    }
 4) More complex STL models cannot be projected (both F5 and F6).
-   Example: adns2610_dev_circuit_inv.stl by Andrew Plumb with the three 
+   Example: adns2610_dev_circuit_inv.stl by Andrew Plumb with the three
    null-faces removed by MeshLab and this scad file:
    projection(cut=true) {
      import_stl("adns2610_dev_circuit_inv.stl");
@@ -82,7 +82,7 @@ o 3D View
   - Allow specifying viewpoint in the scad file
   - overlay indicator displaying current view mode
   - OpenCSG rendering: Coincident surfaces causes z-buffer fighting. Is this somehow
-    avoidable tuning the depth tests in OpenCSG? 
+    avoidable tuning the depth tests in OpenCSG?
   - Use OpenGL picking to facilitate ray-tracing like features like measuring
     thicknesses, distances, slot thicknesses etc.
 o Editor wishlist
@@ -104,7 +104,7 @@ o Editor wishlist
   - C-c/C-v should work on the focused widget, not always in the editor
 o Error reporting/debugging
   - Provide better error messages when polygon ordering causes CGAL errors:
-    o Supply syntax highlighting of the exact polygon indices which are 
+    o Supply syntax highlighting of the exact polygon indices which are
       reported to be wrong
     o Provide some interaction for debug walk-through?
   - Provide visual highlighting of geometry corresponding to code
@@ -169,7 +169,7 @@ o Misc
   - When specifying a transparency with the color() statement,
     the object is not sorted and will be rendered wrongly
   - Go through default values of parameters (e.g. cube() has x,y,z=1 while linear_extrude() has height=100)
-  - Add support for symbolic names to child() statement 
+  - Add support for symbolic names to child() statement
   - Add 'lines' object type for non-solid 2d drawings
   - Is there a reason why modules like echo, empty if, empty for loop returns an
     empty AbstractNode instead of being ignored?
@@ -179,7 +179,7 @@ o Grammar
   - dim->name -> dim->label
   - A random(seed) function
   - import_*() -> *_import() (consistent prefix vs. postfix)
-  - linear_extrude()/rotate_extrude(): Cumbersome names? -> (extrude, revolve, lathe, sweep ?) 
+  - linear_extrude()/rotate_extrude(): Cumbersome names? -> (extrude, revolve, lathe, sweep ?)
 
 IDEAS FOR LANGUAGE CHANGES
 --------------------------

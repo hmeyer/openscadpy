@@ -147,7 +147,7 @@ QString ImportSTLNode::dump(QString indent) const {
 		    filename.toAscii().data(), (int)st.st_mtime, (int)st.st_size, convexity);
     ((AbstractNode*)this)->dump_cache = indent + QString("n%1: ").arg(idx) + text;
   }
-  return dump_cache;  
+  return dump_cache;
 }
 
 QString ImportOFFNode::dump(QString indent) const {

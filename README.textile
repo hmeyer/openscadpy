@@ -150,8 +150,8 @@ h4. Import
 * Surface
 @surface(file=filename, convexity=5, center=False)@
 <pre><code>#surface.dat
-10 9 8 7 6 5 5 5 5 5 
-9 8 7 6 6 4 3 2 1 0 
+10 9 8 7 6 5 5 5 5 5
+9 8 7 6 6 4 3 2 1 0
 8 7 6 6 4 3 2 1 0 0
 7 6 6 4 3 2 1 0 0 0
 6 6 4 3 2 1 1 0 0 0

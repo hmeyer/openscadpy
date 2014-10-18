@@ -88,7 +88,7 @@ void export_stl(CGAL_Nef_polyhedron *root_N, QString filename, QProgressDialog *
 
 	FILE *f = fopen(filename.toUtf8().data(), "w");
 	if (!f) {
-		PRINTA("Can't open STL file \"%1\" for STL export: %2", 
+		PRINTA("Can't open STL file \"%1\" for STL export: %2",
 					 filename, QString(strerror(errno)));
 		set_output_handler(NULL, NULL);
 		return;
@@ -119,7 +119,7 @@ void export_stl(CGAL_Nef_polyhedron *root_N, QString filename, QProgressDialog *
 			vs2.sprintf("%f %f %f", x2, y2, z2);
 			vs3.sprintf("%f %f %f", x3, y3, z3);
 			if (vs1 != vs2 && vs1 != vs3 && vs2 != vs3) {
-				
+
 				double nx = (y1-y2)*(z1-z3) - (z1-z2)*(y1-y3);
 				double ny = (z1-z2)*(x1-x3) - (x1-x2)*(z1-z3);
 				double nz = (x1-x2)*(y1-y3) - (y1-y2)*(x1-x3);
@@ -160,7 +160,7 @@ void export_dxf(CGAL_Nef_polyhedron *root_N, QString filename, QProgressDialog *
 {
 	FILE *f = fopen(filename.toUtf8().data(), "w");
 	if (!f) {
-		PRINTA("Can't open DXF file \"%1\" for DXF export: %2", 
+		PRINTA("Can't open DXF file \"%1\" for DXF export: %2",
 					 filename, QString(strerror(errno)));
 		set_output_handler(NULL, NULL);
 		return;
@@ -168,7 +168,7 @@ void export_dxf(CGAL_Nef_polyhedron *root_N, QString filename, QProgressDialog *
 
 	setlocale(LC_NUMERIC, "C"); // Ensure radix is . (not ,) in output
 
-	// Some importers (e.g. QCAD) needs a HEADER section specifying AutoCAD 2000 as 
+	// Some importers (e.g. QCAD) needs a HEADER section specifying AutoCAD 2000 as
 	// the file format for LWPOLYLINE entities to work
 	fprintf(f, "  0\n"
 					"SECTION\n"

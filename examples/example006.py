@@ -18,9 +18,9 @@ def example006():
 		+map(lambda rot: rotate(ang=pi/2, vec=rot, children=
 			map(lambda p: translate([ p[0]*50, p[1]*50, 0 ],
 				rotate(ang=p[2], vec=[0,0,1], child=edgeprofile())
-				), [	[+1, +1, 0], 
-					[-1, +1, pi/2], 
-					[-1, -1, pi], 
+				), [	[+1, +1, 0],
+					[-1, +1, pi/2],
+					[-1, -1, pi],
 					[+1, -1, 3*pi/2]])
 			)
 			,[ [0, 0, 0], [1, 0, 0], [0, 1, 0] ])
@@ -32,7 +32,7 @@ def example006():
 						)
 					)
 				)
-			), 
+			),
 			[
 				[ 0, 0, [ [0, 0] ] ],
 				[ pi/2, 0, [ [-20, -20], [+20, +20] ] ],

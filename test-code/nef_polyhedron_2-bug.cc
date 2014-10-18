@@ -84,8 +84,8 @@ int main()
 		Point(45,100), Point(45,50), Point(60,80),
 		Point(140,0), Point(45,50), Point(0,0),
 		Point(0,140), Point(0,0), Point(50,140),
-		Point(45,100), Point(50,140), Point(0,0), 
-		Point(45,100), Point(0,0), Point(45,50), 
+		Point(45,100), Point(50,140), Point(0,0),
+		Point(45,100), Point(0,0), Point(45,50),
 	};
 
 

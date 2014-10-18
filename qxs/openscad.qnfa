@@ -5,18 +5,18 @@
 		<start parenthesis="cppcomment:open" indent="1" fold="1">/\*</start>
 		<stop parenthesis="cppcomment:close" indent="1" fold="1">\*/</stop>
 	</context>
-	
+
 	<context id="comment/single" format="comment" >
 		<start>//</start>
 		<stop exclusive="false">\n</stop>
-		
+
 		<context id="evilJump" format="danger" >
 			<start>\\\n</start>
 			<stop exclusive="false">\n</stop>
 			<escape>\\</escape>
 		</context>
 	</context>
-	
+
 	<context id="data/string" format="text" >
 		<start>&quot;</start>
 		<stop>&quot;</stop>
@@ -48,7 +48,7 @@
 	<sequence parenthesis="curly:close" indent="1" fold="1">}</sequence>
 	<sequence parenthesis="square:open">\[</sequence>
 	<sequence parenthesis="square:close">\]</sequence>
-	
+
 	<list id="keywords/toplevel" format="keyword">
 		<word>module</word>
 		<word>function</word>
@@ -59,13 +59,13 @@
 		<word>if</word>
 		<word>else</word>
 	</list>
-	
+
 	<list id="keywords/others" format="keyword">
 		<word>false</word>
 		<word>true</word>
 		<word>undef</word>
 	</list>
-	
+
 	<word id="data/float" format="numbers">-?[0-9]*.[0-9]+f?</word>
 	<word id="data/decimal" format="numbers">-?[0-9]+[ulUL]*</word>
 </QNFA>

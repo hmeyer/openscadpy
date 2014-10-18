@@ -7,12 +7,12 @@ cubesize = 100
 def bars(maxIter = 1, offx=0,offy=0,iter=1):
 	s3 = cubesize / pow(3, iter)
 	res = [
-		translate([s3+offx,s3+offy,-1], 
+		translate([s3+offx,s3+offy,-1],
 			cube([s3, s3, cubesize+2]))]
 	if iter < maxIter:
 		iter+=1
 		res += [
-			bars(maxIter,offx+x*s3,offy+y*s3,iter) 
+			bars(maxIter,offx+x*s3,offy+y*s3,iter)
 				for x in range(0,3) for y in range (0,3)]
 	return union(res)
 

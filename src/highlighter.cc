@@ -53,6 +53,6 @@ void Highlighter::highlightBlock(const QString &text)
 		setFormat(parser_error_pos - n, 1, style);
 #endif
 	}
-*/	
+*/
 }
 

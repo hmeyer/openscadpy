@@ -22,7 +22,7 @@ def shape():
 			rotate(-pi/4, child=scale([ 0.7, 1.3 ], circle(5)))
 		]),
  		import_dxf( "example009.dxf",
-			"body",scale=2.0, convexity=10)	
+			"body",scale=2.0, convexity=10)
 	])
 
 

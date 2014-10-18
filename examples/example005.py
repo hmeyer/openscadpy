@@ -9,7 +9,7 @@ def example005():
 			translate([100, 0, 35], cube(50, True))
 		])]
 		+ map(lambda i:
-			translate([sin(pi*i/3)*80, 
+			translate([sin(pi*i/3)*80,
 				cos(pi*i/3)*80, 0 ],
 				cylinder(r=10,h=200)), range(0,6))
 		+ [translate([0, 0, 200],

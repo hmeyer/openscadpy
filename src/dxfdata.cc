@@ -436,7 +436,7 @@ DxfData::DxfData(const Accuracy &acc, const QString &filename, const QString &la
 		this->paths.append(Path());
 		Path *this_path = &this->paths.last();
 		this_path->is_closed = true;
-		
+
 		this_path->points.append(lines[current_line].p[current_point]);
 		while (1) {
 			this_path->points.append(lines[current_line].p[!current_point]);

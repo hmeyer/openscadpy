@@ -19,8 +19,8 @@ public:
 public slots:
 	//void zoomIn() { zoom(1); }
 	void zoomIn(int n = 1) { zoom(n); }
-	//void zoomOut() { zoom(-1); } 
-	void zoomOut(int n = 1) { zoom(-n); } 
+	//void zoomOut() { zoom(-1); }
+	void zoomOut(int n = 1) { zoom(-n); }
 #else
 	Editor(QWidget *parent) : QTextEdit(parent) {}
 public slots:

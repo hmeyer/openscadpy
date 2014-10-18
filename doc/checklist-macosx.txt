@@ -13,7 +13,7 @@ o Qt4
 o Build dependencies from source
 
   scripts/macosx-build-dependencies.sh
-  
+
 o Build and Deploy OpenSCAD
 
 # Update VERSION in publish-macosx.sh

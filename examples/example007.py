@@ -11,7 +11,7 @@ def clip():
 		)
 
 def cutout():
-	ext = map(lambda lay: translate([0, 0, -50], 
+	ext = map(lambda lay: translate([0, 0, -50],
 					dxf_linear_extrude(
 						file="example007.dxf",
 						layer=lay,
@@ -19,7 +19,7 @@ def cutout():
 						convexity=2)), ["cutout1", "cutout2"])
 	return intersection([
 		rotate(pi/2, [1, 0, 0], child=ext[0]),
-		rotate(pi/2, [0, 0, 1], 
+		rotate(pi/2, [0, 0, 1],
 			rotate(pi/2, [1, 0, 0], child=ext[1])
 		)
 	])

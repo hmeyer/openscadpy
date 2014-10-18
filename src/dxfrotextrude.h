@@ -39,7 +39,7 @@ public:
 	double scale;
 	QString filename, layername;
 	DxfRotateExtrudeNode(const AbstractNode::NodeList &children, const QString &filename, const QString &layer,
-	  Float2 origin, double scale, 
+	  Float2 origin, double scale,
 	  int convexity, const Accuracy &acc=Accuracy(), const Props p=Props())
 	    :AbstractPolyNode(p,children), Accuracy(acc), convexity(convexity),
 	    origin(origin), scale(scale), filename(filename), layername(layer) {}

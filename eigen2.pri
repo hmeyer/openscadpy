@@ -1,4 +1,4 @@
-# Optionally specify location of Eigen2 using the 
+# Optionally specify location of Eigen2 using the
 # EIGEN2DIR env. variable
 EIGEN2_DIR = $$(EIGEN2DIR)
 !isEmpty(EIGEN2_DIR) {
